@@ -1,0 +1,137 @@
+console.log("carga el app");
+const { remote } = require("electron");
+const main = remote.require("./main");
+
+const formularioProducto = document.querySelector("#productForm");
+const nombreProducto = document.querySelector("#name");
+const precioProducto = document.querySelector("#price");
+const descripcionProducto = document.querySelector("#description");
+const listaProductos = document.querySelector("#products");
+
+let productos = [];
+let editando = false;
+let idProductoEditar;
+
+const eliminarProducto = async (id) => {
+  const respuesta = confirm("¿Estás seguro de que quieres eliminarlo?");
+  if (respuesta) {
+    await main.eliminarProducto(id);
+    await obtenerProductos();
+  }
+  return;
+};
+
+const editarProducto = async (id) => {
+  const producto = await main.obtenerProductoPorId(id);
+  nombreProducto.value = producto.nombre;
+  precioProducto.value = producto.precio;
+  descripcionProducto.value = producto.descripcion;
+
+  editando = true;
+  idProductoEditar = id;
+  
+  // Actualizar título del formulario
+  document.querySelector("#formTitle").textContent = "Editar Producto";
+  document.querySelector("#submitText").textContent = "Actualizar";
+  document.querySelector("#cancelEdit").classList.remove("hidden");
+};
+
+formularioProducto.addEventListener("submit", async (e) => {
+  try {
+    e.preventDefault();
+
+    const producto = {
+      nombre: nombreProducto.value,
+      precio: precioProducto.value,
+      descripcion: descripcionProducto.value,
+    };
+
+    if (!editando) {
+      const productoCreado = await main.crearProducto(producto);
+      console.log(productoCreado);
+    } else {
+      const productoActualizado = await main.actualizarProducto(idProductoEditar, producto);
+      console.log(productoActualizado);
+
+      // Resetear estado de edición
+      editando = false;
+      idProductoEditar = "";
+      document.querySelector("#formTitle").textContent = "Agregar Producto";
+      document.querySelector("#submitText").textContent = "Guardar";
+      document.querySelector("#cancelEdit").classList.add("hidden");
+    }
+
+    formularioProducto.reset();
+    nombreProducto.focus();
+    obtenerProductos();
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// Botón cancelar edición
+document.querySelector("#cancelEdit").addEventListener("click", () => {
+  editando = false;
+  idProductoEditar = "";
+  formularioProducto.reset();
+  document.querySelector("#formTitle").textContent = "Agregar Producto";
+  document.querySelector("#submitText").textContent = "Guardar";
+  document.querySelector("#cancelEdit").classList.add("hidden");
+});
+
+function renderizarProductos(productos) {
+  listaProductos.innerHTML = "";
+  
+  if (productos.length === 0) {
+    listaProductos.innerHTML = `
+      <div class="text-center py-10 text-gray-500 dark:text-gray-400">
+        <i class="fas fa-box-open text-3xl mb-3"></i>
+        <p>No hay productos registrados</p>
+      </div>
+    `;
+    return;
+  }
+
+  productos.forEach((producto) => {
+    listaProductos.innerHTML += `
+      <div class="product-card bg-white dark:bg-gray-700 rounded-lg shadow p-4 mb-4 transition-all duration-300 hover:shadow-lg animate__animated animate__fadeIn">
+        <div class="flex justify-between items-start mb-2">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">${producto.nombre}</h3>
+          <span class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-sm font-medium px-2.5 py-0.5 rounded">
+            $${producto.precio}
+          </span>
+        </div>
+        
+        <p class="text-gray-600 dark:text-gray-300 mb-4">${producto.descripcion || 'Sin descripción'}</p>
+        
+        <div class="flex space-x-2">
+          <button onclick="eliminarProducto('${producto.id}')" 
+                  class="flex-1 bg-red-500 hover:bg-red-600 text-white py-1.5 px-3 rounded-lg text-sm transition duration-200">
+            <i class="fas fa-trash-alt mr-1"></i> Eliminar
+          </button>
+          
+          <button onclick="editarProducto('${producto.id}')" 
+                  class="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white py-1.5 px-3 rounded-lg text-sm transition duration-200">
+            <i class="fas fa-edit mr-1"></i> Editar
+          </button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+const obtenerProductos = async () => {
+  productos = await main.obtenerProductos();
+  renderizarProductos(productos);
+};
+
+async function init() {
+  obtenerProductos();
+  
+  // Asignar funciones al objeto window para que sean accesibles desde HTML
+  window.eliminarProducto = eliminarProducto;
+  window.editarProducto = editarProducto;
+}
+
+init();
+
