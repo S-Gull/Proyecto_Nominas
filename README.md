@@ -2,7 +2,7 @@
 
 Aplicación de escritorio construida con **Electron**, **MySQL** y **TailwindCSS** para la gestión de productos (CRUD). Permite agregar, editar, eliminar y listar productos en una base de datos MySQL, con una interfaz moderna y soporte para modo oscuro.
 
-![CRUD EN ELECTRONJS](./CrudElectron.png)
+![CRUD EN ELECTRONJS](./app/img/CrudElectron.png)
 
 ## Características
 
