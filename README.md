@@ -7,7 +7,7 @@ Aplicación de escritorio construida con **Electron**, **MySQL** y **TailwindCSS
 ## Características
 
 - CRUD de productos (nombre, precio, descripción)
-- Interfaz moderna con TailwindCSS y Animate.css
+- Interfaz moderna con TailwindCSS 
 - Notificaciones de escritorio con Electron
 - Modo oscuro
 - Recarga automática en desarrollo
