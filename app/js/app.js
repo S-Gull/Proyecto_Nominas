@@ -7,6 +7,7 @@ const nombreProducto = document.querySelector("#name");
 const precioProducto = document.querySelector("#price");
 const descripcionProducto = document.querySelector("#description");
 const listaProductos = document.querySelector("#products");
+let btnColorModo = document.getElementById("cambio-color")
 
 let productos = [];
 let editando = false;
@@ -135,3 +136,7 @@ async function init() {
 
 init();
 
+btnColorModo.addEventListener('click', ()=>{
+  document.documentElement.classList.toggle('dark')
+
+})
