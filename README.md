@@ -75,7 +75,6 @@ Esto abrirá una ventana de escritorio donde podrás crear, leer, actualizar y e
 * [**promise-mysql**](https://www.npmjs.com/package/promise-mysql): Un wrapper de `mysql` que utiliza Promises.
 * [**mysql**](https://www.npmjs.com/package/mysql): Driver de MySQL para Node.js.
 * [**tailwindcss**](https://tailwindcss.com/): Framework de CSS (utilizado vía CDN).
-* [**animate.css**](https://animate.style/): Biblioteca de animaciones CSS (utilizada vía CDN).
 * [**electron-reload**](https://www.npmjs.com/package/electron-reload): Recarga automáticamente la aplicación durante el desarrollo.
 
 ## Estructura del Proyecto
