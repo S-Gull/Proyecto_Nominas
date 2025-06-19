@@ -52,7 +52,7 @@ const actualizarProducto = async (id, producto) => {
   console.log(resultado);
 };
 
-function crearVentana() {
+const crearVentana = () => {
   ventana = new BrowserWindow({
     width: 1000,
     height: 700,
