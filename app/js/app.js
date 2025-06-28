@@ -22,6 +22,11 @@ const eliminarProducto = async (id) => {
   return;
 };
 
+const obtenerProductos = async () => {
+  productos = await main.obtenerProductos();
+  renderizarProductos(productos);
+};
+
 const editarProducto = async (id) => {
   const producto = await main.obtenerProductoPorId(id);
   nombreProducto.value = producto.nombre;
@@ -31,7 +36,6 @@ const editarProducto = async (id) => {
   editando = true;
   idProductoEditar = id;
   
-  // Actualizar título del formulario
   document.querySelector("#formTitle").textContent = "Editar Producto";
   document.querySelector("#submitText").textContent = "Actualizar";
   document.querySelector("#cancelEdit").classList.remove("hidden");
@@ -48,13 +52,9 @@ formularioProducto.addEventListener("submit", async (e) => {
     };
 
     if (!editando) {
-      const productoCreado = await main.crearProducto(producto);
-      console.log(productoCreado);
+      await main.crearProducto(producto);
     } else {
-      const productoActualizado = await main.actualizarProducto(idProductoEditar, producto);
-      console.log(productoActualizado);
-
-      // Resetear estado de edición
+      await main.actualizarProducto(idProductoEditar, producto);
       editando = false;
       idProductoEditar = "";
       document.querySelector("#formTitle").textContent = "Agregar Producto";
@@ -70,7 +70,6 @@ formularioProducto.addEventListener("submit", async (e) => {
   }
 });
 
-// Botón cancelar edición
 document.querySelector("#cancelEdit").addEventListener("click", () => {
   editando = false;
   idProductoEditar = "";
@@ -121,15 +120,8 @@ function renderizarProductos(productos) {
   });
 }
 
-const obtenerProductos = async () => {
-  productos = await main.obtenerProductos();
-  renderizarProductos(productos);
-};
-
 async function init() {
   obtenerProductos();
-  
-  // Asignar funciones al objeto window para que sean accesibles desde HTML
   window.eliminarProducto = eliminarProducto;
   window.editarProducto = editarProducto;
 }
@@ -138,5 +130,4 @@ init();
 
 btnColorModo.addEventListener('click', ()=>{
   document.documentElement.classList.toggle('dark')
-
-})
+});

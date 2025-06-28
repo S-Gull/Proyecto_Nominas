@@ -1,9 +1,23 @@
 {
   "name": "electron-mysql-crud",
   "version": "1.0.0",
-  "description": "",
+  "description": "Aplicación de escritorio construida con **Electron**, **MySQL** y **TailwindCSS** para la gestión de productos (CRUD). Permite agregar, editar, eliminar y listar productos en una base de datos MySQL, con una interfaz moderna y soporte para modo oscuro.",
+  "keywords": [],
+  "homepage": "https://github.com/S-Gull/crud_tailwin_electron#readme",
+  "bugs": {
+    "url": "https://github.com/S-Gull/crud_tailwin_electron/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/S-Gull/crud_tailwin_electron.git"
+  },
+  "license": "ISC",
+  "author": "Guillem, Victor",
+  "type": "commonjs",
   "main": "app/js/index.js",
-  
+  "scripts": {
+    "start": "electron ."
+  },
   "dependencies": {
     "anymatch": "^3.1.1",
     "bignumber.js": "^9.0.0",
@@ -116,13 +130,5 @@
     "wrappy": "^1.0.2",
     "yallist": "^4.0.0",
     "yauzl": "^2.10.0"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "start": "electron ."
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  }
 }
