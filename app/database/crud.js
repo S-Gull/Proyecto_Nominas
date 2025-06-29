@@ -1,39 +1,42 @@
-const { obtenerConexion } = require("./database");
+const { query } = require("./conexion");
 
-const crearProducto = async (producto) => {
-  const conexion = await obtenerConexion();
-  producto.precio = parseFloat(producto.precio);
-  const resultado = await conexion.query("INSERT INTO productos SET ?", producto);
-  producto.id = resultado.insertId;
-  return producto;
-};
+// Funciones CRUD usando el estilo callback de PHP
+function crearProducto(producto, callback) {
+  const sql = "INSERT INTO productos SET ?";
+  query(sql, producto, (err, result) => {
+    if (err) return callback(err);
+    callback(null, { ...producto, id: result.insertId });
+  });
+}
 
-const obtenerProductos = async () => {
-  const conexion = await obtenerConexion();
-  const resultados = await conexion.query("SELECT * FROM productos ORDER BY id DESC");
-  return resultados;
-};
+function obtenerProductos(callback) {
+  query("SELECT * FROM productos ORDER BY id DESC", (err, results) => {
+    if (err) return callback(err);
+    callback(null, results);
+  });
+}
 
-const eliminarProducto = async (id) => {
-  const conexion = await obtenerConexion();
-  const resultado = await conexion.query("DELETE FROM productos WHERE id = ?", id);
-  return resultado;
-};
+function eliminarProducto(id, callback) {
+  query("DELETE FROM productos WHERE id = ?", [id], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result);
+  });
+}
 
-const obtenerProductoPorId = async (id) => {
-  const conexion = await obtenerConexion();
-  const resultado = await conexion.query("SELECT * FROM productos WHERE id = ?", id);
-  return resultado[0];
-};
+function obtenerProductoPorId(id, callback) {
+  query("SELECT * FROM productos WHERE id = ?", [id], (err, results) => {
+    if (err) return callback(err);
+    callback(null, results[0]);
+  });
+}
 
-const actualizarProducto = async (id, producto) => {
-  const conexion = await obtenerConexion();
-  const resultado = await conexion.query("UPDATE productos SET ? WHERE id = ?", [
-    producto,
-    id,
-  ]);
-  return resultado;
-};
+function actualizarProducto(id, producto, callback) {
+  const sql = "UPDATE productos SET ? WHERE id = ?";
+  query(sql, [producto, id], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result);
+  });
+}
 
 module.exports = {
   crearProducto,

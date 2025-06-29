@@ -98,7 +98,6 @@
     "prepend-http": "^2.0.0",
     "process-nextick-args": "^2.0.1",
     "progress": "^2.0.3",
-    "promise-mysql": "^4.1.4",
     "proto-list": "^1.2.4",
     "pseudomap": "^1.0.2",
     "pump": "^3.0.0",

@@ -2,7 +2,7 @@ console.log('carga el index');
 const { crearVentana } = require("./main");
 const { app } = require("electron");
 
-require('../database/database');
+require('../database/conexion');
 
 require('electron-reload')(__dirname);
 
