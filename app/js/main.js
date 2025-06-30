@@ -1,69 +1,69 @@
-console.log('carga el main');
+console.log('carga el main_vcga');
 const { BrowserWindow } = require("electron");
 const path = require('path');
-const crud = require("../database/crud");
+const crud_vcga = require("../database/crud");
 
-const rutaApp = path.join(__dirname, '..', '/');
+const rutaApp_vcga = path.join(__dirname, '..', '/');
 
-let ventana;
+let ventana_vcga;
 
 // Adaptamos las funciones para que devuelvan promesas
-const crearProducto = (producto) => {
-  return new Promise((resolve, reject) => {
-    crud.crearProducto(producto, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
+const crearProducto_vcga = (producto_vcga) => {
+  return new Promise((resolve_vcga, reject_vcga) => {
+    crud_vcga.crearProducto_vcga(producto_vcga, (err_vcga, result_vcga) => {
+      if (err_vcga) return reject_vcga(err_vcga);
+      resolve_vcga(result_vcga);
     });
   });
 };
 
 // Repetimos el mismo patrón para las demás funciones
-const obtenerProductos = () => new Promise((resolve, reject) => {
-  crud.obtenerProductos((err, results) => {
-    if (err) return reject(err);
-    resolve(results);
+const obtenerProductos_vcga = () => new Promise((resolve_vcga, reject_vcga) => {
+  crud_vcga.obtenerProductos_vcga((err_vcga, results_vcga) => {
+    if (err_vcga) return reject_vcga(err_vcga);
+    resolve_vcga(results_vcga);
   });
 });
 
-const eliminarProducto = (id) => new Promise((resolve, reject) => {
-  crud.eliminarProducto(id, (err, result) => {
-    if (err) return reject(err);
-    resolve(result);
+const eliminarProducto_vcga = (id_vcga) => new Promise((resolve_vcga, reject_vcga) => {
+  crud_vcga.eliminarProducto_vcga(id_vcga, (err_vcga, result_vcga) => {
+    if (err_vcga) return reject_vcga(err_vcga);
+    resolve_vcga(result_vcga);
   });
 });
 
-const obtenerProductoPorId = (id) => new Promise((resolve, reject) => {
-  crud.obtenerProductoPorId(id, (err, result) => {
-    if (err) return reject(err);
-    resolve(result);
+const obtenerProductoPorId_vcga = (id_vcga) => new Promise((resolve_vcga, reject_vcga) => {
+  crud_vcga.obtenerProductoPorId_vcga(id_vcga, (err_vcga, result_vcga) => {
+    if (err_vcga) return reject_vcga(err_vcga);
+    resolve_vcga(result_vcga);
   });
 });
 
-const actualizarProducto = (id, producto) => new Promise((resolve, reject) => {
-  crud.actualizarProducto(id, producto, (err, result) => {
-    if (err) return reject(err);
-    resolve(result);
+const actualizarProducto_vcga = (id_vcga, producto_vcga) => new Promise((resolve_vcga, reject_vcga) => {
+  crud_vcga.actualizarProducto_vcga(id_vcga, producto_vcga, (err_vcga, result_vcga) => {
+    if (err_vcga) return reject_vcga(err_vcga);
+    resolve_vcga(result_vcga);
   });
 });
 
-const crearVentana = () => {
-  ventana = new BrowserWindow({
-    width: 1000,
-    height: 700,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false
+const crearVentana_vcga = () => {
+  ventana_vcga = new BrowserWindow({
+    width_vcga: 1000,
+    height_vcga: 700,
+    webPreferences_vcga: {
+      nodeIntegration_vcga: true,
+      contextIsolation_vcga: false
     },
   });
 
-  ventana.loadFile(rutaApp + 'index.html');
+  ventana_vcga.loadFile(rutaApp_vcga + 'index.html');
 }
 
 module.exports = {
-  crearVentana,
-  crearProducto,
-  obtenerProductos,
-  eliminarProducto,
-  obtenerProductoPorId,
-  actualizarProducto
+  crearVentana_vcga,
+  crearProducto_vcga,
+  obtenerProductos_vcga,
+  eliminarProducto_vcga,
+  obtenerProductoPorId_vcga,
+  actualizarProducto_vcga
 };

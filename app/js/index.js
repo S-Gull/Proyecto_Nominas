@@ -1,5 +1,5 @@
 console.log('carga el index');
-const { crearVentana } = require("./main");
+const { crearVentana_vcga } = require("./main");
 const { app } = require("electron");
 
 require('../database/conexion');
@@ -7,4 +7,4 @@ require('../database/conexion');
 require('electron-reload')(__dirname);
 
 app.allowRendererProcessReuse = true;
-app.whenReady().then(crearVentana);
+app.whenReady().then(crearVentana_vcga);

@@ -1,47 +1,47 @@
-const { query } = require("./conexion");
+const { query_vcga } = require("./conexion");
 
 // Funciones CRUD usando el estilo callback de PHP
-function crearProducto(producto, callback) {
-  const sql = "INSERT INTO productos SET ?";
-  query(sql, producto, (err, result) => {
-    if (err) return callback(err);
-    callback(null, { ...producto, id: result.insertId });
+const crearProducto_vcga = (producto_vcga, callback_vcga) => {
+  const sql_vcga = "INSERT INTO productos SET ?";
+  query_vcga(sql_vcga, producto_vcga, (err_vcga, result_vcga) => {
+    if (err_vcga) return callback_vcga(err_vcga);
+    callback_vcga(null, { ...producto_vcga, id: result_vcga.insertId });
   });
 }
 
-function obtenerProductos(callback) {
-  query("SELECT * FROM productos ORDER BY id DESC", (err, results) => {
-    if (err) return callback(err);
-    callback(null, results);
+const obtenerProductos_vcga = (callback_vcga) => {
+  query_vcga("SELECT * FROM productos ORDER BY id DESC", (err_vcga, results_vcga) => {
+    if (err_vcga) return callback_vcga(err_vcga);
+    callback_vcga(null, results_vcga);
   });
 }
 
-function eliminarProducto(id, callback) {
-  query("DELETE FROM productos WHERE id = ?", [id], (err, result) => {
-    if (err) return callback(err);
-    callback(null, result);
+const eliminarProducto_vcga = (id_vcga, callback_vcga) => {
+  query_vcga("DELETE FROM productos WHERE id = ?", [id_vcga], (err_vcga, result_vcga) => {
+    if (err_vcga) return callback_vcga(err_vcga);
+    callback_vcga(null, result_vcga);
   });
 }
 
-function obtenerProductoPorId(id, callback) {
-  query("SELECT * FROM productos WHERE id = ?", [id], (err, results) => {
-    if (err) return callback(err);
-    callback(null, results[0]);
+const obtenerProductoPorId_vcga = (id_vcga, callback_vcga) => {
+  query_vcga("SELECT * FROM productos WHERE id = ?", [id_vcga], (err_vcga, results_vcga) => {
+    if (err_vcga) return callback_vcga(err_vcga);
+    callback_vcga(null, results_vcga[0]);
   });
 }
 
-function actualizarProducto(id, producto, callback) {
-  const sql = "UPDATE productos SET ? WHERE id = ?";
-  query(sql, [producto, id], (err, result) => {
-    if (err) return callback(err);
-    callback(null, result);
+const actualizarProducto_vcga = (id_vcga, producto_vcga, callback_vcga) => {
+  const sql_vcga = "UPDATE productos SET ? WHERE id = ?";
+  query_vcga(sql_vcga, [producto_vcga, id_vcga], (err_vcga, result_vcga) => {
+    if (err_vcga) return callback_vcga(err_vcga);
+    callback_vcga(null, result_vcga);
   });
 }
 
 module.exports = {
-  crearProducto,
-  obtenerProductos,
-  eliminarProducto,
-  obtenerProductoPorId,
-  actualizarProducto
+  crearProducto_vcga,
+  obtenerProductos_vcga,
+  eliminarProducto_vcga,
+  obtenerProductoPorId_vcga,
+  actualizarProducto_vcga
 };
