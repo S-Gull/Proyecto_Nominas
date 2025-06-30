@@ -12,7 +12,7 @@ const connection_vcga = mysql_vcga.createConnection({
 // Conectar a la base de datos
 connection_vcga.connect((err_vcga) => {
   if (err_vcga) {
-    console.error('Error de conexión_vcga:', err_vcga);
+    console.error('Error de conexión_vcga:', err_vcga.stack);
     return;
   }
   console.log('Conectado a MySQL_vcga');
