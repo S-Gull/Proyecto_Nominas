@@ -100,7 +100,7 @@ function asignarEventos() {
 }
 
 // En renderizarProductos, actualiza los botones:
->>>>>>> main
+
 
 function renderizarProductos(productos) {
   listaProductos.innerHTML = "";
@@ -138,7 +138,7 @@ function renderizarProductos(productos) {
       </div>
     `;
     
-    listaProductos.appendChild(productCard);\
+    listaProductos.appendChild(productCard);
   });
   
   asignarEventos(); 
