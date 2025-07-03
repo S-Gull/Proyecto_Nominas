@@ -100,11 +100,18 @@ function asignarEventos() {
 }
 
 // En renderizarProductos, actualiza los botones:
+
 function renderizarProductos(productos) {
   listaProductos.innerHTML = "";
   
   if (productos.length === 0) {
-    // ... mismo código
+    listaProductos.innerHTML = `
+      <div class="text-center py-10 text-gray-500 dark:text-gray-400">
+        <i class="fas fa-box-open text-3xl mb-3"></i>
+        <p>No hay productos registrados</p>
+      </div>
+    `;
+    return;
   }
 
   productos.forEach((producto) => {
