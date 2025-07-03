@@ -1,6 +1,5 @@
 console.log("carga el app");
 const { ipcRenderer } = require("electron")
-// const main = remote.require("./main");
 
 const formularioProducto = document.querySelector("#productForm");
 const nombreProducto = document.querySelector("#name");
@@ -85,6 +84,7 @@ document.querySelector("#cancelEdit").addEventListener("click", () => {
   document.querySelector("#cancelEdit").classList.add("hidden");
 });
 
+
 function renderizarProductos(productos) {
   listaProductos.innerHTML = "";
   
@@ -97,39 +97,59 @@ function renderizarProductos(productos) {
     `;
     return;
   }
-
   productos.forEach((producto) => {
-    listaProductos.innerHTML += `
-      <div class="product-card bg-white dark:bg-gray-700 rounded-lg shadow p-4 mb-4 transition-all duration-300 hover:shadow-lg animate__animated animate__fadeIn">
-        <div class="flex justify-between items-start mb-2">
-          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">${producto.nombre}</h3>
-          <span class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-sm font-medium px-2.5 py-0.5 rounded">
-            $${producto.precio}
-          </span>
-        </div>
+    const productCard = document.createElement('div');
+    productCard.className = 'product-card bg-white dark:bg-gray-700 rounded-lg shadow p-4 mb-4 transition-all duration-300 hover:shadow-lg animate__animated animate__fadeIn';
+    productCard.innerHTML = `
+      <div class="flex justify-between items-start mb-2">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">${producto.nombre}</h3>
+        <span class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-sm font-medium px-2.5 py-0.5 rounded">
+          $${producto.precio}
+        </span>
+      </div>
+      
+      <p class="text-gray-600 dark:text-gray-300 mb-4">${producto.descripcion || 'Sin descripción'}</p>
+      
+      <div class="flex space-x-2">
+        <button data-id="${producto.id}" class="btn-eliminar flex-1 bg-red-500 hover:bg-red-600 text-white py-1.5 px-3 rounded-lg text-sm transition duration-200">
+          <i class="fas fa-trash-alt mr-1"></i> Eliminar
+        </button>
         
-        <p class="text-gray-600 dark:text-gray-300 mb-4">${producto.descripcion || 'Sin descripción'}</p>
-        
-        <div class="flex space-x-2">
-          <button onclick="eliminarProducto('${producto.id}')" 
-                  class="flex-1 bg-red-500 hover:bg-red-600 text-white py-1.5 px-3 rounded-lg text-sm transition duration-200">
-            <i class="fas fa-trash-alt mr-1"></i> Eliminar
-          </button>
-          
-          <button onclick="editarProducto('${producto.id}')" 
-                  class="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white py-1.5 px-3 rounded-lg text-sm transition duration-200">
-            <i class="fas fa-edit mr-1"></i> Editar
-          </button>
-        </div>
+        <button data-id="${producto.id}" class="btn-editar flex-1 bg-indigo-500 hover:bg-indigo-600 text-white py-1.5 px-3 rounded-lg text-sm transition duration-200">
+          <i class="fas fa-edit mr-1"></i> Editar
+        </button>
       </div>
     `;
+    
+    listaProductos.appendChild(productCard);
+  });
+  
+  asignarEventos(); 
+}
+
+
+function asignarEventos() {
+  document.querySelectorAll('.btn-eliminar').forEach(btn => {
+    btn.addEventListener('click', () => {
+      eliminarProducto(btn.dataset.id);
+    });
+  });
+  
+  document.querySelectorAll('.btn-editar').forEach(btn => {
+    btn.addEventListener('click', () => {
+      editarProducto(btn.dataset.id);
+    });
   });
 }
+
 
 async function init() {
   obtenerProductos();
   window.eliminarProducto = eliminarProducto;
   window.editarProducto = editarProducto;
+
+
+
 }
 
 init();

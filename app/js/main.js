@@ -5,12 +5,15 @@ const crud = require("../database/crud");
 let ventana;
 
 function crearVentana() {
-  ventana = new BrowserWindow({
+    ventana = new BrowserWindow({
     width: 1000,
     height: 700,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false // Para compatibilidad rápida, aunque se recomienda true + preload.js
+      nodeIntegration: false, // IMPORTANTE: deshabilitar
+      contextIsolation: true // HABILITAR seguridad
+      
+     // Archivo de precarga
+    
     }
   });
   ventana.loadFile(path.join(__dirname, '..', 'index.html'));
