@@ -84,6 +84,24 @@ document.querySelector("#cancelEdit").addEventListener("click", () => {
   document.querySelector("#cancelEdit").classList.add("hidden");
 });
 
+<<<<<<< HEAD
+=======
+function asignarEventos() {
+  document.querySelectorAll('.btn-eliminar').forEach(btn => {
+    btn.addEventListener('click', () => {
+      eliminarProducto(btn.dataset.id);
+    });
+  });
+  
+  document.querySelectorAll('.btn-editar').forEach(btn => {
+    btn.addEventListener('click', () => {
+      editarProducto(btn.dataset.id);
+    });
+  });
+}
+
+// En renderizarProductos, actualiza los botones:
+>>>>>>> main
 
 function renderizarProductos(productos) {
   listaProductos.innerHTML = "";
@@ -122,6 +140,7 @@ function renderizarProductos(productos) {
     `;
     
     listaProductos.appendChild(productCard);
+<<<<<<< HEAD
   });
   
   asignarEventos(); 
@@ -139,7 +158,11 @@ function asignarEventos() {
     btn.addEventListener('click', () => {
       editarProducto(btn.dataset.id);
     });
+=======
+>>>>>>> main
   });
+  
+  asignarEventos(); // Asignar eventos después de renderizar
 }
 
 
