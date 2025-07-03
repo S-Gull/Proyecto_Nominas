@@ -1,6 +1,6 @@
 console.log("carga el app");
-const { remote } = require("electron");
-const main = remote.require("./main");
+const { ipcRenderer } = require("electron")
+// const main = remote.require("./main");
 
 const formularioProducto = document.querySelector("#productForm");
 const nombreProducto = document.querySelector("#name");
@@ -16,19 +16,19 @@ let idProductoEditar;
 const eliminarProducto = async (id) => {
   const respuesta = confirm("¿Estás seguro de que quieres eliminarlo?");
   if (respuesta) {
-    await main.eliminarProducto(id);
+    await ipcRenderer.invoke("eliminar-producto", id);
     await obtenerProductos();
   }
   return;
 };
 
 const obtenerProductos = async () => {
-  productos = await main.obtenerProductos();
+  productos = await ipcRenderer.invoke("obtener-productos");
   renderizarProductos(productos);
 };
 
 const editarProducto = async (id) => {
-  const producto = await main.obtenerProductoPorId(id);
+  const producto = await ipcRenderer.invoke("obtener-producto-por-id", id);
   nombreProducto.value = producto.nombre;
   precioProducto.value = producto.precio;
   descripcionProducto.value = producto.descripcion;
@@ -52,9 +52,9 @@ formularioProducto.addEventListener("submit", async (e) => {
     };
 
     if (!editando) {
-      await main.crearProducto(producto);
+      await ipcRenderer.invoke("crear-producto", producto);
     } else {
-      await main.actualizarProducto(idProductoEditar, producto);
+      await ipcRenderer.invoke("actualizar-producto", idProductoEditar, producto);
       editando = false;
       idProductoEditar = "";
       document.querySelector("#formTitle").textContent = "Agregar Producto";
