@@ -29,6 +29,11 @@ const obtenerProductos = async () => {
 
 const editarProducto = async (id) => {
   const producto = await ipcRenderer.invoke("obtener-producto-por-id", id);
+  if (!producto) {
+    console.log(producto);
+    alert("Producto no encontrado");
+    return;
+  } else { 
   nombreProducto.value = producto.nombre;
   precioProducto.value = producto.precio;
   descripcionProducto.value = producto.descripcion;
@@ -39,6 +44,7 @@ const editarProducto = async (id) => {
   document.querySelector("#formTitle").textContent = "Editar Producto";
   document.querySelector("#submitText").textContent = "Actualizar";
   document.querySelector("#cancelEdit").classList.remove("hidden");
+}
 };
 
 formularioProducto.addEventListener("submit", async (e) => {

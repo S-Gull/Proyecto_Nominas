@@ -48,7 +48,7 @@ ipcMain.handle("obtener-producto-por-id", async (event, id) => {
   return new Promise((resolve, reject) => {
     crud.obtenerProductoPorId(id, (err, results) => {
       if (err) reject(err);
-      else resolve(results[0]);
+      else resolve(results && results[0] ? results[0] : null);
     });
   });
 });

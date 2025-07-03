@@ -25,8 +25,7 @@ function eliminarProducto(id, callback) {
 
 function obtenerProductoPorId(id, callback) {
   query("SELECT * FROM productos WHERE id = ?", [id], (err, results) => {
-    if (err) return callback(err);
-    callback(null, results[0]);
+    callback(err, results);
   });
 }
 
@@ -37,6 +36,7 @@ function actualizarProducto(id, producto, callback) {
     callback(null, result);
   });
 }
+
 
 module.exports = {
   crearProducto,
