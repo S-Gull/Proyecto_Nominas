@@ -84,8 +84,7 @@ document.querySelector("#cancelEdit").addEventListener("click", () => {
   document.querySelector("#cancelEdit").classList.add("hidden");
 });
 
-<<<<<<< HEAD
-=======
+
 function asignarEventos() {
   document.querySelectorAll('.btn-eliminar').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -139,8 +138,7 @@ function renderizarProductos(productos) {
       </div>
     `;
     
-    listaProductos.appendChild(productCard);
-<<<<<<< HEAD
+    listaProductos.appendChild(productCard);\
   });
   
   asignarEventos(); 
@@ -158,8 +156,7 @@ function asignarEventos() {
     btn.addEventListener('click', () => {
       editarProducto(btn.dataset.id);
     });
-=======
->>>>>>> main
+
   });
   
   asignarEventos(); // Asignar eventos después de renderizar
