@@ -1,5 +1,5 @@
 console.log('carga el index');
-const { crearVentana } = require("./main");
+const { crearVentana } = require("../js/main");
 const { app } = require("electron");
 
 require('../database/conexion');

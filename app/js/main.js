@@ -13,7 +13,7 @@ function crearVentana() {
       contextIsolation: false // Para compatibilidad rápida, aunque se recomienda true + preload.js
     }
   });
-  ventana.loadFile(path.join(__dirname, '..', 'index.html'));
+  ventana.loadFile(path.join(__dirname, '..','/','views','/' ,'index.html'));
 }
 
 // Handlers IPC
