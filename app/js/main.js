@@ -14,6 +14,7 @@ function crearVentana() {
     }
   });
   ventana.loadFile(path.join(__dirname, '..','/','views','/' ,'index.html'));
+    // ventana.loadFile(path.join(__dirname, '..', 'index.html'));
 }
 
 // Handlers IPC
