@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="min-h-screen bg-light dark:bg-dark-900 transition-colors duration-200">
+    <!-- Contenedor Grid Principal -->
+    <div class="grid min-h-screen grid-rows-[auto_1fr_auto] gap-6">
+        <!-- Header -->
+        <header class="bg-white p-6 shadow-lg dark:bg-dark-800">
+            <div class="container mx-auto flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white font-verdana">Gestión<span class="text-accent1">Usuarios</span></h2>
+                <button id="cambio-color" class="p-2 rounded-full bg-gray-200 dark:bg-dark-700">
+                    <i class="fas fa-moon dark:fa-sun text-gray-700 dark:text-gray-200"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main - Contenido -->
+        <main id="plantilla" class="container mx-auto px-4 py-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Formulario de Usuarios -->
+                <div class="bg-white rounded-xl shadow-lg p-6 dark:bg-dark-800 animate__animated animate__fadeInLeft card">
+                    <h2 class="text-xl font-semibold mb-6 text-gray-800 dark:text-white font-verdana" id="formTitle">Agregar Usuario</h2>
+                    <form id="userForm" class="space-y-4">
+                        <input type="hidden" id="id_usuario">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Departamento -->
+                            <div>
+                                <label for="id_departamento" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Departamento</label>
+                                <select id="id_departamento" required
+                                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                                    <option value="">Seleccione un departamento</option>
+                                    <option value="1">Administración</option>
+                                    <option value="2">Recursos Humanos</option>
+                                    <option value="3">Tecnología</option>
+                                    <option value="4">Ventas</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Rol -->
+                            <div>
+                                <label for="id_rol" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rol</label>
+                                <select id="id_rol" required
+                                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                                    <option value="">Seleccione un rol</option>
+                                    <option value="1">Administrador</option>
+                                    <option value="2">Usuario</option>
+                                    <option value="3">Supervisor</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Cargo -->
+                            <div>
+                                <label for="id_cargo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cargo</label>
+                                <select id="id_cargo" required
+                                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                                    <option value="">Seleccione un cargo</option>
+                                    <option value="1">Gerente</option>
+                                    <option value="2">Analista</option>
+                                    <option value="3">Desarrollador</option>
+                                    <option value="4">Asistente</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Status -->
+                            <div>
+                                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Estado</label>
+                                <select id="status" required
+                                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                                    <option value="">Seleccione un estado</option>
+                                    <option value="Trabajando">Trabajando</option>
+                                    <option value="De Vacaciones">De Vacaciones</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Nombre Completo -->
+                        <div>
+                            <label for="nombre_completo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre Completo</label>
+                            <input type="text" id="nombre_completo" placeholder="Nombre completo" required
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Cédula -->
+                            <div>
+                                <label for="cedula" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cédula</label>
+                                <input type="text" id="cedula" placeholder="Cédula" required
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                            </div>
+                            
+                            <!-- RIF -->
+                            <div>
+                                <label for="rif" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">RIF</label>
+                                <input type="text" id="rif" placeholder="RIF" required
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Fecha de Nacimiento -->
+                            <div>
+                                <label for="fecha_nacimiento" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fecha de Nacimiento</label>
+                                <input type="date" id="fecha_nacimiento" required
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                            
+                            <!-- Fecha de Ingreso -->
+                            <div>
+                                <label for="fecha_ingreso" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fecha de Ingreso</label>
+                                <input type="date" id="fecha_ingreso" required
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Correo Electrónico -->
+                            <div>
+                                <label for="correo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Correo Electrónico</label>
+                                <input type="email" id="correo" placeholder="Correo electrónico" required
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                            </div>
+                            
+                            <!-- Teléfono -->
+                            <div>
+                                <label for="telefono" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Teléfono</label>
+                                <input type="tel" id="telefono" placeholder="Teléfono" required
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                            </div>
+                        </div>
+                        
+                        <!-- Clave -->
+                        <div>
+                            <label for="clave" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Clave</label>
+                            <input type="password" id="clave" placeholder="Clave" required
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                        </div>
+                        
+                        <div class="flex space-x-3">
+                            <button type="submit" 
+                                    class="flex-1 bg-accent1 hover:bg-accent2 text-white font-medium py-2 px-4 rounded-lg transition duration-300 dark:bg-accent1 dark:hover:bg-accent2">
+                                <i class="fas fa-save mr-2"></i> <span id="submitText">Guardar</span>
+                            </button>
+                            
+                            <button type="button" id="cancelEdit" 
+                                    class="hidden bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+                                <i class="fas fa-times mr-2"></i> Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Lista de Usuarios -->
+                <div class="bg-white rounded-xl shadow-lg p-6 dark:bg-dark-800 animate__animated animate__fadeInRight card">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white font-verdana">Lista de Usuarios</h2>
+                        <div class="relative">
+                            <input type="text" id="searchInput" placeholder="Buscar..." 
+                                   class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <div id="users" class="space-y-4">
+                        <!-- Los usuarios se cargarán aquí dinámicamente -->
+                        <div class="text-center py-10 text-gray-500 dark:text-gray-400" id="loadingMessage">
+                            <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                            <p>Cargando usuarios...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white p-6 shadow-lg dark:bg-dark-800">
+            <div class="container mx-auto">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div class="text-center md:text-left mb-6 md:mb-0">
+                        <p class="text-gray-600 dark:text-gray-300 text-sm">
+                            © 2025 Sistema de Gestión de Usuarios. Todos los derechos reservados.
+                        </p>
+                    </div>
+                    
+                    <!-- Tarjetas de desarrolladores -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Tarjeta Victor -->
+                        <div class="flex items-center space-x-4 badge py-3 px-4 rounded-xl">
+                            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
+                                <span class="text-2xl">👤</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-800 dark:text-white font-medium">Victor Contreras</p>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">30.520.132</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Tarjeta Guillermo -->
+                        <div class="flex items-center space-x-4 badge py-3 px-4 rounded-xl">
+                            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
+                                <span class="text-2xl">👤</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-800 dark:text-white font-medium">Guillermo Álvarez</p>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">30.165.318</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Enlaces legales -->
+                    <div class="flex flex-wrap justify-center gap-4 mt-6 md:mt-0">
+                        <a href="#" class="text-gray-600 hover:text-accent1 dark:text-gray-400 dark:hover:text-accent1 text-sm">Términos</a>
+                        <a href="#" class="text-gray-600 hover:text-accent1 dark:text-gray-400 dark:hover:text-accent1 text-sm">Privacidad</a>
+                        <a href="#" class="text-gray-600 hover:text-accent1 dark:text-gray-400 dark:hover:text-accent1 text-sm">Licencia</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Datos de ejemplo para la demo
+        const sampleUsers = [
+            {
+                id: 1,
+                nombre: 'María Rodríguez',
+                cedula: 'V-25.456.789',
+                cargo: 'Gerente de Ventas',
+                departamento: 'Ventas',
+                status: 'Trabajando',
+                fecha_ingreso: '2020-05-15'
+            },
+            {
+                id: 2,
+                nombre: 'Carlos Pérez',
+                cedula: 'V-20.123.456',
+                cargo: 'Desarrollador Senior',
+                departamento: 'Tecnología',
+                status: 'De Vacaciones',
+                fecha_ingreso: '2019-11-20'
+            },
+            {
+                id: 3,
+                nombre: 'Ana Martínez',
+                cedula: 'V-22.987.654',
+                cargo: 'Analista de RRHH',
+                departamento: 'Recursos Humanos',
+                status: 'Trabajando',
+                fecha_ingreso: '2021-02-10'
+            },
+            {
+                id: 4,
+                nombre: 'Luis Gómez',
+                cedula: 'V-19.876.543',
+                cargo: 'Asistente Administrativo',
+                departamento: 'Administración',
+                status: 'Trabajando',
+                fecha_ingreso: '2022-08-05'
+            }
+        ];
+        
+        // Función para cargar usuarios en la lista
+        function loadUsers(users) {
+            const usersContainer = document.getElementById('users');
+            usersContainer.innerHTML = '';
+            
+            if (users.length === 0) {
+                usersContainer.innerHTML = `
+                    <div class="text-center py-10 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-user-slash text-2xl mb-2"></i>
+                        <p>No se encontraron usuarios</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            users.forEach(user => {
+                const userElement = document.createElement('div');
+                userElement.className = 'bg-gray-50 dark:bg-dark-700 rounded-lg p-4 border border-gray-200 dark:border-gray-700';
+                userElement.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-semibold text-gray-800 dark:text-white">${user.nombre}</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${user.cargo} · ${user.departamento}</p>
+                            <div class="flex items-center mt-2">
+                                <span class="status-badge ${user.status === 'Trabajando' ? 'status-working' : 'status-vacation'}">
+                                    ${user.status}
+                                </span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400 ml-3">
+                                    <i class="fas fa-id-card mr-1"></i> ${user.cedula}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="edit-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600" data-id="${user.id}">
+                                <i class="fas fa-edit text-accent1"></i>
+                            </button>
+                            <button class="delete-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600" data-id="${user.id}">
+                                <i class="fas fa-trash text-red-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-calendar-day mr-1"></i> Ingreso: ${formatDate(user.fecha_ingreso)}
+                        </span>
+                        <span class="text-gray-500 dark:text-gray-400">
+                            ID: ${user.id}
+                        </span>
+                    </div>
+                `;
+                usersContainer.appendChild(userElement);
+            });
+            
+            // Agregar event listeners a los botones
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', () => editUser(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', () => deleteUser(btn.dataset.id));
+            });
+        }
+        
+        // Función para formatear fechas
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        }
+        
+        // Función para simular la edición de un usuario
+        function editUser(userId) {
+            const user = sampleUsers.find(u => u.id == userId);
+            if (!user) return;
+            
+            document.getElementById('formTitle').textContent = 'Editar Usuario';
+            document.getElementById('submitText').textContent = 'Actualizar';
+            document.getElementById('cancelEdit').classList.remove('hidden');
+            
+            // Aquí iría la lógica para llenar el formulario con los datos del usuario
+            // Simulación:
+            document.getElementById('id_usuario').value = user.id;
+            document.getElementById('nombre_completo').value = user.nombre;
+            
+            // Cambiar animación del formulario para indicar edición
+            const formCard = document.querySelector('.animate__fadeInLeft');
+            formCard.classList.remove('animate__fadeInLeft');
+            void formCard.offsetWidth; // Trigger reflow
+            formCard.classList.add('animate__pulse');
+            
+            setTimeout(() => {
+                formCard.classList.remove('animate__pulse');
+                formCard.classList.add('animate__fadeInLeft');
+            }, 500);
+        }
+        
+        // Función para eliminar un usuario
+        function deleteUser(userId) {
+            if (confirm('¿Está seguro de que desea eliminar este usuario?')) {
+                // Simulación de eliminación
+                const userIndex = sampleUsers.findIndex(u => u.id == userId);
+                if (userIndex !== -1) {
+                    sampleUsers.splice(userIndex, 1);
+                    loadUsers(sampleUsers);
+                    
+                    // Mostrar notificación de éxito
+                    showNotification('Usuario eliminado correctamente', 'success');
+                }
+            }
+        }
+                
+        // Función para manejar el envío del formulario
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            // Obtener valores del formulario
+            const userId = document.getElementById('id_usuario').value;
+            const nombre = document.getElementById('nombre_completo').value;
+            
+            // Determinar si es creación o actualización
+            if (userId) {
+                // Lógica para actualizar usuario
+                showNotification('Usuario actualizado correctamente', 'success');
+            } else {
+                // Lógica para crear nuevo usuario
+                showNotification('Usuario creado correctamente', 'success');
+                
+                // Resetear formulario
+                document.getElementById('userForm').reset();
+            }
+            
+            // Actualizar lista de usuarios
+            loadUsers(sampleUsers);
+            
+            // Resetear estado del formulario
+            document.getElementById('formTitle').textContent = 'Agregar Usuario';
+            document.getElementById('submitText').textContent = 'Guardar';
+            document.getElementById('cancelEdit').classList.add('hidden');
+        }
+        
+        // Función para cancelar edición
+        function cancelEdit() {
+            document.getElementById('userForm').reset();
+            document.getElementById('formTitle').textContent = 'Agregar Usuario';
+            document.getElementById('submitText').textContent = 'Guardar';
+            document.getElementById('cancelEdit').classList.add('hidden');
+            document.getElementById('id_usuario').value = '';
+        }
+        
+        
+        // Inicializar al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cargar usuarios
+            setTimeout(() => {
+                loadUsers(sampleUsers);
+            }, 1000);
+            
+            // Event listeners
+            document.getElementById('userForm').addEventListener('submit', handleFormSubmit);
+            document.getElementById('cancelEdit').addEventListener('click', cancelEdit);
+            
+            // Manejar búsqueda
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                if (searchTerm) {
+                    const filteredUsers = sampleUsers.filter(user => 
+                        user.nombre.toLowerCase().includes(searchTerm) ||
+                        user.cedula.toLowerCase().includes(searchTerm) ||
+                        user.cargo.toLowerCase().includes(searchTerm)
+                    );
+                    loadUsers(filteredUsers);
+                } else {
+                    loadUsers(sampleUsers);
+                }
+            });
+            
+        });
+    </script>
+    <script type="module" src="../js/app.js"></script>
+</body>
+</html>

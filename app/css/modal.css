@@ -70,3 +70,10 @@
             font-size: 2rem;
             margin-right: 1rem;
         }
+        .dark .modal-content {
+            background-color: #1a1a1a;
+        }
+        
+        .dark .modal-body p {
+            color: #F3EFF5;
+        }

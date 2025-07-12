@@ -1,39 +1,193 @@
 console.log("carga el app_vc_ga");
 const { ipcRenderer } = require("electron");
 const { registerHTML_vc_ga, crudHTML_vc_ga, loginHTML_vc_ga, toggleEye_vc_ga } = require("../js/login");
+const { plantillaHTML_vc_ga, btnColorModo_vc_ga, icon_vc_ga} = require("../js/plantilla");
 
 if (loginHTML_vc_ga) {
   toggleEye_vc_ga();
-  tailwind.config = {
-      theme: {
-          extend: {
+          tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
               colors: {
-                  'dark': '#0D0A0B',
-                  'gray': '#454955',
-                  'light': '#F3EFF5',
-                  'primary': '#72B01D',
-                  'primary-dark': '#3F7D20'
+                primary: '#0D0A0B',
+                secondary: '#454955',
+                light: '#F3EFF5',
+                accent1: '#72B01D',
+                accent2: '#3F7D20',
+                dark: {
+                  900: '#0D0A0B',
+                  800: '#1a1a1a',
+                  700: '#2d2d2d',
+                }
+              },
+              fontFamily: {
+                inter: ['Inter', 'sans-serif'],
+                verdana: ['Verdana', 'sans-serif'],
+              },
+              animation: {
+                'fade-in': 'fadeIn 0.5s ease-in',
+                'slide-down': 'slideDown 0.5s ease-out',
+                'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                'underline': 'underline 0.3s ease-out forwards'
+              },
+              keyframes: {
+                fadeIn: {
+                  '0%': { opacity: '0' },
+                  '100%': { opacity: '1' },
+                },
+                slideDown: {
+                  '0%': { transform: 'translateY(-20px)', opacity: '0' },
+                  '100%': { transform: 'translateY(0)', opacity: '1' },
+                },
+                pulse: {
+                  '0%, 100%': { opacity: '1' },
+                  '50%': { opacity: '0.8' },
+                },
+                underline: {
+                  '0%': { width: '0' },
+                  '100%': { width: '100%' },
+                }
               }
+            }
           }
-      }
-  }
+        };
+      btnColorModo_vc_ga.addEventListener('click', ()=>{
+    document.documentElement.classList.toggle('dark');
+         // Cambiar el icono según el modo actual
+       if(document.documentElement.classList.contains('dark')) {
+            icon_vc_ga.classList.remove('fa-sun');
+            icon_vc_ga.classList.add('fa-moon');
+        } else {
+            icon_vc_ga.classList.remove('fa-moon');
+            icon_vc_ga.classList.add('fa-sun');
+        }
+  });
 }
 
 if (registerHTML_vc_ga){
   toggleEye_vc_ga();
-  tailwind.config = {
-      theme: {
-          extend: {
+          tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
               colors: {
-                  'dark': '#0D0A0B',
-                  'gray': '#454955',
-                  'light': '#F3EFF5',
-                  'primary': '#72B01D',
-                  'primary-dark': '#3F7D20'
+                primary: '#0D0A0B',
+                secondary: '#454955',
+                light: '#F3EFF5',
+                accent1: '#72B01D',
+                accent2: '#3F7D20',
+                dark: {
+                  900: '#0D0A0B',
+                  800: '#1a1a1a',
+                  700: '#2d2d2d',
+                }
+              },
+              fontFamily: {
+                inter: ['Inter', 'sans-serif'],
+                verdana: ['Verdana', 'sans-serif'],
+              },
+              animation: {
+                'fade-in': 'fadeIn 0.5s ease-in',
+                'slide-down': 'slideDown 0.5s ease-out',
+                'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                'underline': 'underline 0.3s ease-out forwards'
+              },
+              keyframes: {
+                fadeIn: {
+                  '0%': { opacity: '0' },
+                  '100%': { opacity: '1' },
+                },
+                slideDown: {
+                  '0%': { transform: 'translateY(-20px)', opacity: '0' },
+                  '100%': { transform: 'translateY(0)', opacity: '1' },
+                },
+                pulse: {
+                  '0%, 100%': { opacity: '1' },
+                  '50%': { opacity: '0.8' },
+                },
+                underline: {
+                  '0%': { width: '0' },
+                  '100%': { width: '100%' },
+                }
               }
+            }
           }
-      }
-  }
+}
+    btnColorModo_vc_ga.addEventListener('click', ()=>{
+    document.documentElement.classList.toggle('dark');
+         // Cambiar el icono según el modo actual
+       if(document.documentElement.classList.contains('dark')) {
+            icon_vc_ga.classList.remove('fa-sun');
+            icon_vc_ga.classList.add('fa-moon');
+        } else {
+            icon_vc_ga.classList.remove('fa-moon');
+            icon_vc_ga.classList.add('fa-sun');
+        }
+  });
+}
+
+if (plantillaHTML_vc_ga) {
+          tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
+              colors: {
+                primary: '#0D0A0B',
+                secondary: '#454955',
+                light: '#F3EFF5',
+                accent1: '#72B01D',
+                accent2: '#3F7D20',
+                dark: {
+                  900: '#0D0A0B',
+                  800: '#1a1a1a',
+                  700: '#2d2d2d',
+                }
+              },
+              fontFamily: {
+                inter: ['Inter', 'sans-serif'],
+                verdana: ['Verdana', 'sans-serif'],
+              },
+              animation: {
+                'fade-in': 'fadeIn 0.5s ease-in',
+                'slide-down': 'slideDown 0.5s ease-out',
+                'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                'underline': 'underline 0.3s ease-out forwards'
+              },
+              keyframes: {
+                fadeIn: {
+                  '0%': { opacity: '0' },
+                  '100%': { opacity: '1' },
+                },
+                slideDown: {
+                  '0%': { transform: 'translateY(-20px)', opacity: '0' },
+                  '100%': { transform: 'translateY(0)', opacity: '1' },
+                },
+                pulse: {
+                  '0%, 100%': { opacity: '1' },
+                  '50%': { opacity: '0.8' },
+                },
+                underline: {
+                  '0%': { width: '0' },
+                  '100%': { width: '100%' },
+                }
+              }
+            }
+          }
+        };
+  console.log("plantilla");
+    btnColorModo_vc_ga.addEventListener('click', ()=>{
+    document.documentElement.classList.toggle('dark');
+     // Cambiar el icono según el modo actual
+       if(document.documentElement.classList.contains('dark')) {
+            icon_vc_ga.classList.remove('fa-sun');
+            icon_vc_ga.classList.add('fa-moon');
+        } else {
+            icon_vc_ga.classList.remove('fa-moon');
+            icon_vc_ga.classList.add('fa-sun');
+        }
+  });
+  
 }
 
 if (crudHTML_vc_ga) {
@@ -55,7 +209,6 @@ if (crudHTML_vc_ga) {
   const precioProducto_vc_ga = document.querySelector("#price");
   const descripcionProducto_vc_ga = document.querySelector("#description");
   const listaProductos_vc_ga = document.querySelector("#products");
-  let btnColorModo_vc_ga = document.getElementById("cambio-color")
 
   let productos_vc_ga = [];
   let editando_vc_ga = false;
@@ -192,8 +345,8 @@ if (crudHTML_vc_ga) {
 
   const init_vc_ga = async () => {
     obtenerProductos_vc_ga();
-    window.eliminarProducto_vc_ga = eliminarProducto_vc_ga;
-    window.editarProducto_vc_ga = editarProducto_vc_ga;
+    document.eliminarProducto_vc_ga = eliminarProducto_vc_ga;
+    document.editarProducto_vc_ga = editarProducto_vc_ga;
   }
 
   init_vc_ga();

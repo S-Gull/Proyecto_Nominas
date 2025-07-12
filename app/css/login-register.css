@@ -18,3 +18,15 @@ body {
             border-color: #72B01D;
             box-shadow: 0 0 0 3px rgba(114, 176, 29, 0.2);
         }
+        /* Estilos para el botón de cambio de modo */
+        #cambio-color {
+            transition: all 0.3s ease;
+        }
+        
+        #cambio-color:hover {
+            transform: scale(1.1);
+        }
+        
+        #cambio-color i {
+            transition: transform 0.3s ease;
+        }
