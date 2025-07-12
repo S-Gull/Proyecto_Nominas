@@ -2,240 +2,237 @@ console.log("carga la conexion");
 const mysql = require('mysql');
 
 // Configuración de conexión inicial (sin base de datos especificada)
-const config = {
+const config_vc_ga = {
   host: 'localhost',
   user: 'root',
   password: '3690'
 };
 
 // Crear una conexión global
-const connection = mysql.createConnection(config);
+const connection_vc_ga = mysql.createConnection(config_vc_ga);
 
-    // Crear la tabla si no existe
-    // Asumiendo que 'connection' es tu conexión MySQL ya creada y conectada
+const tablas_vc_ga = [
+  `CREATE TABLE IF NOT EXISTS productos_vc_ga(
+    id_vc_ga INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nombre_vc_ga VARCHAR(100) NOT NULL,
+    descripcion_vc_ga VARCHAR(255),
+    precio_vc_ga DECIMAL(10,2) NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS td_empresa_vc_ga (
+    id_empresa_vc_ga int PRIMARY KEY,
+    nombre_vc_ga varchar(255),
+    rif_vc_ga varchar(255),
+    direccion_vc_ga varchar(255)
+  )`,
 
-const tablas = [
-      `CREATE TABLE productos(
-        id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-        nombre VARCHAR(100) NOT NULL,
-        descripcion VARCHAR(255),
-        precio DECIMAL(10,2) NOT NULL
-      )` ,
-      `CREATE TABLE IF NOT EXISTS td_empresa_vc_ga (
-        id_empresa_vc_ga int PRIMARY KEY,
-        nombre_vc_ga varchar(255),
-        rif_vc_ga varchar(255),
-        direccion_vc_ga varchar(255)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_roles_vc_ga (
+    id_rol_vc_ga int PRIMARY KEY,
+    nombre_vc_ga varchar(255),
+    descripcion_vc_ga varchar(255)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_roles_vc_ga (
-        id_rol_vc_ga int PRIMARY KEY,
-        nombre_vc_ga varchar(255),
-        descripcion_vc_ga varchar(255)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_status_vc_ga (
+    id_status_vc_ga int PRIMARY KEY,
+    descripcion_vc_ga varchar(255)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_status_vc_ga (
-        id_status_vc_ga int PRIMARY KEY,
-        descripcion_vc_ga varchar(255)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_sucursal_vc_ga (
+    id_sucursal_vc_ga int PRIMARY KEY,
+    id_empresa_vc_ga int,
+    nombre_vc_ga varchar(255),
+    direccion_vc_ga varchar(255),
+    CONSTRAINT fk_sucursal_empresa_vc_ga FOREIGN KEY (id_empresa_vc_ga) REFERENCES td_empresa_vc_ga (id_empresa_vc_ga)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_sucursal_vc_ga (
-        id_sucursal_vc_ga int PRIMARY KEY,
-        id_empresa_vc_ga int,
-        nombre_vc_ga varchar(255),
-        direccion_vc_ga varchar(255),
-        CONSTRAINT fk_sucursal_empresa FOREIGN KEY (id_empresa_vc_ga) REFERENCES td_empresa_vc_ga (id_empresa_vc_ga)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_departamento_vc_ga (
+    id_departamento_vc_ga int PRIMARY KEY,
+    id_sucursal_vc_ga int,
+    nombre_vc_ga varchar(255),
+    CONSTRAINT fk_departamento_sucursal_vc_ga FOREIGN KEY (id_sucursal_vc_ga) REFERENCES td_sucursal_vc_ga (id_sucursal_vc_ga)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_departamento_vc_ga (
-        id_departamento_vc_ga int PRIMARY KEY,
-        id_sucursal_vc_ga int,
-        nombre_vc_ga varchar(255),
-        CONSTRAINT fk_departamento_sucursal FOREIGN KEY (id_sucursal_vc_ga) REFERENCES td_sucursal_vc_ga (id_sucursal_vc_ga)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_usuarios_vc_ga (
+    id_usuario_vc_ga int PRIMARY KEY,
+    id_departamento_vc_ga int,
+    id_rol_vc_ga int,
+    id_status_vc_ga int,
+    nombre_completo_vc_ga varchar(255),
+    cedula_vc_ga varchar(255),
+    rif_vc_ga varchar(255),
+    fecha_nacimiento_vc_ga date,
+    fecha_ingreso_vc_ga date,
+    cargo_vc_ga varchar(255),
+    CONSTRAINT fk_usuarios_departamento_vc_ga FOREIGN KEY (id_departamento_vc_ga) REFERENCES td_departamento_vc_ga (id_departamento_vc_ga),
+    CONSTRAINT fk_usuarios_rol_vc_ga FOREIGN KEY (id_rol_vc_ga) REFERENCES td_roles_vc_ga (id_rol_vc_ga),
+    CONSTRAINT fk_usuarios_status_vc_ga FOREIGN KEY (id_status_vc_ga) REFERENCES td_status_vc_ga (id_status_vc_ga)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_usuarios_vc_ga (
-        id_usuario_vc_ga int PRIMARY KEY,
-        id_departamento_vc_ga int,
-        id_rol_vc_ga int,
-        id_status_vc_ga int,
-        nombre_completo_vc_ga varchar(255),
-        cedula_vc_ga varchar(255),
-        rif_vc_ga varchar(255),
-        fecha_nacimiento_vc_ga date,
-        fecha_ingreso_vc_ga date,
-        cargo_vc_ga varchar(255),
-        CONSTRAINT fk_usuarios_departamento FOREIGN KEY (id_departamento_vc_ga) REFERENCES td_departamento_vc_ga (id_departamento_vc_ga),
-        CONSTRAINT fk_usuarios_rol FOREIGN KEY (id_rol_vc_ga) REFERENCES td_roles_vc_ga (id_rol_vc_ga),
-        CONSTRAINT fk_usuarios_status FOREIGN KEY (id_status_vc_ga) REFERENCES td_status_vc_ga (id_status_vc_ga)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_deduccion_vc_ga (
+    id_deduccion_vc_ga int PRIMARY KEY,
+    nombre_vc_ga varchar(255),
+    porcentaje_vc_ga decimal(5,2),
+    descripcion_vc_ga varchar(255),
+    vigente_desde_vc_ga date,
+    vigente_hasta_vc_ga date
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_deduccion_vc_ga (
-        id_deduccion_vc_ga int PRIMARY KEY,
-        nombre_vc_ga varchar(255),
-        porcentaje_vc_ga decimal(5,2),
-        descripcion_vc_ga varchar(255),
-        vigente_desde_vc_ga date,
-        vigente_hasta_vc_ga date
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_salario_historico_vc_ga (
+    id_salario_vc_ga int PRIMARY KEY,
+    id_usuario_vc_ga int,
+    sueldo_base_vc_ga decimal(10,2),
+    sueldo_variable_vc_ga decimal(10,2),
+    fecha_inicio_vc_ga date,
+    fecha_fin_vc_ga date,
+    CONSTRAINT fk_salario_usuario_vc_ga FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_salario_historico_vc_ga (
-        id_salario_vc_ga int PRIMARY KEY,
-        id_usuario_vc_ga int,
-        sueldo_base_vc_ga decimal(10,2),
-        sueldo_variable_vc_ga decimal(10,2),
-        fecha_inicio_vc_ga date,
-        fecha_fin_vc_ga date,
-        CONSTRAINT fk_salario_usuario FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_bono_vc_ga (
+    id_bono_vc_ga int PRIMARY KEY,
+    id_usuario_vc_ga int,
+    tipo_bono_vc_ga varchar(255),
+    monto_vc_ga decimal(10,2),
+    fecha_pago_vc_ga date,
+    CONSTRAINT fk_bono_usuario_vc_ga FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_bono_vc_ga (
-        id_bono_vc_ga int PRIMARY KEY,
-        id_usuario_vc_ga int,
-        tipo_bono_vc_ga varchar(255),
-        monto_vc_ga decimal(10,2),
-        fecha_pago_vc_ga date,
-        CONSTRAINT fk_bono_usuario FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_horas_extras_vc_ga (
+    id_horas_extras_vc_ga int PRIMARY KEY,
+    id_usuario_vc_ga int,
+    cantidad_horas_vc_ga decimal(5,2),
+    tipo_vc_ga varchar(255),
+    fecha_vc_ga date,
+    monto_vc_ga decimal(10,2),
+    CONSTRAINT fk_horas_usuario_vc_ga FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_horas_extras_vc_ga (
-        id_horas_extras_vc_ga int PRIMARY KEY,
-        id_usuario_vc_ga int,
-        cantidad_horas_vc_ga decimal(5,2),
-        tipo_vc_ga varchar(255),
-        fecha_vc_ga date,
-        monto_vc_ga decimal(10,2),
-        CONSTRAINT fk_horas_usuario FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_vacaciones_vc_ga (
+    id_vacacion_vc_ga int PRIMARY KEY,
+    id_usuario_vc_ga int,
+    dias_derecho_vc_ga int,
+    dias_disfrutados_vc_ga int,
+    fecha_inicio_vc_ga date,
+    fecha_fin_vc_ga date,
+    CONSTRAINT fk_vacaciones_usuario_vc_ga FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_vacaciones_vc_ga (
-        id_vacacion_vc_ga int PRIMARY KEY,
-        id_usuario_vc_ga int,
-        dias_derecho_vc_ga int,
-        dias_disfrutados_vc_ga int,
-        fecha_inicio_vc_ga date,
-        fecha_fin_vc_ga date,
-        CONSTRAINT fk_vacaciones_usuario FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_prestaciones_sociales_vc_ga (
+    id_prestacion_vc_ga int PRIMARY KEY,
+    id_usuario_vc_ga int,
+    monto_vc_ga decimal(10,2),
+    fecha_calculo_vc_ga date,
+    tipo_vc_ga varchar(255),
+    CONSTRAINT fk_prestaciones_usuario_vc_ga FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_prestaciones_sociales_vc_ga (
-        id_prestacion_vc_ga int PRIMARY KEY,
-        id_usuario_vc_ga int,
-        monto_vc_ga decimal(10,2),
-        fecha_calculo_vc_ga date,
-        tipo_vc_ga varchar(255),
-        CONSTRAINT fk_prestaciones_usuario FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_usuario_deduccion_vc_ga (
+    id_usuario_vc_ga int,
+    id_deduccion_vc_ga int,
+    monto_vc_ga decimal(10,2),
+    fecha_aplicacion_vc_ga date,
+    CONSTRAINT fk_usuario_deduccion_usuario_vc_ga FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga),
+    CONSTRAINT fk_usuario_deduccion_deduccion_vc_ga FOREIGN KEY (id_deduccion_vc_ga) REFERENCES td_deduccion_vc_ga (id_deduccion_vc_ga),
+    PRIMARY KEY (id_usuario_vc_ga, id_deduccion_vc_ga, fecha_aplicacion_vc_ga)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_usuario_deduccion_vc_ga (
-        id_usuario_vc_ga int,
-        id_deduccion_vc_ga int,
-        monto_vc_ga decimal(10,2),
-        fecha_aplicacion_vc_ga date,
-        CONSTRAINT fk_usuario_deduccion_usuario FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga),
-        CONSTRAINT fk_usuario_deduccion_deduccion FOREIGN KEY (id_deduccion_vc_ga) REFERENCES td_deduccion_vc_ga (id_deduccion_vc_ga),
-        PRIMARY KEY (id_usuario_vc_ga, id_deduccion_vc_ga, fecha_aplicacion_vc_ga)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_pago_nomina_vc_ga (
+    id_pago_vc_ga int PRIMARY KEY,
+    id_usuario_vc_ga int,
+    fecha_pago_vc_ga date,
+    monto_neto_vc_ga decimal(10,2),
+    periodo_vc_ga varchar(255),
+    CONSTRAINT fk_pago_usuario_vc_ga FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_pago_nomina_vc_ga (
-        id_pago_vc_ga int PRIMARY KEY,
-        id_usuario_vc_ga int,
-        fecha_pago_vc_ga date,
-        monto_neto_vc_ga decimal(10,2),
-        periodo_vc_ga varchar(255),
-        CONSTRAINT fk_pago_usuario FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga (id_usuario_vc_ga)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_recibo_nomina_vc_ga (
+    id_recibo_vc_ga int PRIMARY KEY,
+    id_pago_vc_ga int,
+    fecha_generacion_vc_ga timestamp,
+    contenido_vc_ga text,
+    CONSTRAINT fk_recibo_pago_vc_ga FOREIGN KEY (id_pago_vc_ga) REFERENCES td_pago_nomina_vc_ga (id_pago_vc_ga)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_recibo_nomina_vc_ga (
-        id_recibo_vc_ga int PRIMARY KEY,
-        id_pago_vc_ga int,
-        fecha_generacion_vc_ga timestamp,
-        contenido_vc_ga text,
-        CONSTRAINT fk_recibo_pago FOREIGN KEY (id_pago_vc_ga) REFERENCES td_pago_nomina_vc_ga (id_pago_vc_ga)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_reporte_banco_vc_ga (
+    id_reporte_banco_vc_ga int PRIMARY KEY,
+    id_pago_vc_ga int,
+    info_banco_vc_ga text,
+    CONSTRAINT fk_reporte_banco_pago_vc_ga FOREIGN KEY (id_pago_vc_ga) REFERENCES td_pago_nomina_vc_ga (id_pago_vc_ga)
+  )`,
 
-      `CREATE TABLE IF NOT EXISTS td_reporte_banco_vc_ga (
-        id_reporte_banco_vc_ga int PRIMARY KEY,
-        id_pago_vc_ga int,
-        info_banco_vc_ga text,
-        CONSTRAINT fk_reporte_banco_pago FOREIGN KEY (id_pago_vc_ga) REFERENCES td_pago_nomina_vc_ga (id_pago_vc_ga)
-      )`,
+  `CREATE TABLE IF NOT EXISTS td_reporte_contable_vc_ga (
+    id_reporte_contable_vc_ga int PRIMARY KEY,
+    id_pago_vc_ga int,
+    info_contable_vc_ga text,
+    CONSTRAINT fk_reporte_contable_pago_vc_ga FOREIGN KEY (id_pago_vc_ga) REFERENCES td_pago_nomina_vc_ga (id_pago_vc_ga)
+  )`
+];
 
-      `CREATE TABLE IF NOT EXISTS td_reporte_contable_vc_ga (
-        id_reporte_contable_vc_ga int PRIMARY KEY,
-        id_pago_vc_ga int,
-        info_contable_vc_ga text,
-        CONSTRAINT fk_reporte_contable_pago FOREIGN KEY (id_pago_vc_ga) REFERENCES td_pago_nomina_vc_ga (id_pago_vc_ga)
-      )`
-    ];
-
-    // Función para crear tablas secuencialmente
-function crearTablas() {
-  return tablas.reduce((promise, query) => {
-    return promise.then(() => {
-      return new Promise((resolve, reject) => {
-        connection.query(query, (err) => {
-          if (err) return reject(err);
+// Función para crear tablas secuencialmente
+const crearTablas_vc_ga = () => {
+  return tablas_vc_ga.reduce((promise_vc_ga, query_vc_ga) => {
+    return promise_vc_ga.then(() => {
+      return new Promise((resolve_vc_ga, reject_vc_ga) => {
+        connection_vc_ga.query(query_vc_ga, (err_vc_ga) => {
+          if (err_vc_ga) return reject_vc_ga(err_vc_ga);
           console.log('Tabla creada o ya existe.');
-          resolve();
+          resolve_vc_ga();
         });
       });
     });
   }, Promise.resolve());
-}
+};
 
-connection.connect(async (err) => {
-  if (err) {
-    console.error('Error de conexión inicial:', err);
+connection_vc_ga.connect(async (err_vc_ga) => {
+  if (err_vc_ga) {
+    console.error('Error de conexión inicial:', err_vc_ga);
     return;
   }
 
   try {
-    await new Promise((resolve, reject) => {
-      connection.query('CREATE DATABASE IF NOT EXISTS crud_electron', (err) => {
-        if (err) return reject(err);
-        resolve();
+    await new Promise((resolve_vc_ga, reject_vc_ga) => {
+      connection_vc_ga.query('CREATE DATABASE IF NOT EXISTS crud_electron', (err_vc_ga) => {
+        if (err_vc_ga) return reject_vc_ga(err_vc_ga);
+        resolve_vc_ga();
       });
     });
 
-    await new Promise((resolve, reject) => {
-      connection.query('USE crud_electron', (err) => {
-        if (err) return reject(err);
-        resolve();
+    await new Promise((resolve_vc_ga, reject_vc_ga) => {
+      connection_vc_ga.query('USE crud_electron', (err_vc_ga) => {
+        if (err_vc_ga) return reject_vc_ga(err_vc_ga);
+        resolve_vc_ga();
       });
     });
 
-    await crearTablas();
+    await crearTablas_vc_ga();
 
     console.log('Base de datos y tablas creadas correctamente.');
-  } catch (error) {
-    console.error('Error al crear tablas:', error);
+  } catch (error_vc_ga) {
+    console.error('Error al crear tablas:', error_vc_ga);
   }
-  // NO cerramos la conexión aquí para que siga disponible para la función query
 });
 
 // Función para ejecutar consultas (con reconexión automática)
-function query(sql, params = [], callback) {
+const query_vc_ga = (sql_vc_ga, params_vc_ga = [], callback_vc_ga) => {
   // Crear una nueva conexión para cada consulta
-  const db = mysql.createConnection({
-    ...config,
+  const db_vc_ga = mysql.createConnection({
+    ...config_vc_ga,
     database: 'crud_electron'
   });
 
-  db.connect((err) => {
-    if (err) {
-      console.error('Error de conexión:', err);
-      return callback(err);
+  db_vc_ga.connect((err_vc_ga) => {
+    if (err_vc_ga) {
+      console.error('Error de conexión:', err_vc_ga);
+      return callback_vc_ga(err_vc_ga);
     }
 
-    db.query(sql, params, (err, results) => {
-      db.end();
-      if (err) {
-        console.error('Error en consulta:', err);
-        return callback(err);
+    db_vc_ga.query(sql_vc_ga, params_vc_ga, (err_vc_ga, results_vc_ga) => {
+      db_vc_ga.end();
+      if (err_vc_ga) {
+        console.error('Error en consulta:', err_vc_ga);
+        return callback_vc_ga(err_vc_ga);
       }
-      callback(null, results);
+      callback_vc_ga(null, results_vc_ga);
     });
   });
-}
-module.exports = { query };
+};
+
+module.exports = { query_vc_ga };

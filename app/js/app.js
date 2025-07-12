@@ -1,9 +1,9 @@
-console.log("carga el app");
+console.log("carga el app_vc_ga");
 const { ipcRenderer } = require("electron");
-const { register, crud, login, toggleEye } = require("../js/login");
-// const main = remote.require("./main");
-if (login) {
-  toggleEye();
+const { registerHTML_vc_ga, crudHTML_vc_ga, loginHTML_vc_ga, toggleEye_vc_ga } = require("../js/login");
+
+if (loginHTML_vc_ga) {
+  toggleEye_vc_ga();
   tailwind.config = {
       theme: {
           extend: {
@@ -18,8 +18,9 @@ if (login) {
       }
   }
 }
-if (register){
-  toggleEye();
+
+if (registerHTML_vc_ga){
+  toggleEye_vc_ga();
   tailwind.config = {
       theme: {
           extend: {
@@ -34,171 +35,170 @@ if (register){
       }
   }
 }
-if (crud) {
-      // Configuración Tailwind debe estar inline
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            colors: {
-              primary: '#6366f1',
-              secondary: '#8b5cf6',
-              dark: '#1e293b'
-            }
-          }
+
+if (crudHTML_vc_ga) {
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          primary: '#6366f1',
+          secondary: '#8b5cf6',
+          dark: '#1e293b'
         }
       }
-    const formularioProducto = document.querySelector("#productForm");
-    const nombreProducto = document.querySelector("#name");
-    const precioProducto = document.querySelector("#price");
-    const descripcionProducto = document.querySelector("#description");
-    const listaProductos = document.querySelector("#products");
-    let btnColorModo = document.getElementById("cambio-color")
+    }
+  }
 
-    let productos = [];
-    let editando = false;
-    let idProductoEditar;
+  const formularioProducto_vc_ga = document.querySelector("#productForm");
+  const nombreProducto_vc_ga = document.querySelector("#name");
+  const precioProducto_vc_ga = document.querySelector("#price");
+  const descripcionProducto_vc_ga = document.querySelector("#description");
+  const listaProductos_vc_ga = document.querySelector("#products");
+  let btnColorModo_vc_ga = document.getElementById("cambio-color")
 
-    const eliminarProducto = async (id) => {
-      const respuesta = confirm("¿Estás seguro de que quieres eliminarlo?");
-      if (respuesta) {
-        await ipcRenderer.invoke("eliminar-producto", id);
-        await obtenerProductos();
-      }
+  let productos_vc_ga = [];
+  let editando_vc_ga = false;
+  let idProductoEditar_vc_ga;
+
+  const eliminarProducto_vc_ga = async (id_vc_ga) => {
+    const respuesta_vc_ga = confirm("¿Estás seguro de que quieres eliminarlo?");
+    if (respuesta_vc_ga) {
+      await ipcRenderer.invoke("eliminar-producto_vc_ga", id_vc_ga);
+      await obtenerProductos_vc_ga();
+    }
+    return;
+  };
+
+  const obtenerProductos_vc_ga = async () => {
+    productos_vc_ga = await ipcRenderer.invoke("obtener-productos_vc_ga");
+    renderizarProductos_vc_ga(productos_vc_ga);
+  };
+
+  const editarProducto_vc_ga = async (id_vc_ga) => {
+    const producto_vc_ga = await ipcRenderer.invoke("obtener-producto-por-id_vc_ga", id_vc_ga);
+    if (!producto_vc_ga) {
+      console.log(producto_vc_ga);
+      alert("Producto no encontrado");
       return;
-    };
+    } else { 
+      nombreProducto_vc_ga.value = producto_vc_ga.nombre_vc_ga;
+      precioProducto_vc_ga.value = producto_vc_ga.precio_vc_ga;
+      descripcionProducto_vc_ga.value = producto_vc_ga.descripcion_vc_ga;
 
-    const obtenerProductos = async () => {
-      productos = await ipcRenderer.invoke("obtener-productos");
-      renderizarProductos(productos);
-    };
-
-    const editarProducto = async (id) => {
-      const producto = await ipcRenderer.invoke("obtener-producto-por-id", id);
-      if (!producto) {
-        console.log(producto);
-        alert("Producto no encontrado");
-        return;
-      } else { 
-      nombreProducto.value = producto.nombre;
-      precioProducto.value = producto.precio;
-      descripcionProducto.value = producto.descripcion;
-
-      editando = true;
-      idProductoEditar = id;
+      editando_vc_ga = true;
+      idProductoEditar_vc_ga = id_vc_ga;
       
       document.querySelector("#formTitle").textContent = "Editar Producto";
       document.querySelector("#submitText").textContent = "Actualizar";
       document.querySelector("#cancelEdit").classList.remove("hidden");
     }
-    };
+  };
 
-    formularioProducto.addEventListener("submit", async (e) => {
-      try {
-        e.preventDefault();
+  formularioProducto_vc_ga.addEventListener("submit", async (e_vc_ga) => {
+    try {
+      e_vc_ga.preventDefault();
 
-        const producto = {
-          nombre: nombreProducto.value,
-          precio: precioProducto.value,
-          descripcion: descripcionProducto.value,
-        };
+      const producto_vc_ga = {
+        nombre_vc_ga: nombreProducto_vc_ga.value,
+        precio_vc_ga: precioProducto_vc_ga.value,
+        descripcion_vc_ga: descripcionProducto_vc_ga.value,
+      };
 
-        if (!editando) {
-          await ipcRenderer.invoke("crear-producto", producto);
-        } else {
-          await ipcRenderer.invoke("actualizar-producto", idProductoEditar, producto);
-          editando = false;
-          idProductoEditar = "";
-          document.querySelector("#formTitle").textContent = "Agregar Producto";
-          document.querySelector("#submitText").textContent = "Guardar";
-          document.querySelector("#cancelEdit").classList.add("hidden");
-        }
-
-        formularioProducto.reset();
-        nombreProducto.focus();
-        obtenerProductos();
-      } catch (error) {
-        console.log(error);
+      if (!editando_vc_ga) {
+        await ipcRenderer.invoke("crear-producto_vc_ga", producto_vc_ga);
+      } else {
+        await ipcRenderer.invoke("actualizar-producto_vc_ga", idProductoEditar_vc_ga, producto_vc_ga);
+        editando_vc_ga = false;
+        idProductoEditar_vc_ga = "";
+        document.querySelector("#formTitle").textContent = "Agregar Producto";
+        document.querySelector("#submitText").textContent = "Guardar";
+        document.querySelector("#cancelEdit").classList.add("hidden");
       }
-    });
 
-    document.querySelector("#cancelEdit").addEventListener("click", () => {
-      editando = false;
-      idProductoEditar = "";
-      formularioProducto.reset();
-      document.querySelector("#formTitle").textContent = "Agregar Producto";
-      document.querySelector("#submitText").textContent = "Guardar";
-      document.querySelector("#cancelEdit").classList.add("hidden");
-    });
+      formularioProducto_vc_ga.reset();
+      nombreProducto_vc_ga.focus();
+      obtenerProductos_vc_ga();
+    } catch (error_vc_ga) {
+      console.log(error_vc_ga);
+    }
+  });
 
-    function asignarEventos() {
-      document.querySelectorAll('.btn-eliminar').forEach(btn => {
-        btn.addEventListener('click', () => {
-          eliminarProducto(btn.dataset.id);
-        });
+  document.querySelector("#cancelEdit").addEventListener("click", () => {
+    editando_vc_ga = false;
+    idProductoEditar_vc_ga = "";
+    formularioProducto_vc_ga.reset();
+    document.querySelector("#formTitle").textContent = "Agregar Producto";
+    document.querySelector("#submitText").textContent = "Guardar";
+    document.querySelector("#cancelEdit").classList.add("hidden");
+  });
+
+  const asignarEventos_vc_ga = () => {
+    document.querySelectorAll('.btn-eliminar').forEach(btn_vc_ga => {
+      btn_vc_ga.addEventListener('click', () => {
+        eliminarProducto_vc_ga(btn_vc_ga.dataset.id_vc_ga);
       });
-      
-      document.querySelectorAll('.btn-editar').forEach(btn => {
-        btn.addEventListener('click', () => {
-          editarProducto(btn.dataset.id);
-        });
+    });
+    
+    document.querySelectorAll('.btn-editar').forEach(btn_vc_ga => {
+      btn_vc_ga.addEventListener('click', () => {
+        editarProducto_vc_ga(btn_vc_ga.dataset.id_vc_ga);
       });
+    });
+  }
+
+  const renderizarProductos_vc_ga = (productos_vc_ga) => {
+    listaProductos_vc_ga.innerHTML = "";
+    
+    if (productos_vc_ga.length === 0) {
+      listaProductos_vc_ga.innerHTML = `
+        <div class="text-center py-10 text-gray-500 dark:text-gray-400">
+          <i class="fas fa-box-open text-3xl mb-3"></i>
+          <p>No hay productos registrados</p>
+        </div>
+      `;
+      return;
     }
 
-    // En renderizarProductos, actualiza los botones:
-
-    function renderizarProductos(productos) {
-      listaProductos.innerHTML = "";
-      
-      if (productos.length === 0) {
-        listaProductos.innerHTML = `
-          <div class="text-center py-10 text-gray-500 dark:text-gray-400">
-            <i class="fas fa-box-open text-3xl mb-3"></i>
-            <p>No hay productos registrados</p>
-          </div>
-        `;
-        return;
-      }
-
-      productos.forEach((producto) => {
-        const productCard = document.createElement('div');
-        productCard.className = 'product-card bg-white dark:bg-gray-700 rounded-lg shadow p-4 mb-4 transition-all duration-300 hover:shadow-lg animate__animated animate__fadeIn';
-        productCard.innerHTML = `
-          <div class="flex justify-between items-start mb-2">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">${producto.nombre}</h3>
-            <span class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-sm font-medium px-2.5 py-0.5 rounded">
-              $${producto.precio}
-            </span>
-          </div>
-          
-          <p class="text-gray-600 dark:text-gray-300 mb-4">${producto.descripcion || 'Sin descripción'}</p>
-          
-          <div class="flex space-x-2">
-            <button data-id="${producto.id}" class="btn-eliminar flex-1 bg-red-500 hover:bg-red-600 text-white py-1.5 px-3 rounded-lg text-sm transition duration-200">
-              <i class="fas fa-trash-alt mr-1"></i> Eliminar
-            </button>
-            
-            <button data-id="${producto.id}" class="btn-editar flex-1 bg-indigo-500 hover:bg-indigo-600 text-white py-1.5 px-3 rounded-lg text-sm transition duration-200">
-              <i class="fas fa-edit mr-1"></i> Editar
-            </button>
-          </div>
-        `;
+    productos_vc_ga.forEach((producto_vc_ga) => {
+      const productCard_vc_ga = document.createElement('div');
+      productCard_vc_ga.className = 'product-card bg-white dark:bg-gray-700 rounded-lg shadow p-4 mb-4 transition-all duration-300 hover:shadow-lg animate__animated animate__fadeIn';
+      productCard_vc_ga.innerHTML = `
+        <div class="flex justify-between items-start mb-2">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">${producto_vc_ga.nombre_vc_ga}</h3>
+          <span class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-sm font-medium px-2.5 py-0.5 rounded">
+            $${producto_vc_ga.precio_vc_ga}
+          </span>
+        </div>
         
-        listaProductos.appendChild(productCard);
-      });
+        <p class="text-gray-600 dark:text-gray-300 mb-4">${producto_vc_ga.descripcion_vc_ga || 'Sin descripción'}</p>
+        
+        <div class="flex space-x-2">
+          <button data-id_vc_ga="${producto_vc_ga.id_vc_ga}" class="btn-eliminar flex-1 bg-red-500 hover:bg-red-600 text-white py-1.5 px-3 rounded-lg text-sm transition duration-200">
+            <i class="fas fa-trash-alt mr-1"></i> Eliminar
+          </button>
+          
+          <button data-id_vc_ga="${producto_vc_ga.id_vc_ga}" class="btn-editar flex-1 bg-indigo-500 hover:bg-indigo-600 text-white py-1.5 px-3 rounded-lg text-sm transition duration-200">
+            <i class="fas fa-edit mr-1"></i> Editar
+          </button>
+        </div>
+      `;
       
-      asignarEventos(); // Asignar eventos después de renderizar
-    }
-
-    async function init() {
-      obtenerProductos();
-      window.eliminarProducto = eliminarProducto;
-      window.editarProducto = editarProducto;
-    }
-
-    init();
-
-    btnColorModo.addEventListener('click', ()=>{
-      document.documentElement.classList.toggle('dark')
+      listaProductos_vc_ga.appendChild(productCard_vc_ga);
     });
+    
+    asignarEventos_vc_ga();
+  }
+
+  const init_vc_ga = async () => {
+    obtenerProductos_vc_ga();
+    window.eliminarProducto_vc_ga = eliminarProducto_vc_ga;
+    window.editarProducto_vc_ga = editarProducto_vc_ga;
+  }
+
+  init_vc_ga();
+
+  btnColorModo_vc_ga.addEventListener('click', ()=>{
+    document.documentElement.classList.toggle('dark')
+  });
 }
