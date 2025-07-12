@@ -1,7 +1,8 @@
 console.log("carga el app_vc_ga");
 const { ipcRenderer } = require("electron");
 const { registerHTML_vc_ga, crudHTML_vc_ga, loginHTML_vc_ga, toggleEye_vc_ga } = require("../js/login");
-const { plantillaHTML_vc_ga, btnColorModo_vc_ga, icon_vc_ga} = require("../js/plantilla");
+const { plantillaHTML_vc_ga} = require("../js/plantilla");
+const { setupThemeToggle_vc_ga } = require("../js/dark-mode");
 
 if (loginHTML_vc_ga) {
   toggleEye_vc_ga();
@@ -52,17 +53,7 @@ if (loginHTML_vc_ga) {
             }
           }
         };
-      btnColorModo_vc_ga.addEventListener('click', ()=>{
-    document.documentElement.classList.toggle('dark');
-         // Cambiar el icono según el modo actual
-       if(document.documentElement.classList.contains('dark')) {
-            icon_vc_ga.classList.remove('fa-sun');
-            icon_vc_ga.classList.add('fa-moon');
-        } else {
-            icon_vc_ga.classList.remove('fa-moon');
-            icon_vc_ga.classList.add('fa-sun');
-        }
-  });
+setupThemeToggle_vc_ga();
 }
 
 if (registerHTML_vc_ga){
@@ -114,17 +105,7 @@ if (registerHTML_vc_ga){
             }
           }
 }
-    btnColorModo_vc_ga.addEventListener('click', ()=>{
-    document.documentElement.classList.toggle('dark');
-         // Cambiar el icono según el modo actual
-       if(document.documentElement.classList.contains('dark')) {
-            icon_vc_ga.classList.remove('fa-sun');
-            icon_vc_ga.classList.add('fa-moon');
-        } else {
-            icon_vc_ga.classList.remove('fa-moon');
-            icon_vc_ga.classList.add('fa-sun');
-        }
-  });
+setupThemeToggle_vc_ga();
 }
 
 if (plantillaHTML_vc_ga) {
@@ -175,19 +156,7 @@ if (plantillaHTML_vc_ga) {
             }
           }
         };
-  console.log("plantilla");
-    btnColorModo_vc_ga.addEventListener('click', ()=>{
-    document.documentElement.classList.toggle('dark');
-     // Cambiar el icono según el modo actual
-       if(document.documentElement.classList.contains('dark')) {
-            icon_vc_ga.classList.remove('fa-sun');
-            icon_vc_ga.classList.add('fa-moon');
-        } else {
-            icon_vc_ga.classList.remove('fa-moon');
-            icon_vc_ga.classList.add('fa-sun');
-        }
-  });
-  
+setupThemeToggle_vc_ga();  
 }
 
 if (crudHTML_vc_ga) {
@@ -350,8 +319,5 @@ if (crudHTML_vc_ga) {
   }
 
   init_vc_ga();
-
-  btnColorModo_vc_ga.addEventListener('click', ()=>{
-    document.documentElement.classList.toggle('dark')
-  });
+setupThemeToggle_vc_ga();
 }
