@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Recibos y Reportes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="../css/modal.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="min-h-screen bg-light dark:bg-dark-900 transition-colors duration-200">
+    <!-- Contenedor Grid Principal -->
+    <div class="grid min-h-screen grid-rows-[auto_1fr_auto] gap-6">
+        <!-- Header -->
+        <header class="bg-white p-6 shadow-lg dark:bg-dark-800">
+            <div class="container mx-auto flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white font-verdana">Gestión<span class="text-accent1">Recibos y Reportes</span></h2>
+                <button id="cambio-color" class="p-2 rounded-full bg-gray-200 dark:bg-dark-700">
+                    <i class="fas fa-moon dark:fa-sun text-gray-700 dark:text-gray-200"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main - Contenido -->
+        <main id="reportes" class="container mx-auto px-4 py-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Formulario de Recibos y Reportes -->
+                <div class="bg-white rounded-xl shadow-lg p-6 dark:bg-dark-800 animate__animated animate__fadeInLeft card">
+                    <h2 class="text-xl font-semibold mb-6 text-gray-800 dark:text-white font-verdana" id="formTitle">Agregar Documento</h2>
+                    <form id="documentForm" class="space-y-4">
+                        <input type="hidden" id="id_documento">
+                        
+                        <!-- Selector de Tipo de Documento -->
+                        <div>
+                            <label for="tipo_documento" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Documento</label>
+                            <select id="tipo_documento" required
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                                <option value="">Seleccione un tipo</option>
+                                <option value="recibo">Recibo de Nómina</option>
+                                <option value="reporte_banco">Reporte Bancario</option>
+                                <option value="reporte_contable">Reporte Contable</option>
+                            </select>
+                        </div>
+                        
+                        <!-- ID de Pago -->
+                        <div>
+                            <label for="id_pago_vc_ga" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ID de Pago</label>
+                            <input type="number" id="id_pago_vc_ga" placeholder="ID del pago asociado" required
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                        </div>
+                        
+                        <!-- Campos específicos para Recibo de Nómina -->
+                        <div id="recibo_fields" class="hidden space-y-4">
+                            <div>
+                                <label for="fecha_generacion_vc_ga" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fecha de Generación</label>
+                                <input type="datetime-local" id="fecha_generacion_vc_ga"
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                            
+                            <div>
+                                <label for="contenido_vc_ga" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contenido del Recibo</label>
+                                <textarea id="contenido_vc_ga" rows="4" placeholder="Contenido del recibo"
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos específicos para Reporte Bancario -->
+                        <div id="reporte_banco_fields" class="hidden space-y-4">
+                            <div>
+                                <label for="info_banco_vc_ga" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Información Bancaria</label>
+                                <textarea id="info_banco_vc_ga" rows="4" placeholder="Información del banco"
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos específicos para Reporte Contable -->
+                        <div id="reporte_contable_fields" class="hidden space-y-4">
+                            <div>
+                                <label for="info_contable_vc_ga" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Información Contable</label>
+                                <textarea id="info_contable_vc_ga" rows="4" placeholder="Información contable"
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-3">
+                            <button type="submit" 
+                                    class="flex-1 bg-accent1 hover:bg-accent2 text-white font-medium py-2 px-4 rounded-lg transition duration-300 dark:bg-accent1 dark:hover:bg-accent2">
+                                <i class="fas fa-save mr-2"></i> <span id="submitText">Guardar</span>
+                            </button>
+                            
+                            <button type="button" id="cancelEdit" 
+                                    class="hidden bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+                                <i class="fas fa-times mr-2"></i> Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Lista de Documentos -->
+                <div class="bg-white rounded-xl shadow-lg p-6 dark:bg-dark-800 animate__animated animate__fadeInRight card">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white font-verdana">Lista de Documentos</h2>
+                        <div class="relative">
+                            <input type="text" id="searchInput" placeholder="Buscar..." 
+                                   class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Filtros -->
+                    <div class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <select id="filterType" class="px-4 py-2 rounded-lg border border-gray-300 dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                            <option value="">Todos los tipos</option>
+                            <option value="recibo">Recibos</option>
+                            <option value="reporte_banco">Reportes Bancarios</option>
+                            <option value="reporte_contable">Reportes Contables</option>
+                        </select>
+                        
+                        <input type="number" id="filterPago" placeholder="Filtrar por ID pago" 
+                               class="px-4 py-2 rounded-lg border border-gray-300 dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                        
+                        <input type="date" id="filterDate" 
+                               class="px-4 py-2 rounded-lg border border-gray-300 dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                        
+                        <button id="applyFilters" class="bg-accent1 hover:bg-accent2 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+                            <i class="fas fa-filter mr-2"></i> Filtrar
+                        </button>
+                    </div>
+                    
+                    <div id="documents" class="space-y-4">
+                        <!-- Los documentos se cargarán aquí dinámicamente -->
+                        <div class="text-center py-10 text-gray-500 dark:text-gray-400" id="loadingMessage">
+                            <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                            <p>Cargando documentos...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white p-6 shadow-lg dark:bg-dark-800">
+            <div class="container mx-auto">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div class="text-center md:text-left mb-6 md:mb-0">
+                        <p class="text-gray-600 dark:text-gray-300 text-sm">
+                            © 2025 Sistema de Gestión de Recibos y Reportes. Todos los derechos reservados.
+                        </p>
+                    </div>
+                    
+                    <!-- Tarjetas de desarrolladores -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Tarjeta Victor -->
+                        <div class="flex items-center space-x-4 badge py-3 px-4 rounded-xl">
+                            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
+                                <span class="text-2xl">👤</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-800 dark:text-white font-medium">Victor Contreras</p>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">30.520.132</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Tarjeta Guillermo -->
+                        <div class="flex items-center space-x-4 badge py-3 px-4 rounded-xl">
+                            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
+                                <span class="text-2xl">👤</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-800 dark:text-white font-medium">Guillermo Álvarez</p>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">30.165.318</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Enlaces legales -->
+                    <div class="flex flex-wrap justify-center gap-4 mt-6 md:mt-0">
+                        <a href="#" class="text-gray-600 hover:text-accent1 dark:text-gray-400 dark:hover:text-accent1 text-sm">Términos</a>
+                        <a href="#" class="text-gray-600 hover:text-accent1 dark:text-gray-400 dark:hover:text-accent1 text-sm">Privacidad</a>
+                        <a href="#" class="text-gray-600 hover:text-accent1 dark:text-gray-400 dark:hover:text-accent1 text-sm">Licencia</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modal -->
+    <div id="modalContainer" class="modal-container">
+        <div id="modalContent" class="modal-content bg-white">
+            <div id="modalHeader" class="modal-header">
+                <div class="flex items-center">
+                    <i id="modalIcon" class="modal-icon"></i>
+                    <h2 id="modalTitle" class="text-xl font-bold text-white"></h2>
+                </div>
+                <button id="modalClose" class="text-white hover:text-gray-200 text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modalBody" class="modal-body">
+                <p id="modalMessage" class="text-gray-700"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="modalAction" class="px-4 py-2 rounded-lg font-medium text-white">
+                    Aceptar
+                </button>
+                <button id="modalCancel" class="px-4 py-2 rounded-lg font-medium text-gray-700 bg-gray-200 hover:bg-gray-300" style="display: none;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../js/app.js"></script>
+</body>
+</html>

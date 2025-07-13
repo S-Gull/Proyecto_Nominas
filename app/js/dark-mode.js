@@ -33,14 +33,26 @@ const setupThemeToggle_vc_ga = () => {
     // Escuchar cambios del sistema
     const mediaQuery_vc_ga = window.matchMedia('(prefers-color-scheme: dark)');
     const handleSystemThemeChange_vc_ga = (e_vc_ga) => {
+        const newTheme_vc_ga = e_vc_ga.matches ? 'dark' : 'light';
+        
         if (!localStorage.getItem('themePreference_vc_ga')) {
-            applyTheme_vc_ga(e_vc_ga.matches ? 'dark' : 'light');
+            // Si no hay preferencia guardada, aplicar tema del sistema
+            applyTheme_vc_ga(newTheme_vc_ga);
+        } else {
+            // Si hay preferencia guardada, actualizar el localStorage
+            // solo si el usuario no ha hecho cambios manuales
+            const currentSavedTheme_vc_ga = localStorage.getItem('themePreference_vc_ga');
+            if (currentSavedTheme_vc_ga === getSystemTheme_vc_ga()) {
+                saveThemePreference_vc_ga(newTheme_vc_ga);
+            }
         }
     };
+    
     mediaQuery_vc_ga.addEventListener('change', handleSystemThemeChange_vc_ga);
     
     // Inicializar
     let currentTheme_vc_ga = loadTheme_vc_ga();
+    
     // Evento click
     btnColorModo_vc_ga.addEventListener('click', () => {
         currentTheme_vc_ga = currentTheme_vc_ga === 'dark' ? 'light' : 'dark';
@@ -49,5 +61,4 @@ const setupThemeToggle_vc_ga = () => {
     });
 };
 
-module.exports = {setupThemeToggle_vc_ga }
-
+module.exports = { setupThemeToggle_vc_ga };
