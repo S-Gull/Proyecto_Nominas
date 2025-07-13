@@ -1,64 +1,71 @@
+class ThemeToggle {
+  constructor() {
+    this.btnColorModo = document.getElementById("cambio-color");
+    this.icon = this.btnColorModo.querySelector('i');
+    this.currentTheme = null;
+    this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    // Bindear métodos para mantener el contexto
+    this.handleSystemThemeChange = this.handleSystemThemeChange.bind(this);
+    this.toggleTheme = this.toggleTheme.bind(this);
+  }
+
+  getSystemTheme() {
+    return this.mediaQuery.matches ? 'dark' : 'light';
+  }
+
+  applyTheme(theme) {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    
+    this.icon.classList.replace(
+      theme === 'dark' ? 'fa-sun' : 'fa-moon',
+      theme === 'dark' ? 'fa-moon' : 'fa-sun'
+    );
+  }
+
+  saveThemePreference(theme) {
+    localStorage.setItem('themePreference', theme);
+  }
+
+  loadTheme() {
+    const savedTheme = localStorage.getItem('themePreference');
+    const systemTheme = this.getSystemTheme();
+    const themeToApply = savedTheme || systemTheme;
+    
+    this.applyTheme(themeToApply);
+    return themeToApply;
+  }
+
+  handleSystemThemeChange(e) {
+    const newTheme = e.matches ? 'dark' : 'light';
+    
+    if (!localStorage.getItem('themePreference')) {
+      this.applyTheme(newTheme);
+    } else {
+      const currentSavedTheme = localStorage.getItem('themePreference');
+      if (currentSavedTheme === this.getSystemTheme()) {
+        this.saveThemePreference(newTheme);
+      }
+    }
+  }
+
+  toggleTheme() {
+    this.currentTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+    this.applyTheme(this.currentTheme);
+    this.saveThemePreference(this.currentTheme);
+  }
+
+  init() {
+    this.mediaQuery.addEventListener('change', this.handleSystemThemeChange);
+    this.currentTheme = this.loadTheme();
+    this.btnColorModo.addEventListener('click', this.toggleTheme);
+  }
+}
+
+// Función simple para mantener la misma interfaz
 const setupThemeToggle_vc_ga = () => {
-    const btnColorModo_vc_ga = document.getElementById("cambio-color");
-    const icon_vc_ga = btnColorModo_vc_ga.querySelector('i');
-    
-    // Detectar tema del sistema
-    const getSystemTheme_vc_ga = () => 
-        window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    
-    // Aplicar tema visual
-    const applyTheme_vc_ga = (theme_vc_ga) => {
-        document.documentElement.classList.toggle('dark', theme_vc_ga === 'dark');
-        
-        icon_vc_ga.classList.replace(
-            theme_vc_ga === 'dark' ? 'fa-sun' : 'fa-moon',
-            theme_vc_ga === 'dark' ? 'fa-moon' : 'fa-sun'
-        );
-    };
-    
-    // Guardar preferencia
-    const saveThemePreference_vc_ga = (theme_vc_ga) => 
-        localStorage.setItem('themePreference_vc_ga', theme_vc_ga);
-    
-    // Cargar tema guardado o del sistema
-    const loadTheme_vc_ga = () => {
-        const savedTheme_vc_ga = localStorage.getItem('themePreference_vc_ga');
-        const systemTheme_vc_ga = getSystemTheme_vc_ga();
-        const themeToApply_vc_ga = savedTheme_vc_ga || systemTheme_vc_ga;
-        
-        applyTheme_vc_ga(themeToApply_vc_ga);
-        return themeToApply_vc_ga;
-    };
-    
-    // Escuchar cambios del sistema
-    const mediaQuery_vc_ga = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleSystemThemeChange_vc_ga = (e_vc_ga) => {
-        const newTheme_vc_ga = e_vc_ga.matches ? 'dark' : 'light';
-        
-        if (!localStorage.getItem('themePreference_vc_ga')) {
-            // Si no hay preferencia guardada, aplicar tema del sistema
-            applyTheme_vc_ga(newTheme_vc_ga);
-        } else {
-            // Si hay preferencia guardada, actualizar el localStorage
-            // solo si el usuario no ha hecho cambios manuales
-            const currentSavedTheme_vc_ga = localStorage.getItem('themePreference_vc_ga');
-            if (currentSavedTheme_vc_ga === getSystemTheme_vc_ga()) {
-                saveThemePreference_vc_ga(newTheme_vc_ga);
-            }
-        }
-    };
-    
-    mediaQuery_vc_ga.addEventListener('change', handleSystemThemeChange_vc_ga);
-    
-    // Inicializar
-    let currentTheme_vc_ga = loadTheme_vc_ga();
-    
-    // Evento click
-    btnColorModo_vc_ga.addEventListener('click', () => {
-        currentTheme_vc_ga = currentTheme_vc_ga === 'dark' ? 'light' : 'dark';
-        applyTheme_vc_ga(currentTheme_vc_ga);
-        saveThemePreference_vc_ga(currentTheme_vc_ga);
-    });
+  const themeToggle = new ThemeToggle();
+  themeToggle.init();
 };
 
 module.exports = { setupThemeToggle_vc_ga };

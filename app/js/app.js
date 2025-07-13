@@ -278,7 +278,7 @@ if (crudHTML_vc_ga) {
     const producto_vc_ga = await ipcRenderer.invoke("obtener-producto-por-id_vc_ga", id_vc_ga);
     if (!producto_vc_ga) {
       console.log(producto_vc_ga);
-      alert("Producto no encontrado");
+      modal_vc_ga.showError_vc_ga("Producto no encontrado");
       return;
     } else { 
       nombreProducto_vc_ga.value = producto_vc_ga.nombre_vc_ga;
