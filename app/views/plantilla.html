@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/modal.css">
+</head>
+<body class="min-h-screen bg-light dark:bg-dark-900 transition-colors duration-200">
+    <!-- Contenedor Grid Principal -->
+    <div class="grid min-h-screen grid-rows-[auto_1fr_auto] gap-6">
+        <!-- Header -->
+        <header class="bg-white p-6 shadow-lg dark:bg-dark-800">
+            <div class="container mx-auto flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white font-verdana">Gestión<span class="text-accent1">Usuarios</span></h2>
+                <button id="cambio-color" class="p-2 rounded-full bg-gray-200 dark:bg-dark-700">
+                    <i class="fas fa-moon dark:fa-sun text-gray-700 dark:text-gray-200"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main - Contenido -->
+        <main id="plantilla" class="container mx-auto px-4 py-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Formulario de Usuarios -->
+                <div class="bg-white rounded-xl shadow-lg p-6 dark:bg-dark-800 animate__animated animate__fadeInLeft card">
+                    <h2 class="text-xl font-semibold mb-6 text-gray-800 dark:text-white font-verdana" id="formTitle">Agregar Usuario</h2>
+                    <form id="userForm" class="space-y-4">
+                        <input type="hidden" id="id_usuario">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Departamento -->
+                            <div>
+                                <label for="id_departamento" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Departamento</label>
+                                <select id="id_departamento" required
+                                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                                    <option value="">Seleccione un departamento</option>
+                                    <option value="1">Administración</option>
+                                    <option value="2">Recursos Humanos</option>
+                                    <option value="3">Tecnología</option>
+                                    <option value="4">Ventas</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Rol -->
+                            <div>
+                                <label for="id_rol" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rol</label>
+                                <select id="id_rol" required
+                                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                                    <option value="">Seleccione un rol</option>
+                                    <option value="1">Administrador</option>
+                                    <option value="2">Usuario</option>
+                                    <option value="3">Supervisor</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Cargo -->
+                            <div>
+                                <label for="id_cargo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cargo</label>
+                                <select id="id_cargo" required
+                                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                                    <option value="">Seleccione un cargo</option>
+                                    <option value="1">Gerente</option>
+                                    <option value="2">Analista</option>
+                                    <option value="3">Desarrollador</option>
+                                    <option value="4">Asistente</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Status -->
+                            <div>
+                                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Estado</label>
+                                <select id="status" required
+                                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                                    <option value="">Seleccione un estado</option>
+                                    <option value="Trabajando">Trabajando</option>
+                                    <option value="De Vacaciones">De Vacaciones</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Nombre Completo -->
+                        <div>
+                            <label for="nombre_completo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre Completo</label>
+                            <input type="text" id="nombre_completo" placeholder="Nombre completo" required
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Cédula -->
+                            <div>
+                                <label for="cedula" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cédula</label>
+                                <input type="text" id="cedula" placeholder="Cédula" required
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                            </div>
+                            
+                            <!-- RIF -->
+                            <div>
+                                <label for="rif" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">RIF</label>
+                                <input type="text" id="rif" placeholder="RIF" required
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Fecha de Nacimiento -->
+                            <div>
+                                <label for="fecha_nacimiento" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fecha de Nacimiento</label>
+                                <input type="date" id="fecha_nacimiento" required
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                            
+                            <!-- Fecha de Ingreso -->
+                            <div>
+                                <label for="fecha_ingreso" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fecha de Ingreso</label>
+                                <input type="date" id="fecha_ingreso" required
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Correo Electrónico -->
+                            <div>
+                                <label for="correo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Correo Electrónico</label>
+                                <input type="email" id="correo" placeholder="Correo electrónico" required
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                            </div>
+                            
+                            <!-- Teléfono -->
+                            <div>
+                                <label for="telefono" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Teléfono</label>
+                                <input type="tel" id="telefono" placeholder="Teléfono" required
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                            </div>
+                        </div>
+                        
+                        <!-- Clave -->
+                        <div>
+                            <label for="clave" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Clave</label>
+                            <input type="password" id="clave" placeholder="Clave" required
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                        </div>
+                        
+                        <div class="flex space-x-3">
+                            <button type="submit" 
+                                    class="flex-1 bg-accent1 hover:bg-accent2 text-white font-medium py-2 px-4 rounded-lg transition duration-300 dark:bg-accent1 dark:hover:bg-accent2">
+                                <i class="fas fa-save mr-2"></i> <span id="submitText">Guardar</span>
+                            </button>
+                            
+                            <button type="button" id="cancelEdit" 
+                                    class="hidden bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+                                <i class="fas fa-times mr-2"></i> Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Lista de Usuarios -->
+                <div class="bg-white rounded-xl shadow-lg p-6 dark:bg-dark-800 animate__animated animate__fadeInRight card">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-gray-800 dark:text-white font-verdana">Lista de Usuarios</h2>
+                        <div class="relative">
+                            <input type="text" id="searchInput" placeholder="Buscar..." 
+                                   class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <div id="users" class="space-y-4">
+                        <!-- Los usuarios se cargarán aquí dinámicamente -->
+                        <div class="text-center py-10 text-gray-500 dark:text-gray-400" id="loadingMessage">
+                            <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                            <p>Cargando usuarios...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white p-6 shadow-lg dark:bg-dark-800">
+            <div class="container mx-auto">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div class="text-center md:text-left mb-6 md:mb-0">
+                        <p class="text-gray-600 dark:text-gray-300 text-sm">
+                            © 2025 Sistema de Gestión de Usuarios. Todos los derechos reservados.
+                        </p>
+                    </div>
+                    
+                    <!-- Tarjetas de desarrolladores -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Tarjeta Victor -->
+                        <div class="flex items-center space-x-4 badge py-3 px-4 rounded-xl">
+                            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
+                                <span class="text-2xl">👤</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-800 dark:text-white font-medium">Victor Contreras</p>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">30.520.132</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Tarjeta Guillermo -->
+                        <div class="flex items-center space-x-4 badge py-3 px-4 rounded-xl">
+                            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
+                                <span class="text-2xl">👤</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-800 dark:text-white font-medium">Guillermo Álvarez</p>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">30.165.318</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Enlaces legales -->
+                    <div class="flex flex-wrap justify-center gap-4 mt-6 md:mt-0">
+                        <a href="#" class="text-gray-600 hover:text-accent1 dark:text-gray-400 dark:hover:text-accent1 text-sm">Términos</a>
+                        <a href="#" class="text-gray-600 hover:text-accent1 dark:text-gray-400 dark:hover:text-accent1 text-sm">Privacidad</a>
+                        <a href="#" class="text-gray-600 hover:text-accent1 dark:text-gray-400 dark:hover:text-accent1 text-sm">Licencia</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <div id="modalContainer" class="modal-container">
+    <div id="modalContent" class="modal-content bg-white">
+        <div id="modalHeader" class="modal-header">
+            <div class="flex items-center">
+                <i id="modalIcon" class="modal-icon"></i>
+                <h2 id="modalTitle" class="text-xl font-bold text-white"></h2>
+            </div>
+            <button id="modalClose" class="text-white hover:text-gray-200 text-xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="modalBody" class="modal-body">
+            <p id="modalMessage" class="text-gray-700"></p>
+        </div>
+        <div class="modal-footer">
+            <button id="modalCancel" class="modal-btn-cancel" style="display: none;">
+                Cancelar
+            </button>
+            <!-- <div class="flex-grow"></div> Espacio flexible para separar los botones -->
+            <button id="modalAction" class="modal-btn-accept">
+                Aceptar
+            </button>
+        </div>
+    </div>
+</div>
+    <script type="module" src="../js/app.js"></script>
+</body>
+</html>

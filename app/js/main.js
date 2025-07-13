@@ -1,9 +1,10 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require('path');
-const crud = require("../database/crud");
+const crud_vc_ga = require("../database/crud");
 
-let ventana;
+let ventana_vc_ga;
 
+<<<<<<< HEAD
 function crearVentana() {
     ventana = new BrowserWindow({
     width: 1000,
@@ -14,55 +15,64 @@ function crearVentana() {
       
      // Archivo de precarga
     
+=======
+const crearVentana_vc_ga = () => {
+  ventana_vc_ga = new BrowserWindow({
+    width: 1000,
+    height: 700,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+>>>>>>> main
     }
   });
-  ventana.loadFile(path.join(__dirname, '..', 'index.html'));
-}
+  ventana_vc_ga.loadFile(path.join(__dirname, '..','/','views','/' ,'index.html'));
+};
 
 // Handlers IPC
-ipcMain.handle("crear-producto", async (event, producto) => {
-  return new Promise((resolve, reject) => {
-    crud.crearProducto(producto, (err, result) => {
-      if (err) reject(err);
-      else resolve(result);
+ipcMain.handle("crear-producto_vc_ga", async (event_vc_ga, producto_vc_ga) => {
+  return new Promise((resolve_vc_ga, reject_vc_ga) => {
+    crud_vc_ga.crearProducto_vc_ga(producto_vc_ga, (err_vc_ga, result_vc_ga) => {
+      if (err_vc_ga) reject_vc_ga(err_vc_ga);
+      else resolve_vc_ga(result_vc_ga);
     });
   });
 });
 
-ipcMain.handle("obtener-productos", async () => {
-  return new Promise((resolve, reject) => {
-    crud.obtenerProductos((err, results) => {
-      if (err) reject(err);
-      else resolve(results);
+ipcMain.handle("obtener-productos_vc_ga", async () => {
+  return new Promise((resolve_vc_ga, reject_vc_ga) => {
+    crud_vc_ga.obtenerProductos_vc_ga((err_vc_ga, results_vc_ga) => {
+      if (err_vc_ga) reject_vc_ga(err_vc_ga);
+      else resolve_vc_ga(results_vc_ga);
     });
   });
 });
 
-ipcMain.handle("eliminar-producto", async (event, id) => {
-  return new Promise((resolve, reject) => {
-    crud.eliminarProducto(id, (err, result) => {
-      if (err) reject(err);
-      else resolve(result);
+ipcMain.handle("eliminar-producto_vc_ga", async (event_vc_ga, id_vc_ga) => {
+  return new Promise((resolve_vc_ga, reject_vc_ga) => {
+    crud_vc_ga.eliminarProducto_vc_ga(id_vc_ga, (err_vc_ga, result_vc_ga) => {
+      if (err_vc_ga) reject_vc_ga(err_vc_ga);
+      else resolve_vc_ga(result_vc_ga);
     });
   });
 });
 
-ipcMain.handle("obtener-producto-por-id", async (event, id) => {
-  return new Promise((resolve, reject) => {
-    crud.obtenerProductoPorId(id, (err, results) => {
-      if (err) reject(err);
-      else resolve(results && results[0] ? results[0] : null);
+ipcMain.handle("obtener-producto-por-id_vc_ga", async (event_vc_ga, id_vc_ga) => {
+  return new Promise((resolve_vc_ga, reject_vc_ga) => {
+    crud_vc_ga.obtenerProductoPorId_vc_ga(id_vc_ga, (err_vc_ga, results_vc_ga) => {
+      if (err_vc_ga) reject_vc_ga(err_vc_ga);
+      else resolve_vc_ga(results_vc_ga && results_vc_ga[0] ? results_vc_ga[0] : null);
     });
   });
 });
 
-ipcMain.handle("actualizar-producto", async (event, id, producto) => {
-  return new Promise((resolve, reject) => {
-    crud.actualizarProducto(id, producto, (err, result) => {
-      if (err) reject(err);
-      else resolve(result);
+ipcMain.handle("actualizar-producto_vc_ga", async (event_vc_ga, id_vc_ga, producto_vc_ga) => {
+  return new Promise((resolve_vc_ga, reject_vc_ga) => {
+    crud_vc_ga.actualizarProducto_vc_ga(id_vc_ga, producto_vc_ga, (err_vc_ga, result_vc_ga) => {
+      if (err_vc_ga) reject_vc_ga(err_vc_ga);
+      else resolve_vc_ga(result_vc_ga);
     });
   });
 });
 
-module.exports = { crearVentana };
+module.exports = { crearVentana_vc_ga };

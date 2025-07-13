@@ -5,28 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Electron & MySQL</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src='./tailwind/tailwind.config.js'></script>
+    <script src='../tailwind/tailwind.config.js'></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="icon" href="./img/CrudElectron.png" type="image/x-icon">
-    <script>
-  // Configuración Tailwind debe estar inline
-  tailwind.config = {
-    darkMode: 'class',
-    theme: {
-      extend: {
-        colors: {
-          primary: '#6366f1',
-          secondary: '#8b5cf6',
-          dark: '#1e293b'
-        }
-      }
-    }
-  }
-</script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="icon" href="../img/CrudElectron.png" type="image/x-icon">
 </head>
-<body class="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+<body id="crud" class="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
     <!-- Contenedor Grid Principal -->
     <div class="grid min-h-screen grid-rows-[auto_1fr_auto] gap-6">
         <!-- Header -->
@@ -116,7 +101,7 @@
                         <!-- Tarjeta Victor -->
                         <div class="flex items-center space-x-4 badge py-3 px-4 rounded-xl">
                             <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
-                                <img src="./img/Victor.png" alt="Victor"
+                                <img src="../img/Victor.png" alt="Victor"
                                      class="rounded-full w-10 h-10">
                             </div>
                             <div>
@@ -128,7 +113,7 @@
                         <!-- Tarjeta Guillermo -->
                         <div class="flex items-center space-x-4 badge py-3 px-4 rounded-xl">
                             <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
-                                <img src="./img/Guillermo.jpg" alt="Guillermo"
+                                <img src="../img/Guillermo.jpg" alt="Guillermo"
                                      class="rounded-full w-10 h-10">
                             </div>
                             <div>
@@ -149,6 +134,6 @@
         </footer>
     </div>
 
-    <script src="./js/app.js"></script>
+    <script src="../js/app.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 console.log('carga el index');
-const { crearVentana } = require("./main");
+const { crearVentana_vc_ga } = require("../js/main");
 const { app } = require("electron");
 
 require('../database/conexion');
@@ -11,4 +11,4 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
-app.whenReady().then(crearVentana);
+app.whenReady().then(crearVentana_vc_ga);
