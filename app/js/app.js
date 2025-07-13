@@ -1,10 +1,11 @@
 console.log("carga el app_vc_ga");
 const { ipcRenderer } = require("electron");
 const { registerHTML_vc_ga, crudHTML_vc_ga, loginHTML_vc_ga, toggleEye_vc_ga } = require("../js/login");
-const { plantillaHTML_vc_ga} = require("../js/plantilla");
+const { plantillaHTML_vc_ga, loadUsers_vc_ga, sampleUsers_vc_ga, handleFormSubmit_vc_ga, cancelEdit_vc_ga} = require("../js/plantilla");
 const { setupThemeToggle_vc_ga } = require("../js/dark-mode");
 const { reportesHTML_vc_ga } = require("../js/reportes");
-
+const { ModalDialog_vc_ga } = require("../js/modal");
+const modal_vc_ga = new ModalDialog_vc_ga();
 if (loginHTML_vc_ga) {
   toggleEye_vc_ga();
           tailwind.config = {
@@ -157,7 +158,13 @@ if (plantillaHTML_vc_ga) {
             }
           }
         };
-setupThemeToggle_vc_ga();  
+setupThemeToggle_vc_ga();
+// Inicialización
+document.addEventListener('DOMContentLoaded', () => {
+    loadUsers_vc_ga(sampleUsers_vc_ga);
+    document.getElementById('userForm').addEventListener('submit', handleFormSubmit_vc_ga);
+    document.getElementById('cancelEdit').addEventListener('click', cancelEdit_vc_ga);
+});  
 }
 
 if (reportesHTML_vc_ga) {
@@ -254,7 +261,7 @@ if (crudHTML_vc_ga) {
   let idProductoEditar_vc_ga;
 
   const eliminarProducto_vc_ga = async (id_vc_ga) => {
-    const respuesta_vc_ga = confirm("¿Estás seguro de que quieres eliminarlo?");
+    const respuesta_vc_ga = await modal_vc_ga.showConfirm_vc_ga("¿Estás seguro de que quieres eliminarlo?", "Los cambios no se pueden deshacer");
     if (respuesta_vc_ga) {
       await ipcRenderer.invoke("eliminar-producto_vc_ga", id_vc_ga);
       await obtenerProductos_vc_ga();

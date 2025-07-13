@@ -9,20 +9,26 @@ class ModalDialog_vc_ga {
         this.modalMessage_vc_ga = document.getElementById('modalMessage');
         this.modalClose_vc_ga = document.getElementById('modalClose');
         this.modalAction_vc_ga = document.getElementById('modalAction');
+        this.modalCancel_vc_ga = document.getElementById('modalCancel'); // Necesitarás agregar este botón en tu HTML
+
+        // Variables para manejar la promesa
+        this.resolvePromise = null;
+        this.rejectPromise = null;
 
         // Configurar eventos
-        this.modalClose_vc_ga.addEventListener('click', () => this.hide_vc_ga());
-        this.modalAction_vc_ga.addEventListener('click', () => this.hide_vc_ga());
+        this.modalClose_vc_ga.addEventListener('click', () => this.cancel_vc_ga());
+        this.modalAction_vc_ga.addEventListener('click', () => this.confirm_vc_ga());
+        this.modalCancel_vc_ga.addEventListener('click', () => this.cancel_vc_ga());
 
         // Cerrar al hacer clic fuera del modal
         this.modalContainer_vc_ga.addEventListener('click', (e_vc_ga) => {
             if (e_vc_ga.target === this.modalContainer_vc_ga) {
-                this.hide_vc_ga();
+                this.cancel_vc_ga();
             }
         });
     }
 
-    show_vc_ga(title_vc_ga, message_vc_ga, type_vc_ga) {
+    show_vc_ga(title_vc_ga, message_vc_ga, type_vc_ga, isConfirm = false) {
         // Configurar según el tipo
         switch(type_vc_ga) {
             case 'success':
@@ -47,23 +53,54 @@ class ModalDialog_vc_ga {
         this.modalMessage_vc_ga.textContent = message_vc_ga;
         this.modalAction_vc_ga.textContent = type_vc_ga === 'error' ? 'Reintentar' : 'Aceptar';
         
+        // Mostrar u ocultar botón de cancelar según sea confirmación
+        if (isConfirm) {
+            this.modalCancel_vc_ga.style.display = 'block';
+        } else {
+            this.modalCancel_vc_ga.style.display = 'none';
+        }
+        
         // Mostrar modal
         this.modalContainer_vc_ga.classList.add('active');
         
         // Bloquear scroll de fondo
         document.body.style.overflow = 'hidden';
+
+        // Devolver una promesa
+        return new Promise((resolve, reject) => {
+            this.resolvePromise = resolve;
+            this.rejectPromise = reject;
+        });
+    }
+
+    showConfirm_vc_ga(title_vc_ga, message_vc_ga) {
+        return this.show_vc_ga(title_vc_ga, message_vc_ga, 'warning', true);
     }
     
     showSuccess_vc_ga(title_vc_ga, message_vc_ga) {
-        this.show_vc_ga(title_vc_ga, message_vc_ga, 'success');
+        return this.show_vc_ga(title_vc_ga, message_vc_ga, 'success');
     }
     
     showError_vc_ga(title_vc_ga, message_vc_ga) {
-        this.show_vc_ga(title_vc_ga, message_vc_ga, 'error');
+        return this.show_vc_ga(title_vc_ga, message_vc_ga, 'error');
     }
     
     showWarning_vc_ga(title_vc_ga, message_vc_ga) {
-        this.show_vc_ga(title_vc_ga, message_vc_ga, 'warning');
+        return this.show_vc_ga(title_vc_ga, message_vc_ga, 'warning');
+    }
+
+    confirm_vc_ga() {
+        this.hide_vc_ga();
+        if (this.resolvePromise) {
+            this.resolvePromise(true);
+        }
+    }
+
+    cancel_vc_ga() {
+        this.hide_vc_ga();
+        if (this.resolvePromise) {
+            this.resolvePromise(false);
+        }
     }
     
     hide_vc_ga() {

@@ -49,9 +49,9 @@
         }
         
         .modal-footer {
-            padding: 1rem 1.5rem;
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between; /* Separa los botones a extremos opuestos */
+            padding: 1rem 1.5rem;
         }
         
         .success-bg {
@@ -76,4 +76,45 @@
         
         .dark .modal-body p {
             color: #F3EFF5;
+        }
+
+        .modal-btn-accept {
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            background-color: #3B82F6; /* Azul por defecto (puedes cambiarlo según el tipo de modal) */
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .modal-btn-accept:hover {
+            background-color: #2563EB; /* Azul más oscuro al pasar el mouse */
+        }
+
+        .modal-btn-cancel {
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            background-color: #F3F4F6; /* Fondo gris claro */
+            color: #4B5563; /* Texto gris oscuro */
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .modal-btn-cancel:hover {
+            background-color: #E5E7EB; /* Gris un poco más oscuro al pasar el mouse */
+        }
+
+        /* Ajustes para los diferentes tipos de modales */
+        .modal-header.success-bg ~ .modal-footer .modal-btn-accept {
+            background-color: #10B981; /* Verde para éxito */
+        }
+        .modal-header.error-bg ~ .modal-footer .modal-btn-accept {
+            background-color: #EF4444; /* Rojo para error */
+        }
+        .modal-header.warning-bg ~ .modal-footer .modal-btn-accept {
+            background-color: #F59E0B; /* Amarillo para advertencia */
         }
