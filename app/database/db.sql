@@ -12,19 +12,10 @@ CREATE TABLE productos_vc_ga(
 DESCRIBE productos_vc_ga;
 
 -- Nuevas tablas
-CREATE TABLE IF NOT EXISTS td_empresa_vc_ga (
-  id_empresa_vc_ga int PRIMARY KEY,
-  nombre_vc_ga varchar(255),
-  rif_vc_ga varchar(255),
-  direccion_vc_ga varchar(255)
-);
-
 CREATE TABLE IF NOT EXISTS td_sucursal_vc_ga (
   id_sucursal_vc_ga int PRIMARY KEY,
-  id_empresa_vc_ga int,
   nombre_vc_ga varchar(255),
-  direccion_vc_ga varchar(255),
-  FOREIGN KEY (id_empresa_vc_ga) REFERENCES td_empresa_vc_ga(id_empresa_vc_ga)
+  direccion_vc_ga varchar(255)
 );
 
 CREATE TABLE IF NOT EXISTS td_departamento_vc_ga (
