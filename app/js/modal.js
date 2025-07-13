@@ -111,4 +111,5 @@ class ModalDialog_vc_ga {
     }
 }
 
-module.exports = { ModalDialog_vc_ga };
+const modal_vc_ga = new ModalDialog_vc_ga();
+module.exports = {modal_vc_ga}

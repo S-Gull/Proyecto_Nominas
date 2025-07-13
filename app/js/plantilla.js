@@ -1,6 +1,6 @@
-const { ModalDialog_vc_ga } = require("./modal");
+const { modal_vc_ga } = require("./modal");
+
 const plantillaHTML_vc_ga = document.getElementById("plantilla");
-const modal_vc_ga = new ModalDialog_vc_ga();
 // Datos de ejemplo para la demo
 const sampleUsers_vc_ga = [
     {

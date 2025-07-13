@@ -1,44 +1,15 @@
 console.log("carga la conexion_vcga");
-const mysql_vcga = require('mysql');
+const mysql_vc_ga = require('mysql');
 
-<<<<<<< HEAD
-// Crear una conexión global (similar a PHP)
-const connection_vcga = mysql_vcga.createConnection({
-=======
 // Configuración de conexión inicial (sin base de datos especificada)
 const config_vc_ga = {
->>>>>>> main
   host: 'localhost',
   user: 'root',
   password: '3690'
 };
 
-<<<<<<< HEAD
-// Conectar a la base de datos
-connection_vcga.connect((err_vcga) => {
-  if (err_vcga) {
-    console.error('Error de conexión_vcga:', err_vcga.stack);
-    return;
-  }
-  console.log('Conectado a MySQL_vcga');
-});
-
-// Función para ejecutar consultas estilo PHP
-const query_vcga = (sql_vcga, params_vcga = [], callback_vcga) => {
-  if (!callback_vcga && typeof params_vcga === 'function') {
-    callback_vcga = params_vcga;
-    params_vcga = [];
-  }
-  
-  connection_vcga.query(sql_vcga, params_vcga, (err_vcga, results_vcga) => {
-    if (err_vcga) {
-      console.error('Error en consulta_vcga:', err_vcga);
-      return callback_vcga(err_vcga, null);
-    }
-    callback_vcga(null, results_vcga);
-=======
 // Crear una conexión global
-const connection_vc_ga = mysql.createConnection(config_vc_ga);
+const connection_vc_ga = mysql_vc_ga.createConnection(config_vc_ga);
 
 const tablas_vc_ga = [
   `CREATE TABLE IF NOT EXISTS productos_vc_ga(
@@ -239,16 +210,11 @@ connection_vc_ga.connect(async (err_vc_ga) => {
 // Función para ejecutar consultas (con reconexión automática)
 const query_vc_ga = (sql_vc_ga, params_vc_ga = [], callback_vc_ga) => {
   // Crear una nueva conexión para cada consulta
-  const db_vc_ga = mysql.createConnection({
+  const db_vc_ga = mysql_vc_ga.createConnection({
     ...config_vc_ga,
     database: 'crud_electron'
->>>>>>> main
   });
 
-<<<<<<< HEAD
-// Exportar la función de consulta
-module.exports = { query_vcga };
-=======
   db_vc_ga.connect((err_vc_ga) => {
     if (err_vc_ga) {
       console.error('Error de conexión:', err_vc_ga);
@@ -267,4 +233,3 @@ module.exports = { query_vcga };
 };
 
 module.exports = { query_vc_ga };
->>>>>>> main
