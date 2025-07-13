@@ -1,5 +1,5 @@
-console.log("carga la conexion");
-const mysql = require('mysql');
+console.log("carga la conexion_vcga");
+const mysql_vc_ga = require('mysql');
 
 // Configuración de conexión inicial (sin base de datos especificada)
 const config_vc_ga = {
@@ -9,7 +9,7 @@ const config_vc_ga = {
 };
 
 // Crear una conexión global
-const connection_vc_ga = mysql.createConnection(config_vc_ga);
+const connection_vc_ga = mysql_vc_ga.createConnection(config_vc_ga);
 
 const tablas_vc_ga = [
   `CREATE TABLE IF NOT EXISTS productos_vc_ga(
@@ -210,7 +210,7 @@ connection_vc_ga.connect(async (err_vc_ga) => {
 // Función para ejecutar consultas (con reconexión automática)
 const query_vc_ga = (sql_vc_ga, params_vc_ga = [], callback_vc_ga) => {
   // Crear una nueva conexión para cada consulta
-  const db_vc_ga = mysql.createConnection({
+  const db_vc_ga = mysql_vc_ga.createConnection({
     ...config_vc_ga,
     database: 'crud_electron'
   });

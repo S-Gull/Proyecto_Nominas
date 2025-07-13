@@ -51,8 +51,7 @@ const { registerHTML_vc_ga, crudHTML_vc_ga, loginHTML_vc_ga, toggleEye_vc_ga } =
 const { plantillaHTML_vc_ga, loadUsers_vc_ga, sampleUsers_vc_ga, handleFormSubmit_vc_ga, cancelEdit_vc_ga} = require("../js/plantilla");
 const { setupThemeToggle_vc_ga } = require("../js/dark-mode");
 const { reportesHTML_vc_ga } = require("../js/reportes");
-const { ModalDialog_vc_ga } = require("../js/modal");
-const modal_vc_ga = new ModalDialog_vc_ga();
+const { modal_vc_ga } = require("../js/modal");
 if (loginHTML_vc_ga) {
   toggleEye_vc_ga();
           tailwind.config = {
