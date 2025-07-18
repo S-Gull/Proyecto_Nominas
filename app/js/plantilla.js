@@ -72,55 +72,71 @@ async cargarOpcionesSelect_vc_ga() {
 
 async guardarUsuario_vc_ga(datos_vc_ga) {
   try {
-    // Convertir valores vacíos a null
-    datos_vc_ga.id_departamento_vc_ga = datos_vc_ga.id_departamento_vc_ga || null;
-    datos_vc_ga.id_rol_vc_ga = datos_vc_ga.id_rol_vc_ga || null;
-    datos_vc_ga.id_cargo_vc_ga = datos_vc_ga.id_cargo_vc_ga || null;
-
-    // Validar referencias solo si tienen valor
-    if (datos_vc_ga.id_departamento_vc_ga) {
-      const deptoExists = await this._ejecutarConsulta_vc_ga(
-        'SELECT id_departamento_vc_ga FROM td_departamento_vc_ga WHERE id_departamento_vc_ga = ?',
-        [datos_vc_ga.id_departamento_vc_ga]
-      );
-      if (deptoExists.length === 0) {
-        throw new Error('El departamento seleccionado no existe en la base de datos');
-      }
+    const esNuevo_vc_ga = !datos_vc_ga.id_usuario_vc_ga;
+    
+    // Validación básica de campos requeridos
+    if (!datos_vc_ga.nombre_completo_vc_ga || !datos_vc_ga.cedula_vc_ga) {
+      throw new Error('Nombre completo y cédula son campos obligatorios');
     }
 
-    if (datos_vc_ga.id_rol_vc_ga) {
-      const rolExists = await this._ejecutarConsulta_vc_ga(
-        'SELECT id_rol_vc_ga FROM td_roles_vc_ga WHERE id_rol_vc_ga = ?',
-        [datos_vc_ga.id_rol_vc_ga]
-      );
-      if (rolExists.length === 0) {
-        throw new Error('El rol seleccionado no existe en la base de datos');
-      }
+    // Preparar datos para la base de datos
+    const datosParaGuardar = {
+      nombre_completo_vc_ga: datos_vc_ga.nombre_completo_vc_ga,
+      cedula_vc_ga: datos_vc_ga.cedula_vc_ga,
+      rif_vc_ga: datos_vc_ga.rif_vc_ga || null,
+      fecha_nacimiento_vc_ga: datos_vc_ga.fecha_nacimiento_vc_ga 
+        ? new Date(datos_vc_ga.fecha_nacimiento_vc_ga).toISOString().split('T')[0] 
+        : null,
+      fecha_ingreso_vc_ga: datos_vc_ga.fecha_ingreso_vc_ga 
+        ? new Date(datos_vc_ga.fecha_ingreso_vc_ga).toISOString().split('T')[0] 
+        : null,
+      status_vc_ga: datos_vc_ga.status_vc_ga || 'Trabajando',
+      correo_electronico_vc_ga: datos_vc_ga.correo_electronico_vc_ga || null,
+      telefono_vc_ga: datos_vc_ga.telefono_vc_ga || null,
+      id_departamento_vc_ga: datos_vc_ga.id_departamento_vc_ga || null,
+      id_rol_vc_ga: datos_vc_ga.id_rol_vc_ga || null,
+      id_cargo_vc_ga: datos_vc_ga.id_cargo_vc_ga || null
+    };
+
+    // Solo incluir clave si es nuevo usuario
+    if (esNuevo_vc_ga) {
+      datosParaGuardar.clave_vc_ga = datos_vc_ga.clave_vc_ga || 'Temp1234';
+      datosParaGuardar.clave_temporal_vc_ga = true;
     }
 
-    if (datos_vc_ga.id_cargo_vc_ga) {
-      const cargoExists = await this._ejecutarConsulta_vc_ga(
-        'SELECT id_cargo_vc_ga FROM td_cargos_vc_ga WHERE id_cargo_vc_ga = ?',
-        [datos_vc_ga.id_cargo_vc_ga]
-      );
-      if (cargoExists.length === 0) {
-        throw new Error('El cargo seleccionado no existe en la base de datos');
-      }
-    }
+    // Construir y ejecutar query
+    const query = esNuevo_vc_ga 
+      ? 'INSERT INTO td_usuarios_vc_ga SET ?'
+      : 'UPDATE td_usuarios_vc_ga SET ? WHERE id_usuario_vc_ga = ?';
+    
+    const params = esNuevo_vc_ga 
+      ? [datosParaGuardar] 
+      : [datosParaGuardar, datos_vc_ga.id_usuario_vc_ga];
 
-    // Resto del código de guardado...
-  } catch (error_vc_ga) {
-    console.error('Error detallado:', {
-      error: error_vc_ga,
-      datosIntento: datos_vc_ga,
-      departamentos: this.departamentos_vc_ga,
-      roles: this.roles_vc_ga,
-      cargos: this.cargos_vc_ga
+    const resultado = await this._ejecutarConsulta_vc_ga(query, params);
+    
+    // Recargar lista de usuarios
+    await this.cargarUsuarios_vc_ga();
+
+    return {
+      exito: true,
+      mensaje: esNuevo_vc_ga ? 'Usuario creado exitosamente' : 'Usuario actualizado exitosamente',
+      id: esNuevo_vc_ga ? resultado.insertId : datos_vc_ga.id_usuario_vc_ga
+    };
+
+  } catch (error) {
+    console.error('Error al guardar usuario:', {
+      error: error.message,
+      stack: error.stack,
+      datos: datos_vc_ga
     });
-    throw error_vc_ga;
+    
+    return {
+      exito: false,
+      mensaje: error.message || 'Error desconocido al guardar usuario'
+    };
   }
 }
-
 async _validarReferencias_vc_ga(datos_vc_ga) {
   try {
     // Verificar departamento
@@ -176,19 +192,22 @@ async _validarReferencias_vc_ga(datos_vc_ga) {
     }
   }
 
-  async _ejecutarConsulta_vc_ga(sql_vc_ga, params_vc_ga = []) {
-    return new Promise((resolve_vc_ga, reject_vc_ga) => {
-      query_vc_ga(sql_vc_ga, params_vc_ga, (err_vc_ga, results_vc_ga) => {
-        if (err_vc_ga) {
-          console.error("Error en consulta:", sql_vc_ga, err_vc_ga);
-          reject_vc_ga(new Error("Error al ejecutar consulta en la base de datos"));
-        } else {
-          resolve_vc_ga(results_vc_ga);
-        }
-      });
+async _ejecutarConsulta_vc_ga(sql_vc_ga, params_vc_ga = []) {
+  return new Promise((resolve_vc_ga, reject_vc_ga) => {
+    query_vc_ga(sql_vc_ga, params_vc_ga, (err_vc_ga, results_vc_ga) => {
+      if (err_vc_ga) {
+        console.error("Error en consulta SQL:", {
+          sql: sql_vc_ga,
+          params: params_vc_ga,
+          error: err_vc_ga
+        });
+        reject_vc_ga(new Error("Error al ejecutar consulta en la base de datos"));
+      } else {
+        resolve_vc_ga(results_vc_ga);
+      }
     });
-  }
-
+  });
+}
 _prepararDatosUsuario_vc_ga(datos_vc_ga, esNuevo_vc_ga = false) {
   const datosLimpios_vc_ga = {
     nombre_completo_vc_ga: datos_vc_ga.nombre_completo_vc_ga,
@@ -245,21 +264,56 @@ class PlantillaController_vc_ga {
     document.getElementById('cancelEdit')?.addEventListener('click', () => this.cancelarEdicion_vc_ga());
   }
 
-  async manejarEnvioFormulario_vc_ga(e_vc_ga) {
-    e_vc_ga.preventDefault();
-    
+async manejarEnvioFormulario_vc_ga(e_vc_ga) {
+  e_vc_ga.preventDefault();
+  
+  try {
     const datosFormulario_vc_ga = this.obtenerDatosFormulario_vc_ga();
     
-    try {
-      const resultado_vc_ga = await this.gestor_vc_ga.guardarUsuario_vc_ga(datosFormulario_vc_ga);
-      await modal_vc_ga.showSuccess_vc_ga("Éxito", resultado_vc_ga.mensaje_vc_ga);
-      this.limpiarFormulario_vc_ga();
-      this.mostrarUsuarios_vc_ga();
-    } catch (error_vc_ga) {
-      console.error("Error guardando usuario:", error_vc_ga);
+    // Mostrar loader o estado de carga
+    const submitBtn = e_vc_ga.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+    submitBtn.disabled = true;
+
+    const resultado_vc_ga = await this.gestor_vc_ga.guardarUsuario_vc_ga(datosFormulario_vc_ga);
+    
+    // Verificar si el resultado es válido
+    if (!resultado_vc_ga) {
+      throw new Error('No se recibió respuesta del servidor');
+    }
+
+    // Mostrar mensaje de éxito con validación
+    const mensajeExito = resultado_vc_ga.mensaje_vc_ga || 
+                        (resultado_vc_ga.exito_vc_ga ? 'Operación realizada con éxito' : 'Operación completada');
+    
+    await modal_vc_ga.showSuccess_vc_ga("Éxito", mensajeExito);
+    
+    this.limpiarFormulario_vc_ga();
+    this.mostrarUsuarios_vc_ga();
+  } catch (error_vc_ga) {
+    console.error("Error guardando usuario:", error_vc_ga);
+    
+    // Manejar diferentes tipos de error
+    let mensajeError = 'Ocurrió un error al guardar el usuario';
+    if (error_vc_ga instanceof Error) {
+      mensajeError = error_vc_ga.message;
+    } else if (typeof error_vc_ga === 'string') {
+      mensajeError = error_vc_ga;
+    } else if (error_vc_ga?.message) {
+      mensajeError = error_vc_ga.message;
+    }
+
+    await modal_vc_ga.showError_vc_ga("Error al guardar", mensajeError);
+  } finally {
+    // Restaurar el botón a su estado original
+    const submitBtn = e_vc_ga.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i> <span id="submitText">Guardar</span>';
+      submitBtn.disabled = false;
     }
   }
-
+}
   obtenerDatosFormulario_vc_ga() {
     const form_vc_ga = document.getElementById('userForm');
     return {
@@ -438,14 +492,25 @@ actualizarSelect_vc_ga(idSelect_vc_ga, opciones_vc_ga) {
     return new Date(fecha_vc_ga).toLocaleDateString('es-ES', opciones_vc_ga);
   }
 
-  limpiarFormulario_vc_ga() {
-    document.getElementById('userForm').reset();
-    document.getElementById('formTitle').textContent = 'Agregar Usuario';
-    document.getElementById('submitText').textContent = 'Guardar';
-    document.getElementById('cancelEdit').classList.add('hidden');
-    document.getElementById('id_usuario').value = '';
-  }
+limpiarFormulario_vc_ga() {
+//   const form = document.getElementById('userForm');
+//   if (!form) return;
 
+//   form.reset();
+//   document.getElementById('id_usuario').value = '';
+//   document.getElementById('formTitle').textContent = 'Agregar Usuario';
+//   document.getElementById('submitText').textContent = 'Guardar';
+//   document.getElementById('cancelEdit').classList.add('hidden');
+  
+//   // Restablecer selects
+//   const selects = ['id_departamento', 'id_rol', 'id_cargo'];
+//   selects.forEach(id => {
+//     const select = document.getElementById(id);
+//     if (select) select.value = '';
+//   });
+
+location.href = './plantilla.html'
+}
   cancelarEdicion_vc_ga() {
     this.limpiarFormulario_vc_ga();
   }
