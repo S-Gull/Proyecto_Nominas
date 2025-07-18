@@ -1,107 +1,152 @@
-# Electron MySQL CRUD
+# 📝 Sistema de Gestión de Nómina - Baldox
 
-Aplicación de escritorio construida con **Electron**, **MySQL** y **TailwindCSS** para la gestión de productos (CRUD). Permite agregar, editar, eliminar y listar productos en una base de datos MySQL, con una interfaz moderna y soporte para modo oscuro.
+![Baldox Logo](./app/img/BALDOX_LOGO.jpg)
 
-![CRUD EN ELECTRONJS](./app/img/CrudElectron.png)
+## 📌 Descripción
 
-## Características
+Sistema completo de gestión de nómina desarrollado con Electron.js, MySQL y Tailwind CSS, que permite administrar empleados, departamentos, roles, pagos y reportes de nómina.
 
-- CRUD de productos (nombre, precio, descripción)
-- Interfaz moderna con TailwindCSS 
-- Notificaciones de escritorio con Electron
-- Modo oscuro
-- Recarga automática en desarrollo
+## 🛠️ Tecnologías Utilizadas
 
-## Requisitos
+- **Frontend**: 
+  - Electron.js
+  - Tailwind CSS
+  - Font Awesome
+  - Animate.css
 
-- [Node.js](https://nodejs.org/) (v12 o superior recomendado)
-- [MySQL](https://www.mysql.com/) (servidor local)
-- npm (incluido con Node.js)
+- **Backend**:
+  - Node.js
+  - MySQL
 
-## Instalación
+- **Otros**:
+  - IPC (Comunicación entre procesos)
+  - Sistema de autenticación JWT
+  - Modo oscuro/claro
 
-1. **Clona el repositorio:**
-   ```sh
-   git clone https://github.com/S-Gull/electron-mysql-crud.git
-   cd electron-mysql-crud
+## 🗃️ Estructura del Proyecto
 
-   # CRUD de Productos con Electron y MySQL
+```
+/app
+  ├── /database
+  │   ├── conexion.js       # Configuración de la base de datos
+  │   └── crud.js          # Operaciones CRUD
+  ├── /js
+  │   ├── app.js           # Punto de entrada
+  │   ├── auth.js          # Autenticación
+  │   ├── dark-mode.js     # Toggle modo oscuro
+  │   ├── login.js         # Lógica de login
+  │   ├── main.js          # Configuración de Electron
+  │   ├── modal.js         # Componente modal
+  │   ├── plantilla.js     # Gestión de usuarios
+  │   └── reportes.js      # Gestión de reportes
+  ├── /views
+  │   ├── index.html       # Login
+  │   ├── plantilla.html   # Gestión de usuarios
+  │   └── reportes.html    # Gestión de reportes
+  └── /css                 # Estilos
+```
 
-Este es un proyecto de escritorio para gestionar productos (CRUD) utilizando Electron.js y MySQL como base de datos.
+## 🔌 Requisitos del Sistema
 
-## Instalación
+- Node.js v16+
+- MySQL 8+
+- XAMPP (opcional para entorno local)
 
-Sigue estos pasos para configurar y ejecutar el proyecto en tu entorno local.
+## 🚀 Instalación
 
-### 1. Instala las dependencias:
+1. Clonar el repositorio:
+```bash
+git clone [url-del-repositorio]
+cd crud_tailwind_electron
+```
 
-Abre una terminal en la raíz del proyecto y ejecuta el siguiente comando para instalar todas las dependencias necesarias:
-
+2. Instalar dependencias:
 ```bash
 npm install
 ```
 
-### 2. Configura la base de datos:
+3. Configurar base de datos:
+- Importar el archivo `database.sql` a MySQL
+- Configurar credenciales en `app/database/conexion.js`
 
-**Requisitos:**
-* Asegúrate de tener un servidor MySQL en ejecución.
-
-**Pasos:**
-1.  Ejecuta el siguiente script SQL para crear la base de datos (`electron_mysql_crud`) y la tabla de productos (`products`):
-
-    ```bash
-    mysql -u root -p < app/database/db.sql
-    ```
-
-2.  Por defecto, la configuración de la base de datos se encuentra en `app/database/database.js` con las siguientes credenciales:
-    * **Usuario:** `root`
-    * **Contraseña:** `3690`
-
-    Si tus credenciales de MySQL son diferentes, asegúrate de modificarlas en ese archivo.
-
-## Uso
-
-Una vez que las dependencias estén instaladas y la base de datos configurada, puedes iniciar la aplicación con el siguiente comando:
-
+4. Iniciar la aplicación:
 ```bash
 npm start
 ```
 
-Esto abrirá una ventana de escritorio donde podrás crear, leer, actualizar y eliminar productos.
+## 🗄️ Estructura de la Base de Datos
 
-## Dependencias Principales
+El sistema utiliza 15 tablas relacionadas:
 
-* [**electron**](https://www.electronjs.org/): Framework para crear aplicaciones de escritorio con tecnologías web.
-* [**promise-mysql**](https://www.npmjs.com/package/promise-mysql): Un wrapper de `mysql` que utiliza Promises.
-* [**mysql**](https://www.npmjs.com/package/mysql): Driver de MySQL para Node.js.
-* [**tailwindcss**](https://tailwindcss.com/): Framework de CSS (utilizado vía CDN).
-* [**electron-reload**](https://www.npmjs.com/package/electron-reload): Recarga automáticamente la aplicación durante el desarrollo.
+1. **Tablas principales**:
+   - `td_usuarios_vc_ga` (Empleados)
+   - `td_departamento_vc_ga` (Departamentos)
+   - `td_roles_vc_ga` (Roles de usuario)
+   - `td_cargos_vc_ga` (Cargos)
 
-## Estructura del Proyecto
+2. **Tablas de nómina**:
+   - `td_pago_nomina_vc_ga` (Pagos)
+   - `td_salario_historico_vc_ga` (Historial salarial)
+   - `td_bono_vc_ga` (Bonos)
+   - `td_horas_extras_vc_ga` (Horas extras)
 
+3. **Tablas de reportes**:
+   - `td_recibo_nomina_vc_ga` (Recibos)
+   - `td_reporte_banco_vc_ga` (Reportes bancarios)
+   - `td_reporte_contable_vc_ga` (Reportes contables)
+
+## 🔒 Sistema de Autenticación
+
+- Login con email y contraseña
+- Roles de usuario (Administrador/Usuario)
+- Protección de rutas
+- Manejo de sesiones
+
+## 🎨 Características de la Interfaz
+
+- **Modo oscuro/claro** con persistencia
+- **Animaciones** con Animate.css
+- **Responsive design** con Tailwind
+- **Componentes reutilizables** (modales, formularios)
+- **Validación de formularios**
+
+## 🛠️ Funcionalidades Clave
+
+1. **Gestión de Usuarios**:
+   - CRUD completo de empleados
+   - Asignación de departamentos/roles
+   - Historial salarial
+
+2. **Nómina**:
+   - Registro de pagos
+   - Cálculo automático
+   - Generación de recibos
+
+3. **Reportes**:
+   - Bancarios
+   - Contables
+   - Históricos
+
+## 🐛 Solución de Problemas Comunes
+
+### Error al eliminar usuarios
+```bash
+Error: ER_ROW_IS_REFERENCED_2: Cannot delete or update a parent row
 ```
-electron-mysql-crud/
-├── app/
-│   ├── index.html
-│   ├── css/
-│   │   └── style.css
-│   ├── database/
-│   │   ├── database.js
-│   │   └── db.sql
-│   ├── js/
-│   │   ├── app.js
-│   │   ├── index.js
-│   │   └── main.js
-│   └── tailwind/
-│       └── tailwind.config.js
-├── package.json
-└── README.md
+**Solución**: Asegurar que todas las tablas tienen `ON DELETE CASCADE` en sus FK.
+
+### Error de fechas
+```bash
+The specified value does not conform to the required format "yyyy-MM-dd"
 ```
+**Solución**: Usar el método `_formatearFecha_vc_ga` al guardar.
 
-## Créditos
+### Error de referencias
+```bash
+Error: Uno o más IDs referenciados no existen en la base de datos
+```
+**Solución**: Validar los selects con `validarReferencias_vc_ga`.
 
-Desarrollado por **Victor Contreras** y **Guillermo Álvarez**.
+## 📜 Licencia
 
----
-
-¡Contribuciones y sugerencias son bienvenidas!
+MIT License - Free for commercial and personal use.
