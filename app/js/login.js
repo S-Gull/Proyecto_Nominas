@@ -1,17 +1,15 @@
 const { ipcRenderer } = require('electron');
 const { modal_vc_ga } = require("./modal");
+const { query_vc_ga } = require('../database/conexion');
 
 const loginHTML_vc_ga = document.getElementById("login");
 
 // 1. Capa de Datos (Repositorio)
 class AuthRepositorio_vc_ga {
-  constructor(manejadorQuery_vc_ga) {
-    this.query_vc_ga = manejadorQuery_vc_ga;
-  }
 
-  async obtenerUsuarioPorCredenciales_vc_ga(correo_vc_ga, contraseña_vc_ga) {
+  obtenerUsuarioPorCredenciales_vc_ga = async (correo_vc_ga, contraseña_vc_ga)=> {
     try {
-      return await this.query_vc_ga(
+      return await query_vc_ga(
         'SELECT * FROM td_usuarios_vc_ga WHERE correo_electronico_vc_ga = ? AND clave_vc_ga = ?',
         [correo_vc_ga, contraseña_vc_ga]
       );
@@ -92,8 +90,7 @@ class LoginControlador_vc_ga {
     if (!formulario_vc_ga) return;
 
     formulario_vc_ga.addEventListener('submit', async (e_vc_ga) => {
-      e_vc_ga.preventDefault();
-      
+      e_vc_ga.preventDefault();      
       const correo_vc_ga = document.getElementById('correo').value.trim();
       const contraseña_vc_ga = document.getElementById('clave').value;
 

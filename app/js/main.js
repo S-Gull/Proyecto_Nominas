@@ -76,7 +76,7 @@ ipcMain.handle("verificar-credenciales_vc_ga", async (event_vc_ga, credenciales_
 });
 
 
-ipcMain.handle('query-auth', async (event, sql, params) => {
+ipcMain.handle('query-auth_vc_ga', async (event, sql, params) => {
   return new Promise((resolve, reject) => {
     connection_vc_ga.query(sql, params, (err, results) => {
       if (err) return reject(err);
