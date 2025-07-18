@@ -184,49 +184,7 @@
         </main>
 
         <!-- Footer -->
-        <footer class="bg-white p-6 shadow-lg dark:bg-dark-800">
-            <div class="container mx-auto">
-                <div class="flex flex-col md:flex-row items-center justify-between">
-                    <div class="text-center md:text-left mb-6 md:mb-0">
-                        <p class="text-gray-600 dark:text-gray-300 text-sm">
-                            © 2025 Sistema de Gestión de Usuarios. Todos los derechos reservados.
-                        </p>
-                    </div>
-                    
-                    <!-- Tarjetas de desarrolladores -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <!-- Tarjeta Victor -->
-                        <div class="flex items-center space-x-4 badge py-3 px-4 rounded-xl">
-                            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
-                                <span class="text-2xl">👤</span>
-                            </div>
-                            <div>
-                                <p class="text-gray-800 dark:text-white font-medium">Victor Contreras</p>
-                                <p class="text-gray-500 dark:text-gray-400 text-sm">30.520.132</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Tarjeta Guillermo -->
-                        <div class="flex items-center space-x-4 badge py-3 px-4 rounded-xl">
-                            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12 flex items-center justify-center">
-                                <span class="text-2xl">👤</span>
-                            </div>
-                            <div>
-                                <p class="text-gray-800 dark:text-white font-medium">Guillermo Álvarez</p>
-                                <p class="text-gray-500 dark:text-gray-400 text-sm">30.165.318</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Enlaces legales -->
-                    <div class="flex flex-wrap justify-center gap-4 mt-6 md:mt-0">
-                        <a href="#" class="text-gray-600 hover:text-accent1 dark:text-gray-400 dark:hover:text-accent1 text-sm">Términos</a>
-                        <a href="#" class="text-gray-600 hover:text-accent1 dark:text-gray-400 dark:hover:text-accent1 text-sm">Privacidad</a>
-                        <a href="#" class="text-gray-600 hover:text-accent1 dark:text-gray-400 dark:hover:text-accent1 text-sm">Licencia</a>
-                    </div>
-                </div>
-            </div>
-        </footer>
+\
     </div>
     <div id="modalContainer" class="modal-container">
     <div id="modalContent" class="modal-content bg-white">
@@ -253,6 +211,10 @@
         </div>
     </div>
 </div>
+    <script>
+        const { verificarAutenticacion_vc_ga } = require('../js/auth');
+        // document.addEventListener('DOMContentLoaded', verificarAutenticacion_vc_ga);
+    </script>
     <script type="module" src="../js/app.js"></script>
 </body>
 </html>
