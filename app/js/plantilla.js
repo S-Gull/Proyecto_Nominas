@@ -1,3 +1,4 @@
+//! planilla
 const { modal_vc_ga } = require("./modal");
 const { consulta_vc_ga } = require("../database/conexion");
 

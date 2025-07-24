@@ -1,3 +1,4 @@
+//! Login
 const { ipcRenderer } = require('electron');
 const { modal_vc_ga } = require("./modal");
 const { query_vc_ga } = require('../database/conexion');

@@ -5,7 +5,7 @@ const mysql_vc_ga = require('mysql');
 const config_vc_ga = {
   host: 'localhost',
   user: 'root',
-  password: '3690'
+  password: ''
 };
 
 // Crear una conexión global
@@ -389,29 +389,29 @@ connection_vc_ga.connect(async (err_vc_ga) => {
 });
 
 // Función para ejecutar consultas (con reconexión automática)
-// const query_vc_ga = (sql_vc_ga, params_vc_ga = [], callback_vc_ga) => {
-//   // Crear una nueva conexión para cada consulta
-//   const db_vc_ga = mysql_vc_ga.createConnection({
-//     ...config_vc_ga,
-//     database: 'dbcrud_electron_vc_ga'
-//   });
+const consulta_vc_ga = (sql_vc_ga, params_vc_ga = [], callback_vc_ga) => {
+  // Crear una nueva conexión para cada consulta
+  const db_vc_ga = mysql_vc_ga.createConnection({
+    ...config_vc_ga,
+    database: 'dbcrud_electron_vc_ga'
+  });
 
-//   db_vc_ga.connect((err_vc_ga) => {
-//     if (err_vc_ga) {
-//       console.error('Error de conexión:', err_vc_ga);
-//       return callback_vc_ga(err_vc_ga);
-//     }
+  db_vc_ga.connect((err_vc_ga) => {
+    if (err_vc_ga) {
+      console.error('Error de conexión:', err_vc_ga);
+      return callback_vc_ga(err_vc_ga);
+    }
 
-//     db_vc_ga.query(sql_vc_ga, params_vc_ga, (err_vc_ga, results_vc_ga) => {
-//       db_vc_ga.end();
-//       if (err_vc_ga) {
-//         console.error('Error en consulta:', err_vc_ga);
-//         callback_vc_ga(null,err_vc_ga);
-//       }
-//       callback_vc_ga(null, results_vc_ga);
-//     });
-//   });
-// };
+    db_vc_ga.query(sql_vc_ga, params_vc_ga, (err_vc_ga, results_vc_ga) => {
+      db_vc_ga.end();
+      if (err_vc_ga) {
+        console.error('Error en consulta:', err_vc_ga);
+        callback_vc_ga(null,err_vc_ga);
+      }
+      callback_vc_ga(null, results_vc_ga);
+    });
+  });
+};
 const query_vc_ga = (sql_vc_ga, params_vc_ga = []) => {
   return new Promise((resolve, reject) => {
     const db_vc_ga = mysql_vc_ga.createConnection({
@@ -430,4 +430,4 @@ const query_vc_ga = (sql_vc_ga, params_vc_ga = []) => {
 };
 
 
-module.exports = { query_vc_ga };
+module.exports = { query_vc_ga, consulta_vc_ga };
