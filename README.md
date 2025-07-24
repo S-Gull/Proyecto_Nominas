@@ -45,29 +45,42 @@ Sistema completo de gestión de nómina desarrollado con Electron.js, MySQL y Ta
 ## 🗃️ Estructura del Proyecto
 
 ```
-/app
-  ├── /database
-  │   ├── conexion.js       # Configuración de la base de datos
-  │   └── crud.js           # Operaciones CRUD
-  ├── /js
-  │   ├── app.js            # Punto de entrada
-  │   ├── auth.js           # Autenticación
-  │   ├── dark-mode.js      # Toggle modo oscuro
-  │   ├── login.js          # Lógica de login
-  │   ├── main.js           # Configuración de Electron
-  │   ├── modal.js          # Componente modal
-  │   ├── plantilla.js      # Gestión de usuarios
-  │   └── reportes.js       # Gestión de reportes
-  ├── /views
-  │   ├── index.html        # Login
-  │   ├── plantilla.html    # Gestión de usuarios
-  │   └── reportes.html     # Gestión de reportes
-  ├── /css
-  │   ├── login-register.css
-  │   ├── modal.css
-  │   └── style.css
-  ├── /img                  # Imágenes y logos
-  └── /tailwind             # Configuración Tailwind
+.
+├── .gitignore
+├── package.json
+├── package-lock.json
+├── README.md
+└── app/
+    ├── css/
+    │   ├── login-register.css
+    │   ├── modal.css
+    │   └── style.css
+    ├── database/
+    │   ├── conexion.js
+    │   ├── crud.js
+    │   └── db.sql
+    ├── img/
+    │   ├── BALDOX_LOGO.jpg
+    │   ├── crud.png
+    │   ├── CrudElectron.png
+    │   ├── Guillermo.jpg
+    │   └── Victor.png
+    ├── js/
+    │   ├── app.js
+    │   ├── auth.js
+    │   ├── dark-mode.js
+    │   ├── index.js
+    │   ├── login.js
+    │   ├── main.js
+    │   ├── modal.js
+    │   ├── plantilla.js
+    │   └── reportes.js
+    ├── tailwind/
+    │   └── tailwind.config.js
+    └── views/
+        ├── index.html
+        ├── plantilla.html
+        └── reportes.html
 ```
 
 ---
