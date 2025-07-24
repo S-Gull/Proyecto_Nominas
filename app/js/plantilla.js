@@ -1,5 +1,5 @@
 const { modal_vc_ga } = require("./modal");
-const { query_vc_ga } = require("../database/conexion");
+const { consulta_vc_ga } = require("../database/conexion");
 
 class GestorUsuarios_vc_ga {
   constructor() {
@@ -194,7 +194,7 @@ async _validarReferencias_vc_ga(datos_vc_ga) {
 
 async _ejecutarConsulta_vc_ga(sql_vc_ga, params_vc_ga = []) {
   return new Promise((resolve_vc_ga, reject_vc_ga) => {
-    query_vc_ga(sql_vc_ga, params_vc_ga, (err_vc_ga, results_vc_ga) => {
+    consulta_vc_ga(sql_vc_ga, params_vc_ga, (err_vc_ga, results_vc_ga) => {
       if (err_vc_ga) {
         console.error("Error en consulta SQL:", {
           sql: sql_vc_ga,

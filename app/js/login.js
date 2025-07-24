@@ -97,7 +97,7 @@ class LoginControlador_vc_ga {
       try {
         const usuario_vc_ga = await this.auth_vc_ga.autenticar_vc_ga(correo_vc_ga, contraseña_vc_ga);
         GestorSesion_vc_ga.guardarUsuarioActual_vc_ga(usuario_vc_ga);
-        window.location.href = 'reportes.html';
+        window.location.href = 'plantilla.html';
       } catch (error_vc_ga) {
         await this.modal_vc_ga.showError_vc_ga('Error al iniciar sesión', error_vc_ga.message);
       }
