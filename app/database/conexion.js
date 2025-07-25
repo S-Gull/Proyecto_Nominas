@@ -375,10 +375,10 @@ connection_vc_ga.connect(async (err_vc_ga) => {
     });
 
     // Crear tablas
-    await crearTablas_vc_ga();
+    // await crearTablas_vc_ga();
     
     // Insertar datos de prueba
-    await insertarDatosPrueba_vc_ga();
+    // await insertarDatosPrueba_vc_ga();
 
     console.log('Base de datos, tablas y datos de prueba inicializados correctamente.');
   } catch (error_vc_ga) {
