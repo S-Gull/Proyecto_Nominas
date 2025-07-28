@@ -7,7 +7,7 @@ const path = require('path');
 const config = {
   host: 'localhost',
   user: 'root',
-  password: '3690',
+  password: '',
   charset: 'utf8mb4' // Soporte completo para Unicode (incluye emojis y caracteres especiales)
 };
 
