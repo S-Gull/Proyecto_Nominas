@@ -6,6 +6,10 @@ const { setupThemeToggle_vc_ga } = require("../js/dark-mode");
 const { reportesHTML_vc_ga } = require("../js/reportes");
 const { modal_vc_ga } = require("../js/modal");
 const { initEmpleado } = require("../js/empleado");
+
+if (!GestorSesion_vc_ga.verificarAcceso_vc_ga()) {
+  // El método ya maneja la redirección automáticamente
+}
 if (LoginControlador_vc_ga) {
           tailwind.config = {
           darkMode: 'class',

@@ -106,9 +106,30 @@ class LoginControlador_vc_ga {
 }
 
 // 4. Capa de Estado (Gestión de Sesión)
+// class GestorSesion_vc_ga {
+//   static guardarUsuarioActual_vc_ga(usuario_vc_ga) {
+//     sessionStorage.setItem('usuarioActual_vc_ga', JSON.stringify(usuario_vc_ga));
+//   }
+
+//   static obtenerUsuarioActual_vc_ga() {
+//     return JSON.parse(sessionStorage.getItem('usuarioActual_vc_ga'));
+//   }
+
+//   static cerrarSesion_vc_ga() {
+//     sessionStorage.removeItem('usuarioActual_vc_ga');
+//   }
+// }
+
+// Fábrica para inicialización
+// Modificación para GestorSesion_vc_ga en login.js
 class GestorSesion_vc_ga {
   static guardarUsuarioActual_vc_ga(usuario_vc_ga) {
-    sessionStorage.setItem('usuarioActual_vc_ga', JSON.stringify(usuario_vc_ga));
+    // Guardar solo el id y el rol del usuario
+    const datosMinimos = {
+      id: usuario_vc_ga.id_usuario_vc_ga, // Asegúrate que esta propiedad coincide con tu DB
+      rol: usuario_vc_ga.id_rol_vc_ga // Asegúrate que esta propiedad coincide con tu DB
+    };
+    sessionStorage.setItem('usuarioActual_vc_ga', JSON.stringify(datosMinimos));
   }
 
   static obtenerUsuarioActual_vc_ga() {
@@ -118,9 +139,50 @@ class GestorSesion_vc_ga {
   static cerrarSesion_vc_ga() {
     sessionStorage.removeItem('usuarioActual_vc_ga');
   }
-}
 
-// Fábrica para inicialización
+ static verificarAcceso_vc_ga(urlsPermitidas = ['./index.html']) {
+    const usuarioActual = this.obtenerUsuarioActual_vc_ga();
+    const urlActual = location.href;
+
+    // Primero verificar si la URL actual está en las permitidas
+    const esUrlPermitida = urlsPermitidas.some(url => 
+      urlActual.endsWith(url) || 
+      urlActual.includes(url.replace('./', ''))
+    );
+
+    if (esUrlPermitida) {
+      console.log('URL permitida, acceso libre');
+      return true; // No hacer más validaciones
+    }
+
+    // Luego verificar si es la página de admin
+    if (urlActual.endsWith('/views/plantilla.html')) {
+      console.log('Verificación de admin en /views/plantilla.html');
+      
+      if (!usuarioActual || usuarioActual.rol !== 1) {
+        modal_vc_ga.showError_vc_ga("Error",'Acceso Denegado para no-admins');
+        setTimeout(() => {
+          location.href = './empleado.html';
+        }, 1000);
+        return false;
+      }
+      console.log('Acceso permitido para admin');
+      return true;
+    }
+    
+    // Finalmente verificar sesión para otras páginas
+    if (!usuarioActual) {
+      modal_vc_ga.showError_vc_ga("Error",'Acceso Denegado');
+      setTimeout(() => {
+        location.href = urlsPermitidas[0]; // Redirige a la primera URL permitida
+      }, 1000);
+      return false;
+    }
+    
+    console.log('Acceso permitido');
+    return true;
+  }
+}
 class AuthFabrica_vc_ga {
   static crear_vc_ga() {
     const repositorio_vc_ga = new AuthRepositorio_vc_ga(
