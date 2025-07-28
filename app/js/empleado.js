@@ -1,5 +1,7 @@
 const { query_vc_ga } = require("../database/conexion");
 
+const empleadoHTML_vc_ga = document.getElementById('employee-view');
+
 function getSessionEmployeeId() {
   const id = sessionStorage.getItem("selectedUserId");
   if (!id) throw new Error("No se encontró 'selectedUserId' en sessionStorage");
@@ -147,5 +149,6 @@ module.exports = {
   reloadDeductionHistory,
   reloadExtrasHistory,
   reloadBonusHistory,
-  reloadVacationHistory
+  reloadVacationHistory,
+  empleadoHTML_vc_ga
 };

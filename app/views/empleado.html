@@ -13,62 +13,13 @@
   <!-- Estilos -->
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/modal.css">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            primary: '#0D0A0B',
-            secondary: '#454955',
-            light: '#F3EFF5',
-            accent1: '#72B01D',
-            accent2: '#3F7D20',
-            dark: {
-              900: '#0D0A0B',
-              800: '#1a1a1a',
-              700: '#2d2d2d',
-            }
-          },
-          fontFamily: {
-            inter: ['Inter', 'sans-serif'],
-            verdana: ['Verdana', 'sans-serif'],
-          },
-          animation: {
-            'fade-in': 'fadeIn 0.5s ease-in',
-            'slide-down': 'slideDown 0.5s ease-out',
-            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'underline': 'underline 0.3s ease-out forwards'
-          },
-          keyframes: {
-            fadeIn: {
-              '0%': { opacity: '0' },
-              '100%': { opacity: '1' },
-            },
-            slideDown: {
-              '0%': { transform: 'translateY(-20px)', opacity: '0' },
-              '100%': { transform: 'translateY(0)', opacity: '1' },
-            },
-            pulse: {
-              '0%, 100%': { opacity: '1' },
-              '50%': { opacity: '0.8' },
-            },
-            underline: {
-              '0%': { width: '0' },
-              '100%': { width: '100%' },
-            }
-          }
-        }
-      }
-    }
-  </script>
 </head>
 <body class="min-h-screen bg-light dark:bg-dark-900 transition-colors duration-200 font-inter">
 
   <!-- Header -->
   <header class="bg-white dark:bg-dark-800 p-6 shadow-lg">
     <div class="container mx-auto flex justify-between items-center">
-      <h2 class="text-2xl font-verdana text-primary dark:text-light">Perfil<span class="text-accent1">Empleado</span></h2>
+      <h2 class="text-2xl font-verdana text-primary dark:text-light">Mi<span class="text-accent1">Perfil</span></h2>
       <button id="cambio-color" class="p-2 rounded-full bg-gray-200 dark:bg-dark-700">
         <i class="fas fa-moon dark:fa-sun text-gray-700 dark:text-gray-200"></i>
       </button>

@@ -156,7 +156,7 @@ class GestorSesion_vc_ga {
     }
 
     // Luego verificar si es la página de admin
-    if (urlActual.endsWith('/views/plantilla.html')) {
+    if (urlActual.endsWith('/views/plantilla.html') || urlActual.endsWith('/views/seleccionado.html')) {
       console.log('Verificación de admin en /views/plantilla.html');
       
       if (!usuarioActual || usuarioActual.rol !== 1) {
