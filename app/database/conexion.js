@@ -1,13 +1,14 @@
 console.log("Cargando módulo de conexión VCGA");
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const fs = require('fs').promises;
 const path = require('path');
 
-// Configuración de conexión
+// Configuración de conexión con charset para español
 const config = {
   host: 'localhost',
   user: 'root',
-  password: '3690'
+  password: '',
+  charset: 'utf8mb4' // Soporte completo para Unicode (incluye emojis y caracteres especiales)
 };
 
 // Función para verificar si la BD existe
@@ -34,7 +35,7 @@ const verificarTablasBD = async (connection) => {
   });
 };
 
-// Función para eliminar y recrear la BD
+// Función para eliminar y recrear la BD con collation para español
 const recrearBD = async (connection) => {
   try {
     await new Promise((resolve, reject) => {
@@ -46,11 +47,17 @@ const recrearBD = async (connection) => {
     });
 
     await new Promise((resolve, reject) => {
-      connection.query(`CREATE DATABASE dbcrud_electron_vc_ga`, (err) => {
-        if (err) return reject(err);
-        console.log('Base de datos creada');
-        resolve();
-      });
+      // Crear BD con collation para español
+      connection.query(
+        `CREATE DATABASE dbcrud_electron_vc_ga 
+         CHARACTER SET utf8mb4 
+         COLLATE utf8mb4_spanish_ci`, 
+        (err) => {
+          if (err) return reject(err);
+          console.log('Base de datos creada');
+          resolve();
+        }
+      );
     });
 
     await new Promise((resolve, reject) => {
@@ -65,12 +72,20 @@ const recrearBD = async (connection) => {
   }
 };
 
-// Función para ejecutar archivo SQL
+// Función para ejecutar archivo SQL con soporte para español
 const ejecutarArchivoSQL = async (connection, filePath) => {
   try {
     const sqlContent = await fs.readFile(filePath, 'utf8');
     const queries = sqlContent.split(';').filter(q => q.trim().length > 0);
     
+    // Establecer charset al inicio
+    await new Promise((resolve, reject) => {
+      connection.query(`SET NAMES utf8mb4`, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+
     for (const query of queries) {
       await new Promise((resolve, reject) => {
         connection.query(query, (err, results) => {
@@ -127,31 +142,49 @@ const inicializarBD = async () => {
   }
 };
 
-// Funciones de consulta (sin cambios)
+// Funciones de consulta con soporte para caracteres españoles
 const consulta_vc_ga = (sql, params = [], callback) => {
-  const db = mysql.createConnection({ ...config, database: 'dbcrud_electron_vc_ga' });
+  const db = mysql.createConnection({ 
+    ...config, 
+    database: 'dbcrud_electron_vc_ga',
+    charset: 'utf8mb4'
+  });
 
   db.connect((err) => {
     if (err) return callback(err);
     
-    db.query(sql, params, (err, results) => {
-      db.end();
-      callback(err, results);
+    // Establecer charset
+    db.query(`SET NAMES utf8mb4`, (err) => {
+      if (err) return callback(err);
+      
+      db.query(sql, params, (err, results) => {
+        db.end();
+        callback(err, results);
+      });
     });
   });
 };
 
 const query_vc_ga = (sql, params = []) => {
   return new Promise((resolve, reject) => {
-    const db = mysql.createConnection({ ...config, database: 'dbcrud_electron_vc_ga' });
+    const db = mysql.createConnection({ 
+      ...config, 
+      database: 'dbcrud_electron_vc_ga',
+      charset: 'utf8mb4'
+    });
     
     db.connect(err => {
       if (err) return reject(err);
       
-      db.query(sql, params, (err, results) => {
-        db.end();
+      // Establecer charset
+      db.query(`SET NAMES utf8mb4`, (err) => {
         if (err) return reject(err);
-        resolve(results);
+        
+        db.query(sql, params, (err, results) => {
+          db.end();
+          if (err) return reject(err);
+          resolve(results);
+        });
       });
     });
   });
@@ -166,7 +199,11 @@ module.exports = {
   query_vc_ga, 
   consulta_vc_ga,
   ejecutarArchivoSQL: (filePath) => {
-    const connection = mysql.createConnection({ ...config, database: 'dbcrud_electron_vc_ga' });
+    const connection = mysql.createConnection({ 
+      ...config, 
+      database: 'dbcrud_electron_vc_ga',
+      charset: 'utf8mb4'
+    });
     return ejecutarArchivoSQL(connection, filePath)
       .finally(() => connection.end());
   },
