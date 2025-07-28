@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi Panel de Empleado</title>
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <!-- Estilos -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/modal.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0D0A0B',
+            secondary: '#454955',
+            light: '#F3EFF5',
+            accent1: '#72B01D',
+            accent2: '#3F7D20',
+            dark: {
+              900: '#0D0A0B',
+              800: '#1a1a1a',
+              700: '#2d2d2d',
+            }
+          },
+          fontFamily: {
+            inter: ['Inter', 'sans-serif'],
+            verdana: ['Verdana', 'sans-serif'],
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in',
+            'slide-down': 'slideDown 0.5s ease-out',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'underline': 'underline 0.3s ease-out forwards'
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            slideDown: {
+              '0%': { transform: 'translateY(-20px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' },
+            },
+            pulse: {
+              '0%, 100%': { opacity: '1' },
+              '50%': { opacity: '0.8' },
+            },
+            underline: {
+              '0%': { width: '0' },
+              '100%': { width: '100%' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-light dark:bg-dark-900 transition-colors duration-200 font-inter">
+
+  <!-- Header -->
+  <header class="bg-white dark:bg-dark-800 p-6 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+      <h2 class="text-2xl font-verdana text-primary dark:text-light">Perfil<span class="text-accent1">Empleado</span></h2>
+      <button id="cambio-color" class="p-2 rounded-full bg-gray-200 dark:bg-dark-700">
+        <i class="fas fa-moon dark:fa-sun text-gray-700 dark:text-gray-200"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Contenido -->
+  <main class="container mx-auto px-4 py-6" id="employee-view">
+    <!-- Información básica del empleado -->
+    <section class="mb-8 animate-fade-in">
+      <h2 class="text-2xl font-verdana mb-4 underline text-primary dark:text-light">Datos Personales</h2>
+      <div class="bg-light dark:bg-dark-800 p-4 rounded-2xl shadow-md">
+        <p class="mb-1 text-primary dark:text-light"><strong>Nombre:</strong> <span id="empName">Cargando...</span></p>
+        <p class="mb-1 text-primary dark:text-light"><strong>Cédula:</strong> <span id="empCedula">Cargando...</span></p>
+        <p class="mb-1 text-primary dark:text-light"><strong>Cargo:</strong> <span id="empCargo">Cargando...</span></p>
+        <p class="mb-1 text-primary dark:text-light"><strong>Departamento:</strong> <span id="empDept">Cargando...</span></p>
+        <p class="text-primary dark:text-light"><strong>Ingreso:</strong> <span id="empIngreso">Cargando...</span></p>
+      </div>
+    </section>
+
+    <!-- Pestañas de gestión -->
+    <section class="animate-slide-down">
+      <h2 class="text-2xl font-verdana mb-4 underline text-primary dark:text-light">Mi Información</h2>
+      <div class="border-b border-secondary mb-4">
+        <nav class="flex -mb-px space-x-4" role="tablist">
+          <button class="tab-btn px-4 py-2 text-sm font-medium text-secondary dark:text-light hover:text-accent1" data-tab="salary">Salario</button>
+          <button class="tab-btn px-4 py-2 text-sm font-medium text-secondary dark:text-light hover:text-accent1" data-tab="deductions">Deducciones</button>
+          <button class="tab-btn px-4 py-2 text-sm font-medium text-secondary dark:text-light hover:text-accent1" data-tab="extras">Horas Extras</button>
+          <button class="tab-btn px-4 py-2 text-sm font-medium text-secondary dark:text-light hover:text-accent1" data-tab="bonuses">Bonos</button>
+          <button class="tab-btn px-4 py-2 text-sm font-medium text-secondary dark:text-light hover:text-accent1" data-tab="vacations">Vacaciones</button>
+          <button class="tab-btn px-4 py-2 text-sm font-medium text-secondary dark:text-light hover:text-accent1" data-tab="socialBenefits">Prestaciones</button>
+        </nav>
+      </div>
+
+      <div id="tabsContent" class="text-primary dark:text-light">
+        <!-- Contenido de las pestañas -->
+      </div>
+    </section>
+
+    <!-- Reporte de nómina -->
+    <section id="payroll-report" class="mt-8 animate-pulse-slow">
+      <h2 class="text-2xl font-verdana mb-4 underline text-primary dark:text-light">Mi Nómina</h2>
+      <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
+        <select id="reportPeriod" class="px-4 py-2 border border-secondary rounded-lg text-primary dark:text-light bg-white dark:bg-dark-700">
+          <option value="">-- Seleccione Periodo --</option>
+        </select>
+        <button id="calcPayrollBtn" class="bg-accent1 hover:bg-accent2 text-light px-4 py-2 rounded-lg">Calcular</button>
+      </div>
+      <div id="payrollPreview" class="mt-6 bg-light dark:bg-dark-800 p-4 rounded-2xl shadow-md">
+        <pre id="payrollReportContent" class="whitespace-pre-wrap text-sm font-mono text-primary dark:text-light"></pre>
+        <button id="generateReceiptBtn" class="mt-4 bg-accent1 hover:bg-accent2 text-light px-4 py-2 rounded-lg">Generar Recibo</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal reutilizable -->
+  <div id="modalContainer" class="modal-container">
+    <div id="modalContent" class="modal-content bg-white dark:bg-dark-800">
+        <div id="modalHeader" class="modal-header">
+            <div class="flex items-center">
+                <i id="modalIcon" class="modal-icon"></i>
+                <h2 id="modalTitle" class="text-xl font-bold text-white"></h2>
+            </div>
+            <button id="modalClose" class="text-white hover:text-gray-200 text-xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="modalBody" class="modal-body">
+            <p id="modalMessage" class="text-primary dark:text-light"></p>
+        </div>
+        <div class="modal-footer">
+            <button id="modalCancel" class="modal-btn-cancel" style="display: none;">
+                Cancelar
+            </button>
+            <button id="modalAction" class="modal-btn-accept">
+                Aceptar
+            </button>
+        </div>
+    </div>
+  </div>
+
+  <!-- Script principal -->
+  <script type="module" src="../js/app.js"></script>
+</body>
+</html>

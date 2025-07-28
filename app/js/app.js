@@ -5,6 +5,7 @@ const { PlantillaController_vc_ga, GestorUsuarios_vc_ga } = require("../js/plant
 const { setupThemeToggle_vc_ga } = require("../js/dark-mode");
 const { reportesHTML_vc_ga } = require("../js/reportes");
 const { modal_vc_ga } = require("../js/modal");
+const { initEmpleado } = require("../js/empleado");
 if (LoginControlador_vc_ga) {
           tailwind.config = {
           darkMode: 'class',
@@ -179,3 +180,55 @@ document.getElementById('tipo_documento').addEventListener('change', function() 
 
 }
 
+  // Solo lanzamos initEmployeeView si la vista de empleado está presente
+  if (document.getElementById('employee-view')) {
+      setupThemeToggle_vc_ga();
+            tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
+              colors: {
+                primary: '#0D0A0B',
+                secondary: '#454955',
+                light: '#F3EFF5',
+                accent1: '#72B01D',
+                accent2: '#3F7D20',
+                dark: {
+                  900: '#0D0A0B',
+                  800: '#1a1a1a',
+                  700: '#2d2d2d',
+                }
+              },
+              fontFamily: {
+                inter: ['Inter', 'sans-serif'],
+                verdana: ['Verdana', 'sans-serif'],
+              },
+              animation: {
+                'fade-in': 'fadeIn 0.5s ease-in',
+                'slide-down': 'slideDown 0.5s ease-out',
+                'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                'underline': 'underline 0.3s ease-out forwards'
+              },
+              keyframes: {
+                fadeIn: {
+                  '0%': { opacity: '0' },
+                  '100%': { opacity: '1' },
+                },
+                slideDown: {
+                  '0%': { transform: 'translateY(-20px)', opacity: '0' },
+                  '100%': { transform: 'translateY(0)', opacity: '1' },
+                },
+                pulse: {
+                  '0%, 100%': { opacity: '1' },
+                  '50%': { opacity: '0.8' },
+                },
+                underline: {
+                  '0%': { width: '0' },
+                  '100%': { width: '100%' },
+                }
+              }
+            }
+          }
+        }
+    initEmpleado();
+  }

@@ -333,60 +333,65 @@ async manejarEnvioFormulario_vc_ga(e_vc_ga) {
     };
   }
 
-  async mostrarUsuarios_vc_ga() {
-    const contenedor_vc_ga = document.getElementById('users');
-    if (!contenedor_vc_ga) return;
+async mostrarUsuarios_vc_ga() {
+  const contenedor_vc_ga = document.getElementById('users');
+  if (!contenedor_vc_ga) return;
 
-    if (this.gestor_vc_ga.usuarios_vc_ga.length === 0) {
-      contenedor_vc_ga.innerHTML = `
-        <div class="text-center py-10 text-gray-500 dark:text-gray-400">
-          <i class="fas fa-user-slash text-2xl mb-2"></i>
-          <p>No se encontraron usuarios</p>
-        </div>`;
-      return;
-    }
+  if (this.gestor_vc_ga.usuarios_vc_ga.length === 0) {
+    contenedor_vc_ga.innerHTML = `
+      <div class="text-center py-10 text-gray-500 dark:text-gray-400">
+        <i class="fas fa-user-slash text-2xl mb-2"></i>
+        <p>No se encontraron usuarios</p>
+      </div>`;
+    return;
+  }
 
-    contenedor_vc_ga.innerHTML = this.gestor_vc_ga.usuarios_vc_ga.map(usuario_vc_ga => `
-      <div class="bg-gray-50 dark:bg-dark-700 rounded-lg p-4 border border-gray-200 dark:border-gray-700 mb-4">
-        <div class="flex justify-between items-start">
-          <div>
-            <h3 class="font-semibold text-gray-800 dark:text-white">${usuario_vc_ga.nombre_completo_vc_ga}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              ${usuario_vc_ga.nombre_cargo_vc_ga} · ${usuario_vc_ga.nombre_departamento_vc_ga}
-            </p>
-            <div class="flex items-center mt-2">
-              <span class="status-badge ${usuario_vc_ga.status_vc_ga === 'Trabajando' ? 'status-working' : 'status-vacation'}">
-                ${usuario_vc_ga.status_vc_ga}
-              </span>
-              <span class="text-sm text-gray-500 dark:text-gray-400 ml-3">
-                <i class="fas fa-id-card mr-1"></i> ${usuario_vc_ga.cedula_vc_ga}
-              </span>
-            </div>
-          </div>
-          <div class="flex space-x-2">
-            <button class="edit-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600" 
-                    data-id="${usuario_vc_ga.id_usuario_vc_ga}">
-              <i class="fas fa-edit text-accent1"></i>
-            </button>
-            <button class="delete-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600" 
-                    data-id="${usuario_vc_ga.id_usuario_vc_ga}">
-              <i class="fas fa-trash text-red-500"></i>
-            </button>
+  contenedor_vc_ga.innerHTML = this.gestor_vc_ga.usuarios_vc_ga.map(usuario_vc_ga => `
+    <div class="bg-gray-50 dark:bg-dark-700 rounded-lg p-4 border border-gray-200 dark:border-gray-700 mb-4">
+      <div class="flex justify-between items-start">
+        <div>
+          <h3 class="font-semibold text-gray-800 dark:text-white">${usuario_vc_ga.nombre_completo_vc_ga}</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            ${usuario_vc_ga.nombre_cargo_vc_ga} · ${usuario_vc_ga.nombre_departamento_vc_ga}
+          </p>
+          <div class="flex items-center mt-2">
+            <span class="status-badge ${usuario_vc_ga.status_vc_ga === 'Trabajando' ? 'status-working' : 'status-vacation'}">
+              ${usuario_vc_ga.status_vc_ga}
+            </span>
+            <span class="text-sm text-gray-500 dark:text-gray-400 ml-3">
+              <i class="fas fa-id-card mr-1"></i> ${usuario_vc_ga.cedula_vc_ga}
+            </span>
           </div>
         </div>
-        <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-between text-sm">
-          <span class="text-gray-500 dark:text-gray-400">
-            <i class="fas fa-calendar-day mr-1"></i> Ingreso: ${this.formatearFechaLegible_vc_ga(usuario_vc_ga.fecha_ingreso_vc_ga)}
-          </span>
-          <span class="text-gray-500 dark:text-gray-400">
-            ID: ${usuario_vc_ga.id_usuario_vc_ga}
-          </span>
+        <div class="flex space-x-2">
+          <button class="edit-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600" 
+                  data-id="${usuario_vc_ga.id_usuario_vc_ga}">
+            <i class="fas fa-edit text-accent1"></i>
+          </button>
+          <button class="delete-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600" 
+                  data-id="${usuario_vc_ga.id_usuario_vc_ga}">
+            <i class="fas fa-trash text-red-500"></i>
+          </button>
+          <button class="view-more-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600"
+                  data-id="${usuario_vc_ga.id_usuario_vc_ga}">
+            <i class="fas fa-arrow-right text-accent2"></i> Ver Más
+          </button>
         </div>
       </div>
-    `).join('');
+      <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-between text-sm">
+        <span class="text-gray-500 dark:text-gray-400">
+          <i class="fas fa-calendar-day mr-1"></i> Ingreso: ${this.formatearFechaLegible_vc_ga(usuario_vc_ga.fecha_ingreso_vc_ga)}
+        </span>
+        <span class="text-gray-500 dark:text-gray-400">
+          ID: ${usuario_vc_ga.id_usuario_vc_ga}
+        </span>
+      </div>
+    </div>
+  `).join('');
 
-    this.configurarEventosBotones_vc_ga();
-  }
+  this.configurarEventosBotones_vc_ga();
+  this.configurarEventoVerMas_vc_ga();
+}
 
   configurarEventosBotones_vc_ga() {
     document.querySelectorAll('.edit-btn').forEach(btn_vc_ga => {
@@ -397,6 +402,19 @@ async manejarEnvioFormulario_vc_ga(e_vc_ga) {
       btn_vc_ga.addEventListener('click', () => this.eliminarUsuario_vc_ga(btn_vc_ga.dataset.id));
     });
   }
+
+configurarEventoVerMas_vc_ga() {
+  document.querySelectorAll('.view-more-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const userId = btn.dataset.id;
+      // Guardar en sessionStorage
+      sessionStorage.setItem('selectedUserId', userId);
+      // Redirigir a la vista de empleado
+      window.location.href = 'empleado.html';
+    });
+  });
+}
+
 
 async editarUsuario_vc_ga(id_vc_ga) {
   const usuario_vc_ga = this.gestor_vc_ga.usuarios_vc_ga.find(u_vc_ga => u_vc_ga.id_usuario_vc_ga == id_vc_ga);

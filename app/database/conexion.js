@@ -7,7 +7,7 @@ const path = require('path');
 const config = {
   host: 'localhost',
   user: 'root',
-  password: ''
+  password: '3690'
 };
 
 // Función para verificar si la BD existe
