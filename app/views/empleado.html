@@ -17,14 +17,18 @@
 <body class="min-h-screen bg-light dark:bg-dark-900 transition-colors duration-200 font-inter">
 
   <!-- Header -->
-  <header class="bg-white dark:bg-dark-800 p-6 shadow-lg">
-    <div class="container mx-auto flex justify-between items-center">
-      <h2 class="text-2xl font-verdana text-primary dark:text-light">Mi<span class="text-accent1">Perfil</span></h2>
-      <button id="cambio-color" class="p-2 rounded-full bg-gray-200 dark:bg-dark-700">
-        <i class="fas fa-moon dark:fa-sun text-gray-700 dark:text-gray-200"></i>
-      </button>
-    </div>
-  </header>
+        <header class="bg-white p-6 shadow-lg dark:bg-dark-800">
+            <div class="container mx-auto flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white font-verdana">Mi<span class="text-accent1">Perfil</span></h2>
+                <div class="flex items-center space-x-4">
+                    <button id="cerrar-sesion" class="px-4 py-2 bg-accent1 text-white rounded-lg hover:bg-accent2 transition-colors duration-300 font-inter">
+                        Cerrar Sesión
+                    </button>
+                    <button id="cambio-color" class="p-2 rounded-full bg-gray-200 dark:bg-dark-700">
+                        <i class="fas fa-moon dark:fa-sun text-gray-700 dark:text-gray-200"></i>
+                    </button>
+                </div>
+            </div>
 
   <!-- Contenido -->
   <main class="container mx-auto px-4 py-6" id="employee-view">

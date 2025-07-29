@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "anymatch": "^3.1.1",
+    "bcryptjs": "^3.0.2",
     "bignumber.js": "^9.0.0",
     "binary-extensions": "^2.0.0",
     "bluebird": "^3.7.2",

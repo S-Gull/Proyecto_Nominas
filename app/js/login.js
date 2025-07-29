@@ -1,6 +1,7 @@
 const { ipcRenderer } = require('electron');
 const { modal_vc_ga } = require("./modal");
 const { query_vc_ga } = require('../database/conexion');
+const bcrypt = require('bcryptjs'); // Añadir bcrypt para verificación de hashes
 
 const loginHTML_vc_ga = document.getElementById("login");
 const botonCerrarSesion_vc_ga = document.getElementById('cerrar-sesion');
@@ -9,12 +10,13 @@ const botonCerrarSesion_vc_ga = document.getElementById('cerrar-sesion');
 // 1. Capa de Datos (Repositorio)
 class AuthRepositorio_vc_ga {
 
-  obtenerUsuarioPorCredenciales_vc_ga = async (correo_vc_ga, contraseña_vc_ga)=> {
+  obtenerUsuarioPorCorreo_vc_ga = async (correo_vc_ga) => {
     try {
-      return await query_vc_ga(
-        'SELECT * FROM td_usuarios_vc_ga WHERE correo_electronico_vc_ga = ? AND clave_vc_ga = ?',
-        [correo_vc_ga, contraseña_vc_ga]
+      const resultado = await query_vc_ga(
+        'SELECT * FROM td_usuarios_vc_ga WHERE correo_electronico_vc_ga = ?',
+        [correo_vc_ga]
       );
+      return resultado && resultado.length > 0 ? resultado[0] : null;
     } catch (error_vc_ga) {
       console.error('Error en repositorio:', error_vc_ga);
       throw new Error('Error al consultar la base de datos');
@@ -41,18 +43,28 @@ class AuthServicio_vc_ga {
     this.repositorio_vc_ga = repositorio_vc_ga;
   }
 
-  async autenticar_vc_ga(correo_vc_ga, contraseña_vc_ga) {
+ async autenticar_vc_ga(correo_vc_ga, contraseña_vc_ga) {
     if (!correo_vc_ga || !contraseña_vc_ga) {
       throw new Error('Correo y contraseña son obligatorios');
     }
 
-    const usuario_vc_ga = await this.repositorio_vc_ga.obtenerUsuarioPorCredenciales_vc_ga(correo_vc_ga, contraseña_vc_ga);
+    const usuario_vc_ga = await this.repositorio_vc_ga.obtenerUsuarioPorCorreo_vc_ga(correo_vc_ga);
     
-    if (!usuario_vc_ga || usuario_vc_ga.length === 0) {
+    if (!usuario_vc_ga) {
       throw new Error('Credenciales incorrectas');
     }
 
-    return this.limpiarDatosUsuario_vc_ga(usuario_vc_ga[0]);
+    // Verificar contraseña normal O temporal usando bcrypt
+    const esContraseñaValida = await bcrypt.compare(contraseña_vc_ga, usuario_vc_ga.clave_vc_ga);
+    const esTemporalValida = usuario_vc_ga.clave_vc_ga 
+      ? await bcrypt.compare(contraseña_vc_ga, usuario_vc_ga.clave_vc_ga)
+      : false;
+
+    if (!esContraseñaValida && !esTemporalValida) {
+      throw new Error('Credenciales incorrectas');
+    }
+
+    return this.limpiarDatosUsuario_vc_ga(usuario_vc_ga);
   }
 
   limpiarDatosUsuario_vc_ga(usuario_vc_ga) {
@@ -112,26 +124,28 @@ class LoginControlador_vc_ga {
 
       try {
         const usuario_vc_ga = await this.auth_vc_ga.autenticar_vc_ga(correo_vc_ga, contraseña_vc_ga);
-        // Obtener el rol usando el nuevo método
-        const rol = await this.auth_vc_ga.repositorio_vc_ga.obtenerRolPorCredenciales_vc_ga(correo_vc_ga, contraseña_vc_ga);
+        const rol = usuario_vc_ga.id_rol_vc_ga;
 
-        // Guardar sesión mínima
         GestorSesion_vc_ga.guardarUsuarioActual_vc_ga(usuario_vc_ga);
 
-        // Redirección según rol
-        if (rol === 1) {
-          this.modal_vc_ga.showSuccess_vc_ga("Redirigiendo ...", "Inicio de Sesión Exitoso");
-          setTimeout(()=>{
-          location.href = 'plantilla.html';
-          }, 2000)
-        } else {
-          this.modal_vc_ga.showSuccess_vc_ga("Redirigiendo ...", "Inicio de Sesión Exitoso");
-          setTimeout(()=>{
-          location.href = 'empleado.html';
-          }, 2000)
+        // Determinar si usó contraseña temporal
+        if (!usuario_vc_ga.clave_vc_ga) {
+          this.modal_vc_ga.showConfirm_vc_ga(
+            "Contraseña Temporal Detectada", 
+            "Por favor cambie su contraseña en la sección de perfil"
+          );
         }
 
+        // Redirección según rol
+        const redireccion = rol === 1 ? 'plantilla.html' : 'empleado.html';
+        this.modal_vc_ga.showSuccess_vc_ga("Redirigiendo ...", "Inicio de Sesión Exitoso");
+        
+        setTimeout(() => {
+          location.href = redireccion;
+        }, 2000);
+
       } catch (error_vc_ga) {
+        console.log(error_vc_ga.message)
         await this.modal_vc_ga.showError_vc_ga('Error al iniciar sesión', error_vc_ga.message);
       }
     });
@@ -141,7 +155,6 @@ class LoginControlador_vc_ga {
 
     botonCerrarSesion_vc_ga.addEventListener('click', async () => {
       try {
-        console.log("ola")
         GestorSesion_vc_ga.cerrarSesion_vc_ga();
         await this.modal_vc_ga.showSuccess_vc_ga('Sesión finalizada', 'Has cerrado sesión correctamente.');
         setTimeout(() => {
