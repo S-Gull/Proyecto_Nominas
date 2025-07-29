@@ -3,6 +3,8 @@ const { modal_vc_ga } = require("./modal");
 const { query_vc_ga } = require('../database/conexion');
 
 const loginHTML_vc_ga = document.getElementById("login");
+const botonCerrarSesion_vc_ga = document.getElementById('cerrar-sesion');
+
 
 // 1. Capa de Datos (Repositorio)
 class AuthRepositorio_vc_ga {
@@ -70,6 +72,7 @@ class LoginControlador_vc_ga {
   inicializar_vc_ga() {
     this.configurarToggleContraseña_vc_ga();
     this.configurarFormularioLogin_vc_ga();
+    this.configurarCerrarSesion_vc_ga();
   }
 
   configurarToggleContraseña_vc_ga() {
@@ -133,6 +136,22 @@ class LoginControlador_vc_ga {
       }
     });
   }
+  configurarCerrarSesion_vc_ga() {
+    if (!botonCerrarSesion_vc_ga) return;
+
+    botonCerrarSesion_vc_ga.addEventListener('click', async () => {
+      try {
+        console.log("ola")
+        GestorSesion_vc_ga.cerrarSesion_vc_ga();
+        await this.modal_vc_ga.showSuccess_vc_ga('Sesión finalizada', 'Has cerrado sesión correctamente.');
+        setTimeout(() => {
+          location.href = 'index.html';
+        }, 1000);
+      } catch (error_vc_ga) {
+        await this.modal_vc_ga.showError_vc_ga('Error al cerrar sesión', error_vc_ga.message);
+      }
+    });
+  }
 }
 
 // 4. Capa de Estado (Gestión de Sesión)
@@ -152,6 +171,7 @@ class GestorSesion_vc_ga {
 
   static cerrarSesion_vc_ga() {
     sessionStorage.removeItem('usuarioActual_vc_ga');
+    sessionStorage.removeItem('selectedUserId');
   }
 
  static verificarAcceso_vc_ga(urlsPermitidas = ['./index.html']) {
@@ -223,5 +243,8 @@ module.exports = {
   LoginControlador_vc_ga, 
   AuthServicio_vc_ga, 
   AuthRepositorio_vc_ga, 
-  GestorSesion_vc_ga 
+  GestorSesion_vc_ga,
+  AuthFabrica_vc_ga,
+  botonCerrarSesion_vc_ga,
+  loginHTML_vc_ga
 };
