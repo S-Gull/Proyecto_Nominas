@@ -5,7 +5,7 @@ const { PlantillaController_vc_ga, GestorUsuarios_vc_ga } = require("../js/plant
 const { setupThemeToggle_vc_ga } = require("../js/dark-mode");
 const { reportesHTML_vc_ga } = require("../js/reportes");
 const { modal_vc_ga } = require("../js/modal");
-const { initEmpleado, empleadoHTML_vc_ga } = require("../js/empleado");
+const { empleadoHTML_vc_ga, iniciarEmpleado_vc_ga } = require("../js/empleado");
 const { selectedHTML_vc_ga, inicializarEmpleado, addSalary, editSalary, deleteSalary, addDeduction, editDeduction, deleteDeduction, addExtra, editExtra, deleteExtra, addBonus, editBonus, deleteBonus, addVacation, editVacation, deleteVacation } = require("../js/seleccionado");
 
 if (!GestorSesion_vc_ga.verificarAcceso_vc_ga()) {
@@ -235,7 +235,7 @@ document.getElementById('tipo_documento').addEventListener('change', function() 
             }
           }
         }
-    initEmpleado();
+    iniciarEmpleado_vc_ga();
   }
 
   if (selectedHTML_vc_ga) {
