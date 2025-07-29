@@ -1,4 +1,5 @@
 console.log("Cargando módulo de conexión VCGA");
+
 const mysql = require('mysql2');
 const fs = require('fs').promises;
 const path = require('path');
@@ -12,178 +13,174 @@ const config = {
 };
 
 // Función para verificar si la BD existe
-const verificarExistenciaBD = async (connection) => {
-  return new Promise((resolve, reject) => {
-    connection.query(`SHOW DATABASES LIKE 'dbcrud_electron_vc_ga'`, (err, results) => {
-      if (err) return reject(err);
-      resolve(results.length > 0);
+const verificarExistenciaBD_vc_ga = async (conexion_vc_ga) => {
+  return new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+    conexion_vc_ga.query(`SHOW DATABASES LIKE 'dbcrud_electron_vc_ga'`, (error_vc_ga, resultados_vc_ga) => {
+      if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+      resolver_vc_ga(resultados_vc_ga.length > 0);
     });
   });
 };
 
 // Función para verificar si la BD tiene tablas
-const verificarTablasBD = async (connection) => {
-  return new Promise((resolve, reject) => {
-    connection.query(`USE dbcrud_electron_vc_ga`, (err) => {
-      if (err) return reject(err);
+const verificarTablasBD_vc_ga = async (conexion_vc_ga) => {
+  return new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+    conexion_vc_ga.query(`USE dbcrud_electron_vc_ga`, (error_vc_ga) => {
+      if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
       
-      connection.query(`SHOW TABLES`, (err, results) => {
-        if (err) return reject(err);
-        resolve(results.length > 0);
+      conexion_vc_ga.query(`SHOW TABLES`, (error_vc_ga, resultados_vc_ga) => {
+        if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+        resolver_vc_ga(resultados_vc_ga.length > 0);
       });
     });
   });
 };
 
 // Función para eliminar y recrear la BD con collation para español
-const recrearBD = async (connection) => {
+const recrearBD_vc_ga = async (conexion_vc_ga) => {
   try {
-    await new Promise((resolve, reject) => {
-      connection.query(`DROP DATABASE IF EXISTS dbcrud_electron_vc_ga`, (err) => {
-        if (err) return reject(err);
+    await new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+      conexion_vc_ga.query(`DROP DATABASE IF EXISTS dbcrud_electron_vc_ga`, (error_vc_ga) => {
+        if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
         console.log('Base de datos eliminada');
-        resolve();
+        resolver_vc_ga();
       });
     });
 
-    await new Promise((resolve, reject) => {
-      // Crear BD con collation para español
-      connection.query(
+    await new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+      conexion_vc_ga.query(
         `CREATE DATABASE dbcrud_electron_vc_ga 
          CHARACTER SET utf8mb4 
          COLLATE utf8mb4_spanish_ci`, 
-        (err) => {
-          if (err) return reject(err);
+        (error_vc_ga) => {
+          if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
           console.log('Base de datos creada');
-          resolve();
+          resolver_vc_ga();
         }
       );
     });
 
-    await new Promise((resolve, reject) => {
-      connection.query(`USE dbcrud_electron_vc_ga`, (err) => {
-        if (err) return reject(err);
-        resolve();
+    await new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+      conexion_vc_ga.query(`USE dbcrud_electron_vc_ga`, (error_vc_ga) => {
+        if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+        resolver_vc_ga();
       });
     });
-  } catch (error) {
-    console.error('Error al recrear la base de datos:', error);
-    throw error;
+  } catch (error_vc_ga) {
+    console.error('Error al recrear la base de datos:', error_vc_ga);
+    throw error_vc_ga;
   }
 };
 
 // Función para ejecutar archivo SQL con soporte para español
-const ejecutarArchivoSQL = async (connection, filePath) => {
+const ejecutarArchivoSQL_vc_ga = async (conexion_vc_ga, rutaArchivo_vc_ga) => {
   try {
-    const sqlContent = await fs.readFile(filePath, 'utf8');
-    const queries = sqlContent.split(';').filter(q => q.trim().length > 0);
+    const contenidoSQL_vc_ga = await fs.readFile(rutaArchivo_vc_ga, 'utf8');
+    const consultas_vc_ga = contenidoSQL_vc_ga.split(';').filter(q => q.trim().length > 0);
     
-    // Establecer charset al inicio
-    await new Promise((resolve, reject) => {
-      connection.query(`SET NAMES utf8mb4`, (err) => {
-        if (err) return reject(err);
-        resolve();
+    await new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+      conexion_vc_ga.query(`SET NAMES utf8mb4`, (error_vc_ga) => {
+        if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+        resolver_vc_ga();
       });
     });
 
-    for (const query of queries) {
-      await new Promise((resolve, reject) => {
-        connection.query(query, (err, results) => {
-          if (err) return reject(err);
-          console.log('Consulta ejecutada:', query.substring(0, 50) + '...');
-          resolve(results);
+    for (const consulta_vc_ga of consultas_vc_ga) {
+      await new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+        conexion_vc_ga.query(consulta_vc_ga, (error_vc_ga, resultados_vc_ga) => {
+          if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+          console.log('Consulta ejecutada:', consulta_vc_ga.substring(0, 50) + '...');
+          resolver_vc_ga(resultados_vc_ga);
         });
       });
     }
-  } catch (error) {
-    console.error('Error al ejecutar archivo SQL:', error);
-    throw error;
+  } catch (error_vc_ga) {
+    console.error('Error al ejecutar archivo SQL:', error_vc_ga);
+    throw error_vc_ga;
   }
 };
 
 // Función principal de inicialización
-const inicializarBD = async () => {
-  const connection = mysql.createConnection(config);
+const inicializarBD_vc_ga = async () => {
+  const conexion_vc_ga = mysql.createConnection(config);
   
   try {
-    await new Promise((resolve, reject) => {
-      connection.connect(err => {
-        if (err) return reject(err);
-        resolve();
+    await new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+      conexion_vc_ga.connect(error_vc_ga => {
+        if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+        resolver_vc_ga();
       });
     });
 
-    const bdExiste = await verificarExistenciaBD(connection);
+    const bdExiste_vc_ga = await verificarExistenciaBD_vc_ga(conexion_vc_ga);
     
-    if (bdExiste) {
+    if (bdExiste_vc_ga) {
       console.log('La base de datos ya existe');
       
-      const tieneTablas = await verificarTablasBD(connection).catch(() => false);
+      const tieneTablas_vc_ga = await verificarTablasBD_vc_ga(conexion_vc_ga).catch(() => false);
       
-      if (!tieneTablas) {
+      if (!tieneTablas_vc_ga) {
         console.log('La base de datos no tiene tablas, recreando...');
-        await recrearBD(connection);
-        await ejecutarArchivoSQL(connection, path.join(__dirname, 'database.sql'));
+        await recrearBD_vc_ga(conexion_vc_ga);
+        await ejecutarArchivoSQL_vc_ga(conexion_vc_ga, path.join(__dirname, 'database.sql'));
       } else {
         console.log('La base de datos tiene tablas, no se requiere recreación');
       }
     } else {
       console.log('La base de datos no existe, creando...');
-      await recrearBD(connection);
-      await ejecutarArchivoSQL(connection, path.join(__dirname, 'database.sql'));
+      await recrearBD_vc_ga(conexion_vc_ga);
+      await ejecutarArchivoSQL_vc_ga(conexion_vc_ga, path.join(__dirname, 'database.sql'));
     }
 
     console.log('Base de datos inicializada correctamente');
-  } catch (error) {
-    console.error('Error durante la inicialización:', error);
-    throw error;
+  } catch (error_vc_ga) {
+    console.error('Error durante la inicialización:', error_vc_ga);
+    throw error_vc_ga;
   } finally {
-    connection.end();
+    conexion_vc_ga.end();
   }
 };
 
 // Funciones de consulta con soporte para caracteres españoles
-const consulta_vc_ga = (sql, params = [], callback) => {
-  const db = mysql.createConnection({ 
+const consulta_vc_ga = (sql_vc_ga, parametros_vc_ga = [], callback_vc_ga) => {
+  const db_vc_ga = mysql.createConnection({ 
     ...config, 
     database: 'dbcrud_electron_vc_ga',
     charset: 'utf8mb4'
   });
 
-  db.connect((err) => {
-    if (err) return callback(err);
+  db_vc_ga.connect((error_vc_ga) => {
+    if (error_vc_ga) return callback_vc_ga(error_vc_ga);
     
-    // Establecer charset
-    db.query(`SET NAMES utf8mb4`, (err) => {
-      if (err) return callback(err);
+    db_vc_ga.query(`SET NAMES utf8mb4`, (error_vc_ga) => {
+      if (error_vc_ga) return callback_vc_ga(error_vc_ga);
       
-      db.query(sql, params, (err, results) => {
-        db.end();
-        callback(err, results);
+      db_vc_ga.query(sql_vc_ga, parametros_vc_ga, (error_vc_ga, resultados_vc_ga) => {
+        db_vc_ga.end();
+        callback_vc_ga(error_vc_ga, resultados_vc_ga);
       });
     });
   });
 };
 
-const query_vc_ga = (sql, params = []) => {
-  return new Promise((resolve, reject) => {
-    const db = mysql.createConnection({ 
+const query_vc_ga = (sql_vc_ga, parametros_vc_ga = []) => {
+  return new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+    const db_vc_ga = mysql.createConnection({ 
       ...config, 
       database: 'dbcrud_electron_vc_ga',
       charset: 'utf8mb4'
     });
     
-    db.connect(err => {
-      if (err) return reject(err);
+    db_vc_ga.connect(error_vc_ga => {
+      if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
       
-      // Establecer charset
-      db.query(`SET NAMES utf8mb4`, (err) => {
-        if (err) return reject(err);
+      db_vc_ga.query(`SET NAMES utf8mb4`, (error_vc_ga) => {
+        if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
         
-        db.query(sql, params, (err, results) => {
-          db.end();
-          if (err) return reject(err);
-          resolve(results);
+        db_vc_ga.query(sql_vc_ga, parametros_vc_ga, (error_vc_ga, resultados_vc_ga) => {
+          db_vc_ga.end();
+          if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+          resolver_vc_ga(resultados_vc_ga);
         });
       });
     });
@@ -191,21 +188,21 @@ const query_vc_ga = (sql, params = []) => {
 };
 
 // Inicialización automática al cargar el módulo
-inicializarBD().catch(err => {
-  console.error('Error en inicialización automática:', err);
+inicializarBD_vc_ga().catch(error_vc_ga => {
+  console.error('Error en inicialización automática:', error_vc_ga);
 });
 
 module.exports = { 
   query_vc_ga, 
   consulta_vc_ga,
-  ejecutarArchivoSQL: (filePath) => {
-    const connection = mysql.createConnection({ 
+  ejecutarArchivoSQL: (ruta_vc_ga) => {
+    const conexion_vc_ga = mysql.createConnection({ 
       ...config, 
       database: 'dbcrud_electron_vc_ga',
       charset: 'utf8mb4'
     });
-    return ejecutarArchivoSQL(connection, filePath)
-      .finally(() => connection.end());
+    return ejecutarArchivoSQL_vc_ga(conexion_vc_ga, ruta_vc_ga)
+      .finally(() => conexion_vc_ga.end());
   },
-  inicializarBD
+  inicializarBD: inicializarBD_vc_ga
 };
