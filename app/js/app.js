@@ -287,6 +287,18 @@ document.getElementById('tipo_documento').addEventListener('change', function() 
             }
           }
         }
+          const tabButtons_vc_ga = document.querySelectorAll('.tab-btn');
+  const tabContents_vc_ga = document.querySelectorAll('.tab-content');
+  tabButtons_vc_ga.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      tabContents_vc_ga.forEach(c => c.classList.add('hidden'));
+      document.getElementById(target).classList.remove('hidden');
+      tabButtons_vc_ga.forEach(b => b.classList.remove('border-b-2', 'border-accent1'));
+      btn.classList.add('border-b-2', 'border-accent1');
+    });
+  });
+  if (tabButtons_vc_ga.length) tabButtons_vc_ga[0].click();
      // Cargar datos de empleado
   inicializarEmpleado();
 

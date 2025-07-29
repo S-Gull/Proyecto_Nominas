@@ -8,6 +8,32 @@ function getSessionEmployeeId() {
   return parseInt(id, 10);
 }
 
+// Función para configurar las pestañas
+function setupTabs() {
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-pane');
+  
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      
+      // Ocultar todos los contenidos de pestañas
+      tabContents.forEach(c => c.classList.add('hidden'));
+      
+      // Mostrar el contenido de la pestaña seleccionada
+      document.getElementById(target).classList.remove('hidden');
+      
+      // Actualizar estilos de los botones
+      tabButtons.forEach(b => b.classList.remove('border-b-2', 'border-accent1'));
+      btn.classList.add('border-b-2', 'border-accent1');
+    });
+  });
+  
+  // Activar la primera pestaña por defecto
+  if (tabButtons.length) tabButtons[0].click();
+}
+
+
 // Carga todos los datos al inicio
 async function initEmpleado() {
     console.log('algo')
@@ -23,14 +49,12 @@ async function initEmpleado() {
   document.getElementById('empDept').textContent = personal.nombre_departamento_vc_ga;
   document.getElementById('empIngreso').textContent = new Date(personal.fecha_ingreso_vc_ga).toLocaleDateString();
 
-  document.getElementById('salaryBase').value = salary.sueldo_base_vc_ga;
-  document.getElementById('salaryVariable').value = salary.sueldo_variable_vc_ga;
-
   await reloadSalaryHistory(employeeId);
   await reloadDeductionHistory(employeeId);
   await reloadExtrasHistory(employeeId);
   await reloadBonusHistory(employeeId);
   await reloadVacationHistory(employeeId);
+  setupTabs();
 }
 
 // Todas las funciones CRUD se basan en el ID del sessionStorage
@@ -144,7 +168,6 @@ async function reloadVacationHistory(id) {
 
 module.exports = {
   initEmpleado,
-  actualizarSalario,
   reloadSalaryHistory,
   reloadDeductionHistory,
   reloadExtrasHistory,
