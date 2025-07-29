@@ -237,8 +237,8 @@ document.getElementById('tipo_documento').addEventListener('change', function() 
           }
         }
 
-    const controlador = EmpleadoFabrica_vc_ga.crear();
-     controlador.iniciar();
+    const controlador_vc_ga = EmpleadoFabrica_vc_ga.crear_vc_ga();
+     controlador_vc_ga.iniciar_vc_ga();
   }
 
   if (selectedHTML_vc_ga) {
