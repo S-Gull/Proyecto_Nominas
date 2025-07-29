@@ -18,6 +18,19 @@ class AuthRepositorio_vc_ga {
       throw new Error('Error al consultar la base de datos');
     }
   }
+
+  obtenerRolPorCredenciales_vc_ga = async (correo_vc_ga, contraseña_vc_ga) => {
+    try {
+      const filas = await query_vc_ga(
+        'SELECT id_rol_vc_ga FROM td_usuarios_vc_ga WHERE correo_electronico_vc_ga = ? AND clave_vc_ga = ?',
+        [correo_vc_ga, contraseña_vc_ga]
+      );
+      return filas && filas.length > 0 ? filas[0].id_rol_vc_ga : null;
+    } catch (error_vc_ga) {
+      console.error('Error al obtener rol en repositorio:', error_vc_ga);
+      throw new Error('Error al consultar el rol en la base de datos');
+    }
+  }
 }
 
 // 2. Capa de Servicio (Lógica de Negocio)
@@ -96,8 +109,25 @@ class LoginControlador_vc_ga {
 
       try {
         const usuario_vc_ga = await this.auth_vc_ga.autenticar_vc_ga(correo_vc_ga, contraseña_vc_ga);
+        // Obtener el rol usando el nuevo método
+        const rol = await this.auth_vc_ga.repositorio_vc_ga.obtenerRolPorCredenciales_vc_ga(correo_vc_ga, contraseña_vc_ga);
+
+        // Guardar sesión mínima
         GestorSesion_vc_ga.guardarUsuarioActual_vc_ga(usuario_vc_ga);
-        window.location.href = 'plantilla.html';
+
+        // Redirección según rol
+        if (rol === 1) {
+          this.modal_vc_ga.showSuccess_vc_ga("Redirigiendo ...", "Inicio de Sesión Exitoso");
+          setTimeout(()=>{
+          location.href = 'plantilla.html';
+          }, 2000)
+        } else {
+          this.modal_vc_ga.showSuccess_vc_ga("Redirigiendo ...", "Inicio de Sesión Exitoso");
+          setTimeout(()=>{
+          location.href = 'empleado.html';
+          }, 2000)
+        }
+
       } catch (error_vc_ga) {
         await this.modal_vc_ga.showError_vc_ga('Error al iniciar sesión', error_vc_ga.message);
       }
@@ -106,22 +136,6 @@ class LoginControlador_vc_ga {
 }
 
 // 4. Capa de Estado (Gestión de Sesión)
-// class GestorSesion_vc_ga {
-//   static guardarUsuarioActual_vc_ga(usuario_vc_ga) {
-//     sessionStorage.setItem('usuarioActual_vc_ga', JSON.stringify(usuario_vc_ga));
-//   }
-
-//   static obtenerUsuarioActual_vc_ga() {
-//     return JSON.parse(sessionStorage.getItem('usuarioActual_vc_ga'));
-//   }
-
-//   static cerrarSesion_vc_ga() {
-//     sessionStorage.removeItem('usuarioActual_vc_ga');
-//   }
-// }
-
-// Fábrica para inicialización
-// Modificación para GestorSesion_vc_ga en login.js
 class GestorSesion_vc_ga {
   static guardarUsuarioActual_vc_ga(usuario_vc_ga) {
     // Guardar solo el id y el rol del usuario

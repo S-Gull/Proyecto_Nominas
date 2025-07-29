@@ -10,6 +10,7 @@ const { selectedHTML_vc_ga, inicializarEmpleado, addSalary, editSalary, deleteSa
 
 if (!GestorSesion_vc_ga.verificarAcceso_vc_ga()) {
   // El método ya maneja la redirección automáticamente
+  console.log("Verificando ...")
 }
 if (LoginControlador_vc_ga) {
           tailwind.config = {

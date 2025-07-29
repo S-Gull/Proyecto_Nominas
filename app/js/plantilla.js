@@ -409,8 +409,8 @@ configurarEventoVerMas_vc_ga() {
       const userId = btn.dataset.id;
       // Guardar en sessionStorage
       sessionStorage.setItem('selectedUserId', userId);
-      // Redirigir a la vista de empleado
-      window.location.href = 'empleado.html';
+      // Redirigir a la vista del empleado seleccionado
+      window.location.href = 'seleccionado.html';
     });
   });
 }
