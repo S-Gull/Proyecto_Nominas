@@ -13,7 +13,7 @@ class AuthRepositorio_vc_ga {
   obtenerUsuarioPorCorreo_vc_ga = async (correo_vc_ga) => {
     try {
       const resultado = await query_vc_ga(
-        'SELECT * FROM td_usuarios_vc_ga WHERE correo_electronico_vc_ga = ?',
+        'SELECT *, clave_temporal_vc_ga FROM td_usuarios_vc_ga WHERE correo_electronico_vc_ga = ?',
         [correo_vc_ga]
       );
       return resultado && resultado.length > 0 ? resultado[0] : null;
@@ -54,13 +54,18 @@ class AuthServicio_vc_ga {
       throw new Error('Credenciales incorrectas');
     }
 
-    // Verificar contraseña normal O temporal usando bcrypt
-    const esContraseñaValida = await bcrypt.compare(contraseña_vc_ga, usuario_vc_ga.clave_vc_ga);
-    const esTemporalValida = usuario_vc_ga.clave_vc_ga 
-      ? await bcrypt.compare(contraseña_vc_ga, usuario_vc_ga.clave_vc_ga)
-      : false;
+    // NUEVA LÓGICA DE VERIFICACIÓN
+    let esValida = false;
+    
+    if (usuario_vc_ga.clave_temporal_vc_ga) {
+      // Verificación con hash para claves temporales
+      esValida = await bcrypt.compare(contraseña_vc_ga, usuario_vc_ga.clave_vc_ga);
+    } else {
+      // Verificación directa para claves normales
+      esValida = (contraseña_vc_ga === usuario_vc_ga.clave_vc_ga);
+    }
 
-    if (!esContraseñaValida && !esTemporalValida) {
+    if (!esValida) {
       throw new Error('Credenciales incorrectas');
     }
 
@@ -87,31 +92,45 @@ class LoginControlador_vc_ga {
     this.configurarCerrarSesion_vc_ga();
   }
 
-  configurarToggleContraseña_vc_ga() {
+configurarToggleContraseña_vc_ga() {
     const inputContraseña_vc_ga = document.getElementById('clave');
     const botonToggle_vc_ga = document.getElementById('togglePassword');
     
     if (!inputContraseña_vc_ga || !botonToggle_vc_ga) return;
 
-    botonToggle_vc_ga.addEventListener('click', () => {
-      const tipo_vc_ga = inputContraseña_vc_ga.getAttribute('type') === 'password' 
-        ? 'text' 
-        : 'password';
-      inputContraseña_vc_ga.setAttribute('type', tipo_vc_ga);
-      this.actualizarIconoToggle_vc_ga(botonToggle_vc_ga, tipo_vc_ga);
+    // Delegación de eventos para manejar clics en el SVG
+    botonToggle_vc_ga.addEventListener('click', (event) => {
+        // Verificar si el clic fue en el SVG o en el botón
+        const esSVG = event.target.closest('svg');
+        const esBoton = event.target === botonToggle_vc_ga;
+        
+        if (esSVG || esBoton) {
+            const tipoActual = inputContraseña_vc_ga.getAttribute('type');
+            const nuevoTipo = tipoActual === 'password' ? 'text' : 'password';
+            
+            inputContraseña_vc_ga.setAttribute('type', nuevoTipo);
+            this.actualizarIconoToggle_vc_ga(botonToggle_vc_ga, nuevoTipo);
+            
+            // Prevenir comportamiento por defecto
+            event.preventDefault();
+            event.stopPropagation();
+        }
     });
-  }
+}
 
-  actualizarIconoToggle_vc_ga(boton_vc_ga, tipo_vc_ga) {
-    boton_vc_ga.innerHTML = tipo_vc_ga === 'password'
-      ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray eye-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-         </svg>`
-      : `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray eye-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-         </svg>`;
-  }
+actualizarIconoToggle_vc_ga(boton_vc_ga, tipo_vc_ga) {
+    // Mantener la estructura del botón y solo cambiar el SVG interno
+    const iconoActual = boton_vc_ga.querySelector('.eye-icon');
+    
+    if (iconoActual) {
+        const nuevoSVG = tipo_vc_ga === 'password'
+            ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`
+            : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />`;
+        
+        iconoActual.innerHTML = nuevoSVG;
+    }
+}
 
   async configurarFormularioLogin_vc_ga() {
     const formulario_vc_ga = document.querySelector('form');
@@ -240,17 +259,6 @@ class AuthFabrica_vc_ga {
   }
 }
 
-// Inicialización condicional
-if (document.getElementById('login')) {
-  const controladorLogin_vc_ga = AuthFabrica_vc_ga.crear_vc_ga();
-}
-
-// Interfaz para futuros proveedores de autenticación
-class IProveedorAuth_vc_ga {
-  async login_vc_ga(correo_vc_ga, contraseña_vc_ga) {
-    throw new Error('Método login_vc_ga debe ser implementado');
-  }
-}
 
 module.exports = { 
   LoginControlador_vc_ga, 

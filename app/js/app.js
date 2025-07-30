@@ -62,6 +62,8 @@ if (loginHTML_vc_ga || botonCerrarSesion_vc_ga) {
     }
   };
   
+  // Inicializar el controlador de login si existe el formulario o el botón de cerrar sesión
+  const controladorLogin_vc_ga = AuthFabrica_vc_ga.crear_vc_ga();
   setupThemeToggle_vc_ga();
 }
 
