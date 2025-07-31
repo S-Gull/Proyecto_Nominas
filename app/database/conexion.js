@@ -4,12 +4,12 @@ const mysql = require('mysql2');
 const fs = require('fs').promises;
 const path = require('path');
 
-// Configuración de conexión con charset para español
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') }); // Ajusta la ruta si tu .env está en otra ubicación
 const config = {
-  host: 'localhost',
-  user: 'root',
-  password: '3690',
-  charset: 'utf8mb4' // Soporte completo para Unicode (incluye emojis y caracteres especiales)
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  charset: 'utf8mb4'
 };
 
 // Función para verificar si la BD existe
