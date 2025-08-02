@@ -259,6 +259,8 @@ class EmpleadoControlador_vc_ga {
                 throw new Error(`Rol no soportado: ${usuario_vc_ga.id_rol_vc_ga}`);
         }
 
+        // Configurar visibilidad de la sección de gestión o mostrar mensaje de bienvenida
+        this.configurarVisibilidadGestion_vc_ga();
         // Cargar datos personales y UI
         const { personal_vc_ga } = await this.servicio_vc_ga.obtenerDetallesEmpleado_vc_ga(this.idEmpleado_vc_ga);
 
@@ -287,6 +289,19 @@ class EmpleadoControlador_vc_ga {
         const id = sessionStorage.getItem("selectedUserId");
         if (!id) throw new Error("No se encontró 'selectedUserId' en sessionStorage");
         return parseInt(id, 10);
+    }
+
+      // Nuevo método para manejar visibilidad o mensaje según rol
+    configurarVisibilidadGestion_vc_ga() {
+        const usuario_vc_ga = GestorSesion_vc_ga.obtenerUsuarioActual_vc_ga();
+        const seccionGestion = document.querySelector('section[name="Gestion admin"]');
+        if (!usuario_vc_ga || !seccionGestion) return;
+
+        if (usuario_vc_ga.rol === 1) {
+            console.log("Bienvenido Administrador");
+        } else if (usuario_vc_ga.rol === 2) {
+            seccionGestion.classList.add("hidden");
+        }
     }
 
     configurarPestañas_vc_ga() {
