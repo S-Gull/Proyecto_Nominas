@@ -1,11 +1,13 @@
 USE dbcrud_electron_vc_ga;
 
+-- Tabla de sucursales
 CREATE TABLE IF NOT EXISTS td_sucursal_vc_ga (
     id_sucursal_vc_ga int PRIMARY KEY AUTO_INCREMENT,
     nombre_vc_ga varchar(255),
     direccion_vc_ga varchar(255)
 );
 
+-- Tabla de departamentos
 CREATE TABLE IF NOT EXISTS td_departamento_vc_ga (
     id_departamento_vc_ga int PRIMARY KEY AUTO_INCREMENT,
     id_sucursal_vc_ga int,
@@ -13,18 +15,21 @@ CREATE TABLE IF NOT EXISTS td_departamento_vc_ga (
     FOREIGN KEY (id_sucursal_vc_ga) REFERENCES td_sucursal_vc_ga(id_sucursal_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- Tabla de roles
 CREATE TABLE IF NOT EXISTS td_roles_vc_ga (
     id_rol_vc_ga int PRIMARY KEY AUTO_INCREMENT,
     nombre_vc_ga varchar(255),
     descripcion_vc_ga varchar(255)
 );
 
+-- Tabla de cargos
 CREATE TABLE IF NOT EXISTS td_cargos_vc_ga (
     id_cargo_vc_ga int PRIMARY KEY AUTO_INCREMENT,
     nombre_vc_ga varchar(255),
     descripcion_vc_ga varchar(255)
 );
 
+-- Tabla de usuarios
 CREATE TABLE IF NOT EXISTS td_usuarios_vc_ga (
     id_usuario_vc_ga int PRIMARY KEY AUTO_INCREMENT,
     id_departamento_vc_ga int NULL,
@@ -45,14 +50,15 @@ CREATE TABLE IF NOT EXISTS td_usuarios_vc_ga (
     FOREIGN KEY (id_cargo_vc_ga) REFERENCES td_cargos_vc_ga(id_cargo_vc_ga) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
--- Tabla modificada: solo almacena salario mensual sin fechas
+-- Tabla de salario histórico
 CREATE TABLE IF NOT EXISTS td_salario_historico_vc_ga (
     id_salario_vc_ga int PRIMARY KEY AUTO_INCREMENT,
     id_usuario_vc_ga int,
-    salario_vc_ga decimal(10,2),  -- Única columna para salario
+    salario_vc_ga decimal(10,2),
     FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- Tabla de bonos
 CREATE TABLE IF NOT EXISTS td_bono_vc_ga (
     id_bono_vc_ga int PRIMARY KEY AUTO_INCREMENT,
     id_usuario_vc_ga int,
@@ -62,6 +68,7 @@ CREATE TABLE IF NOT EXISTS td_bono_vc_ga (
     FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- Tabla de horas extras
 CREATE TABLE IF NOT EXISTS td_horas_extras_vc_ga (
     id_horas_extras_vc_ga int PRIMARY KEY AUTO_INCREMENT,
     id_usuario_vc_ga int,
@@ -72,6 +79,7 @@ CREATE TABLE IF NOT EXISTS td_horas_extras_vc_ga (
     FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- Tabla de deducciones
 CREATE TABLE IF NOT EXISTS td_deduccion_vc_ga (
     id_deduccion_vc_ga int PRIMARY KEY AUTO_INCREMENT,
     nombre_vc_ga varchar(255),
@@ -81,6 +89,7 @@ CREATE TABLE IF NOT EXISTS td_deduccion_vc_ga (
     vigente_hasta_vc_ga date
 );
 
+-- Tabla de relación usuario-deducción
 CREATE TABLE IF NOT EXISTS td_usuario_deduccion_vc_ga (
     id_usuario_deduccion_vc_ga int PRIMARY KEY AUTO_INCREMENT,
     id_usuario_vc_ga int,
@@ -91,32 +100,28 @@ CREATE TABLE IF NOT EXISTS td_usuario_deduccion_vc_ga (
     FOREIGN KEY (id_deduccion_vc_ga) REFERENCES td_deduccion_vc_ga(id_deduccion_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Eliminado el campo periodo_vc_ga
-CREATE TABLE IF NOT EXISTS td_pago_nomina_vc_ga (
-    id_pago_vc_ga int PRIMARY KEY AUTO_INCREMENT,
+-- Tabla de recibos de nómina (modificada para no depender de pagos)
+CREATE TABLE IF NOT EXISTS td_recibo_nomina_vc_ga (
+    id_recibo_vc_ga int PRIMARY KEY AUTO_INCREMENT,
     id_usuario_vc_ga int,
-    fecha_pago_vc_ga date,
-    monto_neto_vc_ga decimal(10,2),
+    id_pago_vc_ga int,
+    fecha_pago_vc_ga date,  -- Fecha cuando se realizó el pago
+    monto_neto_vc_ga decimal(10,2),  -- Monto total pagado
+    fecha_generacion_vc_ga timestamp,  -- Cuando se generó el recibo
+    contenido_vc_ga text,  -- Detalle del recibo
     FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS td_recibo_nomina_vc_ga (
-    id_recibo_vc_ga int PRIMARY KEY AUTO_INCREMENT,
-    id_pago_vc_ga int,
-    fecha_generacion_vc_ga timestamp,
-    contenido_vc_ga text,
-    FOREIGN KEY (id_pago_vc_ga) REFERENCES td_pago_nomina_vc_ga(id_pago_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
--- Tablas modificadas para reportes diarios
+-- Tabla de reportes bancarios
 CREATE TABLE IF NOT EXISTS td_reporte_banco_vc_ga (
     id_reporte_banco_vc_ga int PRIMARY KEY AUTO_INCREMENT,
-    fecha_reporte_vc_ga date,  -- Fecha del reporte
-    info_banco_vc_ga text      -- Información consolidada de todos los recibos del día
+    fecha_reporte_vc_ga date,
+    info_banco_vc_ga text
 );
 
+-- Tabla de reportes contables
 CREATE TABLE IF NOT EXISTS td_reporte_contable_vc_ga (
     id_reporte_contable_vc_ga int PRIMARY KEY AUTO_INCREMENT,
-    fecha_reporte_vc_ga date,  -- Fecha del reporte
-    info_contable_vc_ga text   -- Información consolidada de todos los recibos del día
+    fecha_reporte_vc_ga date,
+    info_contable_vc_ga text
 );
