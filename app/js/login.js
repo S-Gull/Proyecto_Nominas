@@ -195,6 +195,7 @@ class GestorSesion_vc_ga {
       rol: usuario_vc_ga.id_rol_vc_ga // Asegúrate que esta propiedad coincide con tu DB
     };
     sessionStorage.setItem('usuarioActual_vc_ga', JSON.stringify(datosMinimos));
+    sessionStorage.setItem('selectedUserId', JSON.stringify(datosMinimos.id));
   }
 
   static obtenerUsuarioActual_vc_ga() {

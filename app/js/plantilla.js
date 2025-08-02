@@ -410,7 +410,7 @@ configurarEventoVerMas_vc_ga() {
       // Guardar en sessionStorage
       sessionStorage.setItem('selectedUserId', userId);
       // Redirigir a la vista del empleado seleccionado
-      window.location.href = 'seleccionado.html';
+      window.location.href = 'empleado.html';
     });
   });
 }
