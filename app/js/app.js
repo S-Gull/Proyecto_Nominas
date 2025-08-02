@@ -3,7 +3,7 @@ const { ipcRenderer } = require("electron");
 const { LoginControlador_vc_ga, AuthServicio_vc_ga, AuthRepositorio_vc_ga, GestorSesion_vc_ga, loginHTML_vc_ga, botonCerrarSesion_vc_ga, AuthFabrica_vc_ga } = require("../js/login");
 const { PlantillaController_vc_ga, GestorUsuarios_vc_ga } = require("../js/plantilla");
 const { setupThemeToggle_vc_ga } = require("../js/dark-mode");
-const { reportesHTML_vc_ga } = require("../js/reportes");
+const { reportesHTML_vc_ga, ReportesController_vc_ga } = require("../js/reportes");
 const { modal_vc_ga } = require("../js/modal");
 const { empleadoHTML_vc_ga, EmpleadoFabrica_vc_ga } = require("../js/empleado");
 const { selectedHTML_vc_ga, inicializarEmpleado, addSalary, editSalary, deleteSalary, addDeduction, editDeduction, deleteDeduction, addExtra, editExtra, deleteExtra, addBonus, editBonus, deleteBonus, addVacation, editVacation, deleteVacation } = require("../js/seleccionado");
@@ -244,7 +244,7 @@ document.getElementById('tipo_documento').addEventListener('change', function() 
      controlador_vc_ga.iniciar_vc_ga();
   }
 
-  if (selectedHTML_vc_ga) {
+  if (reportesHTML_vc_ga) {
       setupThemeToggle_vc_ga();
             tailwind.config = {
           darkMode: 'class',
@@ -293,4 +293,6 @@ document.getElementById('tipo_documento').addEventListener('change', function() 
             }
           }
         }
+        const controladorReportes_vc_ga = new ReportesController_vc_ga;
+        controladorReportes_vc_ga._init_vc_ga();
   }
