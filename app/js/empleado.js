@@ -192,9 +192,6 @@ class EmpleadoServicio_vc_ga {
     async actualizarBono_vc_ga(...args) { return await this.repositorio_vc_ga.actualizarBono_vc_ga(...args); }
     async eliminarBono_vc_ga(idReg) { return await this.repositorio_vc_ga.eliminarBono_vc_ga(idReg); }
 
-
-
-
 }
 
 // 3. Capa de Controlador
@@ -246,7 +243,23 @@ class EmpleadoControlador_vc_ga {
         }
 
     async iniciar_vc_ga() {
-        this.idEmpleado_vc_ga = this.obtenerIdEmpleadoSesion_vc_ga();
+        // Obtenemos usuario y rol
+        const usuario_vc_ga = GestorSesion_vc_ga.obtenerUsuarioActual_vc_ga();
+        if (!usuario_vc_ga) throw new Error("Usuario no encontrado en sesión");
+
+        // Seleccionamos método según rol
+        switch (usuario_vc_ga.rol) {
+            case 2:
+                this.idEmpleado_vc_ga = this.obtenerIdEmpleadoSesion_vc_ga();
+                break;
+            case 1:
+                this.idEmpleado_vc_ga = this.obtenerIdEmpleadoSeleccionado_vc_ga();
+                break;
+            default:
+                throw new Error(`Rol no soportado: ${usuario_vc_ga.id_rol_vc_ga}`);
+        }
+
+        // Cargar datos personales y UI
         const { personal_vc_ga } = await this.servicio_vc_ga.obtenerDetallesEmpleado_vc_ga(this.idEmpleado_vc_ga);
 
         document.getElementById('empName').textContent = personal_vc_ga.nombre_completo_vc_ga;
@@ -267,6 +280,13 @@ class EmpleadoControlador_vc_ga {
         const usuario_vc_ga = GestorSesion_vc_ga.obtenerUsuarioActual_vc_ga();
         if (!usuario_vc_ga) throw new Error("Usuario no encontrado en sesión");
         return usuario_vc_ga.id;
+    }
+
+    // Nuevo método para obtener ID de empleado seleccionado en sessionStorage
+    obtenerIdEmpleadoSeleccionado_vc_ga() {
+        const id = sessionStorage.getItem("selectedUserId");
+        if (!id) throw new Error("No se encontró 'selectedUserId' en sessionStorage");
+        return parseInt(id, 10);
     }
 
     configurarPestañas_vc_ga() {

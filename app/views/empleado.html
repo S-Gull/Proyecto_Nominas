@@ -98,10 +98,6 @@
             <label class="block mb-1" for="salaryBase">Sueldo Base</label>
             <input id="salaryBase" type="number" class="w-full p-2 border rounded bg-white text-black dark:bg-black dark:text-white" />
           </div>
-          <div class="mb-4">
-            <label class="block mb-1" for="salaryVariable">Sueldo Variable</label>
-            <input id="salaryVariable" type="number" class="w-full p-2 border rounded bg-white text-black dark:bg-black dark:text-white" />
-          </div>
           <div class="flex space-x-2 mb-4">
             <button id="addSalaryBtn" class="px-4 py-2 bg-accent1 rounded">Agregar</button>
             <button id="editSalaryBtn" class="px-4 py-2 bg-accent2 rounded">Editar</button>
@@ -109,9 +105,9 @@
           </div>
           <table class="w-full text-sm">
             <thead>
-              <tr><th>Inicio</th><th>Fin</th><th>Base</th><th>Variable</th></tr>
+              <tr><th>Salario</th> <th></th></tr>
             </thead>
-            <tbody id="salaryHistory"></tbody>
+            <tbody class="text-center" id="salaryHistory"></tbody>
           </table>
         </div>
 
