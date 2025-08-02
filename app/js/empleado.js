@@ -26,6 +26,28 @@ class EmpleadoRepositorio_vc_ga {
         );
     }
 
+    async crearSalario_vc_ga(idUsuario, salario) { 
+    return await query_vc_ga(
+        'INSERT INTO td_salario_historico_vc_ga (id_usuario_vc_ga, salario_vc_ga) VALUES (?, ?)',
+        [idUsuario, salario]
+    );
+    }
+
+    async actualizarSalario_vc_ga(idSalario, salario) {
+    return await query_vc_ga(
+        'UPDATE td_salario_historico_vc_ga SET salario_vc_ga = ? WHERE id_salario_vc_ga = ?',
+        [salario, idSalario]
+    );
+    }
+
+    async eliminarSalario_vc_ga(idSalario) {
+    return await query_vc_ga(
+        'DELETE FROM td_salario_historico_vc_ga WHERE id_salario_vc_ga = ?',
+        [idSalario]
+    );
+    }
+
+
     async obtenerHistorialDeducciones_vc_ga(id_vc_ga) {
         return await query_vc_ga(
             `SELECT fecha_aplicacion_vc_ga AS fecha, d.nombre_vc_ga AS tipo, monto_vc_ga AS monto
@@ -36,6 +58,32 @@ class EmpleadoRepositorio_vc_ga {
         );
     }
 
+    async crearDeduccionUsuario_vc_ga(idUsuario, idDeduccion, monto, fecha) {
+    return await query_vc_ga(
+        `INSERT INTO td_usuario_deduccion_vc_ga
+        (id_usuario_vc_ga, id_deduccion_vc_ga, monto_vc_ga, fecha_aplicacion_vc_ga)
+        VALUES (?, ?, ?, ?)`,
+        [idUsuario, idDeduccion, monto, fecha]
+    );
+    }
+
+    async actualizarDeduccionUsuario_vc_ga(idReg, monto, fecha) {
+    return await query_vc_ga(
+        `UPDATE td_usuario_deduccion_vc_ga
+        SET monto_vc_ga = ?, fecha_aplicacion_vc_ga = ?
+        WHERE id_usuario_deduccion_vc_ga = ?`,
+        [monto, fecha, idReg]
+    );
+    }
+
+    async eliminarDeduccionUsuario_vc_ga(idReg) {
+    return await query_vc_ga(
+        'DELETE FROM td_usuario_deduccion_vc_ga WHERE id_usuario_deduccion_vc_ga = ?',
+        [idReg]
+    );
+    }
+
+
     async obtenerHistorialHorasExtras_vc_ga(id_vc_ga) {
         return await query_vc_ga(
             `SELECT fecha_vc_ga AS fecha, tipo_vc_ga AS tipo, cantidad_horas_vc_ga AS horas, monto_vc_ga AS monto
@@ -44,6 +92,32 @@ class EmpleadoRepositorio_vc_ga {
         );
     }
 
+    async crearHorasExtras_vc_ga(idUsuario, tipo, horas, monto, fecha) {
+    return await query_vc_ga(
+        `INSERT INTO td_horas_extras_vc_ga
+        (id_usuario_vc_ga, tipo_vc_ga, cantidad_horas_vc_ga, monto_vc_ga, fecha_vc_ga)
+        VALUES (?, ?, ?, ?, ?)`,
+        [idUsuario, tipo, horas, monto, fecha]
+    );
+    }
+
+    async actualizarHorasExtras_vc_ga(idReg, tipo, horas, monto, fecha) {
+    return await query_vc_ga(
+        `UPDATE td_horas_extras_vc_ga
+        SET tipo_vc_ga = ?, cantidad_horas_vc_ga = ?, monto_vc_ga = ?, fecha_vc_ga = ?
+        WHERE id_horas_extras_vc_ga = ?`,
+        [tipo, horas, monto, fecha, idReg]
+    );
+    }
+
+    async eliminarHorasExtras_vc_ga(idReg) {
+    return await query_vc_ga(
+        'DELETE FROM td_horas_extras_vc_ga WHERE id_horas_extras_vc_ga = ?',
+        [idReg]
+    );
+    }
+
+
     async obtenerHistorialBonos_vc_ga(id_vc_ga) {
         return await query_vc_ga(
             `SELECT fecha_pago_vc_ga AS fecha, tipo_bono_vc_ga AS tipo, monto_vc_ga AS monto
@@ -51,6 +125,32 @@ class EmpleadoRepositorio_vc_ga {
             [id_vc_ga]
         );
     }
+
+    async crearBono_vc_ga(idUsuario, tipo, monto, fecha) {
+    return await query_vc_ga(
+        `INSERT INTO td_bono_vc_ga
+        (id_usuario_vc_ga, tipo_bono_vc_ga, monto_vc_ga, fecha_pago_vc_ga)
+        VALUES (?, ?, ?, ?)`,
+        [idUsuario, tipo, monto, fecha]
+    );
+    }
+
+    async actualizarBono_vc_ga(idReg, tipo, monto, fecha) {
+    return await query_vc_ga(
+        `UPDATE td_bono_vc_ga
+        SET tipo_bono_vc_ga = ?, monto_vc_ga = ?, fecha_pago_vc_ga = ?
+        WHERE id_bono_vc_ga = ?`,
+        [tipo, monto, fecha, idReg]
+    );
+    }
+
+    async eliminarBono_vc_ga(idReg) {
+    return await query_vc_ga(
+        'DELETE FROM td_bono_vc_ga WHERE id_bono_vc_ga = ?',
+        [idReg]
+    );
+    }
+
 }
 
 // 2. Capa de Servicio
@@ -79,6 +179,22 @@ class EmpleadoServicio_vc_ga {
     async obtenerHistorialBonos_vc_ga(id_vc_ga) {
         return await this.repositorio_vc_ga.obtenerHistorialBonos_vc_ga(id_vc_ga);
     }
+    async crearSalario_vc_ga(idUsuario, salario) { return await this.repositorio_vc_ga.crearSalario_vc_ga(idUsuario, salario); }
+    async actualizarSalario_vc_ga(idSalario, salario) { return await this.repositorio_vc_ga.actualizarSalario_vc_ga(idSalario, salario); }
+    async eliminarSalario_vc_ga(idSalario) { return await this.repositorio_vc_ga.eliminarSalario_vc_ga(idSalario); }
+    async crearDeduccionUsuario_vc_ga(...args) { return await this.repositorio_vc_ga.crearDeduccionUsuario_vc_ga(...args); }
+    async actualizarDeduccionUsuario_vc_ga(...args) { return await this.repositorio_vc_ga.actualizarDeduccionUsuario_vc_ga(...args); }
+    async eliminarDeduccionUsuario_vc_ga(idReg) { return await this.repositorio_vc_ga.eliminarDeduccionUsuario_vc_ga(idReg); }
+    async crearHorasExtras_vc_ga(...args) { return await this.repositorio_vc_ga.crearHorasExtras_vc_ga(...args); }
+    async actualizarHorasExtras_vc_ga(...args) { return await this.repositorio_vc_ga.actualizarHorasExtras_vc_ga(...args); }
+    async eliminarHorasExtras_vc_ga(idReg) { return await this.repositorio_vc_ga.eliminarHorasExtras_vc_ga(idReg); }
+    async crearBono_vc_ga(...args) { return await this.repositorio_vc_ga.crearBono_vc_ga(...args); }
+    async actualizarBono_vc_ga(...args) { return await this.repositorio_vc_ga.actualizarBono_vc_ga(...args); }
+    async eliminarBono_vc_ga(idReg) { return await this.repositorio_vc_ga.eliminarBono_vc_ga(idReg); }
+
+
+
+
 }
 
 // 3. Capa de Controlador
@@ -87,6 +203,47 @@ class EmpleadoControlador_vc_ga {
         this.servicio_vc_ga = servicio_vc_ga;
         this.idEmpleado_vc_ga = null;
     }
+
+        //CRUD SALARIO
+        async crearSalario_vc_ga(salario) { return await this.servicio_vc_ga.crearSalario_vc_ga(this.idEmpleado_vc_ga, salario); }
+        async actualizarSalario_vc_ga(idSalario, salario) { return await this.servicio_vc_ga.actualizarSalario_vc_ga(idSalario, salario); }
+        async eliminarSalario_vc_ga(idSalario) { return await this.servicio_vc_ga.eliminarSalario_vc_ga(idSalario); }
+
+
+        //CRUD DEDUCCIONES
+        async crearDeduccion_vc_ga(idDeduccion, monto, fecha) {
+        return await this.servicio_vc_ga.crearDeduccionUsuario_vc_ga(this.idEmpleado_vc_ga, idDeduccion, monto, fecha);
+        }
+        async actualizarDeduccion_vc_ga(idReg, monto, fecha) {
+        return await this.servicio_vc_ga.actualizarDeduccionUsuario_vc_ga(idReg, monto, fecha);
+        }
+        async eliminarDeduccion_vc_ga(idReg) {
+        return await this.servicio_vc_ga.eliminarDeduccionUsuario_vc_ga(idReg);
+        }
+
+
+        //CRUD HORAS EXTRAS
+        async crearExtras_vc_ga(tipo, horas, monto, fecha) {
+        return await this.servicio_vc_ga.crearHorasExtras_vc_ga(this.idEmpleado_vc_ga, tipo, horas, monto, fecha);
+        }
+        async actualizarExtras_vc_ga(idReg, tipo, horas, monto, fecha) {
+        return await this.servicio_vc_ga.actualizarHorasExtras_vc_ga(idReg, tipo, horas, monto, fecha);
+        }
+        async eliminarExtras_vc_ga(idReg) {
+        return await this.servicio_vc_ga.eliminarHorasExtras_vc_ga(idReg);
+        }
+
+
+        // CRUD BONOS
+        async crearBono_vc_ga(tipo, monto, fecha) {
+        return await this.servicio_vc_ga.crearBono_vc_ga(this.idEmpleado_vc_ga, tipo, monto, fecha);
+        }
+        async actualizarBono_vc_ga(idReg, tipo, monto, fecha) {
+        return await this.servicio_vc_ga.actualizarBono_vc_ga(idReg, tipo, monto, fecha);
+        }
+        async eliminarBono_vc_ga(idReg) {
+        return await this.servicio_vc_ga.eliminarBono_vc_ga(idReg);
+        }
 
     async iniciar_vc_ga() {
         this.idEmpleado_vc_ga = this.obtenerIdEmpleadoSesion_vc_ga();
@@ -103,6 +260,7 @@ class EmpleadoControlador_vc_ga {
         await this.recargarHistorialHorasExtras_vc_ga();
         await this.recargarHistorialBonos_vc_ga();
         this.configurarPestañas_vc_ga();
+
     }
 
     obtenerIdEmpleadoSesion_vc_ga() {
@@ -113,18 +271,22 @@ class EmpleadoControlador_vc_ga {
 
     configurarPestañas_vc_ga() {
         const botonesPestaña_vc_ga = document.querySelectorAll('.tab-btn');
-        const contenidosPestaña_vc_ga = document.querySelectorAll('.tab-pane');
+        const contenidosPestaña_vc_ga = document.querySelectorAll('.tab-content'); // ahora coincide con HTML
 
         botonesPestaña_vc_ga.forEach(boton_vc_ga => {
             boton_vc_ga.addEventListener('click', () => {
                 const destino_vc_ga = boton_vc_ga.dataset.tab;
+                // ocultar todos los contenidos
                 contenidosPestaña_vc_ga.forEach(contenido_vc_ga => contenido_vc_ga.classList.add('hidden'));
+                // mostrar solo el seleccionado
                 document.getElementById(destino_vc_ga).classList.remove('hidden');
+                // restablecer estilo de pestañas
                 botonesPestaña_vc_ga.forEach(b_vc_ga => b_vc_ga.classList.remove('border-b-2', 'border-accent1'));
                 boton_vc_ga.classList.add('border-b-2', 'border-accent1');
             });
         });
 
+        // activar la primera pestaña al iniciar
         if (botonesPestaña_vc_ga.length) botonesPestaña_vc_ga[0].click();
     }
 
