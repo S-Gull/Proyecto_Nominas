@@ -1,3 +1,5 @@
+
+
 console.log("Cargando módulo de conexión VCGA");
 
 const mysql = require('mysql2');
