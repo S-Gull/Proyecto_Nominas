@@ -153,4 +153,4 @@ CREATE TABLE IF NOT EXISTS td_reporte_contable_recibos_vc_ga (
     FOREIGN KEY (id_recibo_vc_ga) REFERENCES td_recibo_nomina_vc_ga(id_recibo_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- FUNCIONES PARA BONOS
+
