@@ -36,38 +36,57 @@ Sistema completo de gestión de nómina desarrollado con Electron.js, MySQL y Ta
   - MySQL
 
 - **Otros**:  
-  - IPC (Comunicación entre procesos)  
-  - Sistema de autenticación JWT  
-  - Modo oscuro/claro
+  - IPC (Comunicación entre procesos)
+  - bcryptjs (hash de contraseñas)
+  - electron-reload (recarga automática en desarrollo)
+  - fs-extra, path, y utilidades de Node.js
+
+---
 
 ---
 
 ## 🗃️ Estructura del Proyecto
 
 ```
-/app
-  ├── /database
-  │   ├── conexion.js       # Configuración de la base de datos
-  │   └── crud.js           # Operaciones CRUD
-  ├── /js
-  │   ├── app.js            # Punto de entrada
-  │   ├── auth.js           # Autenticación
-  │   ├── dark-mode.js      # Toggle modo oscuro
-  │   ├── login.js          # Lógica de login
-  │   ├── main.js           # Configuración de Electron
-  │   ├── modal.js          # Componente modal
-  │   ├── plantilla.js      # Gestión de usuarios
-  │   └── reportes.js       # Gestión de reportes
-  ├── /views
-  │   ├── index.html        # Login
-  │   ├── plantilla.html    # Gestión de usuarios
-  │   └── reportes.html     # Gestión de reportes
-  ├── /css
-  │   ├── login-register.css
-  │   ├── modal.css
-  │   └── style.css
-  ├── /img                  # Imágenes y logos
-  └── /tailwind             # Configuración Tailwind
+.
+├── .gitignore
+├── package.json
+├── README.md
+└── app/
+    ├── css/
+    │   ├── login-register.css
+    │   ├── modal.css
+    │   └── style.css
+    ├── database/
+    │   ├── conexion.js
+    │   ├── crud.js
+    │   ├── database.sql
+    │   ├── datosPrueba.sql
+    ├── img/
+    │   ├── BALDOX_LOGO.jpg
+    │   ├── crud.png
+    │   ├── CrudElectron.png
+    │   ├── Guillermo.png
+    │   └── Victor.png
+    ├── js/
+    │   ├── app.js
+    │   ├── dark-mode.js
+    │   ├── empleado.js
+    │   ├── index.js
+    │   ├── login.js
+    │   ├── main.js
+    │   ├── modal.js
+    │   ├── plantilla.js
+    │   ├── reportes.js
+    │   └── seleccionado.js
+    ├── tailwind/
+    │   └── tailwind.config.js
+    └── views/
+        ├── empleado.html
+        ├── index.html
+        ├── plantilla.html
+        ├── reportes.html
+        └── seleccionado.html
 ```
 
 ---
@@ -77,6 +96,9 @@ Sistema completo de gestión de nómina desarrollado con Electron.js, MySQL y Ta
 - Node.js v16+
 - MySQL 8+
 - XAMPP (opcional para entorno local)
+- Linux (desarrollado y probado en Zorin OS)
+
+---
 
 ---
 
@@ -85,7 +107,7 @@ Sistema completo de gestión de nómina desarrollado con Electron.js, MySQL y Ta
 1. **Clonar el repositorio:**
    ```bash
    git clone [url-del-repositorio]
-   cd crud_tailwind_electron
+   cd INGENIERIA\ DEL\ SOFTWARE/project/main
    ```
 
 2. **Instalar dependencias:**
@@ -94,7 +116,8 @@ Sistema completo de gestión de nómina desarrollado con Electron.js, MySQL y Ta
    ```
 
 3. **Configurar base de datos:**
-   - Importar el archivo `database.sql` a MySQL
+   - Importar el archivo `app/database/database.sql` a MySQL
+   - (Opcional) Importar `datosPrueba.sql` para datos de ejemplo
    - Configurar credenciales en `app/database/conexion.js`
 
 4. **Iniciar la aplicación:**
@@ -106,24 +129,22 @@ Sistema completo de gestión de nómina desarrollado con Electron.js, MySQL y Ta
 
 ## 🗄️ Estructura de la Base de Datos
 
-El sistema utiliza 15 tablas relacionadas:
+El sistema utiliza varias tablas relacionadas, incluyendo:
 
-1. **Tablas principales:**
-   - `td_usuarios_vc_ga` (Empleados)
-   - `td_departamento_vc_ga` (Departamentos)
-   - `td_roles_vc_ga` (Roles de usuario)
-   - `td_cargos_vc_ga` (Cargos)
+- `td_usuarios_vc_ga` (Empleados)
+- `td_departamento_vc_ga` (Departamentos)
+- `td_roles_vc_ga` (Roles de usuario)
+- `td_cargos_vc_ga` (Cargos)
+- `td_pago_nomina_vc_ga` (Pagos)
+- `td_salario_historico_vc_ga` (Historial salarial)
+- `td_bono_vc_ga` (Bonos)
+- `td_horas_extras_vc_ga` (Horas extras)
+- `td_recibo_nomina_vc_ga` (Recibos)
+- `td_reporte_banco_vc_ga` (Reportes bancarios)
+- `td_reporte_contable_vc_ga` (Reportes contables)
+- ...y otras para deducciones, vacaciones, prestaciones, etc.
 
-2. **Tablas de nómina:**
-   - `td_pago_nomina_vc_ga` (Pagos)
-   - `td_salario_historico_vc_ga` (Historial salarial)
-   - `td_bono_vc_ga` (Bonos)
-   - `td_horas_extras_vc_ga` (Horas extras)
-
-3. **Tablas de reportes:**
-   - `td_recibo_nomina_vc_ga` (Recibos)
-   - `td_reporte_banco_vc_ga` (Reportes bancarios)
-   - `td_reporte_contable_vc_ga` (Reportes contables)
+---
 
 ---
 
@@ -189,4 +210,4 @@ Error: Uno o más IDs referenciados no existen en la base de datos
 
 ## 📜 Licencia
 
-MIT License - Free for commercial and personal use.
+MIT License - Free for commercial and personal

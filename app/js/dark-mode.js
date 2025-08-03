@@ -1,71 +1,71 @@
-class ThemeToggle {
+class ThemeToggle_vc_ga {
   constructor() {
-    this.btnColorModo = document.getElementById("cambio-color");
-    this.icon = this.btnColorModo.querySelector('i');
-    this.currentTheme = null;
-    this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    this.btnColorModo_vc_ga = document.getElementById("cambio-color");
+    this.icon_vc_ga = this.btnColorModo_vc_ga.querySelector('i');
+    this.currentTheme_vc_ga = null;
+    this.mediaQuery_vc_ga = window.matchMedia('(prefers-color-scheme: dark)');
     
     // Bindear métodos para mantener el contexto
-    this.handleSystemThemeChange = this.handleSystemThemeChange.bind(this);
-    this.toggleTheme = this.toggleTheme.bind(this);
+    this.handleSystemThemeChange_vc_ga = this.handleSystemThemeChange_vc_ga.bind(this);
+    this.toggleTheme_vc_ga = this.toggleTheme_vc_ga.bind(this);
   }
 
-  getSystemTheme() {
-    return this.mediaQuery.matches ? 'dark' : 'light';
+  getSystemTheme_vc_ga() {
+    return this.mediaQuery_vc_ga.matches ? 'dark' : 'light';
   }
 
-  applyTheme(theme) {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
+  applyTheme_vc_ga(theme_vc_ga) {
+    document.documentElement.classList.toggle('dark', theme_vc_ga === 'dark');
     
-    this.icon.classList.replace(
-      theme === 'dark' ? 'fa-sun' : 'fa-moon',
-      theme === 'dark' ? 'fa-moon' : 'fa-sun'
+    this.icon_vc_ga.classList.replace(
+      theme_vc_ga === 'dark' ? 'fa-sun' : 'fa-moon',
+      theme_vc_ga === 'dark' ? 'fa-moon' : 'fa-sun'
     );
   }
 
-  saveThemePreference(theme) {
-    localStorage.setItem('themePreference', theme);
+  saveThemePreference_vc_ga(theme_vc_ga) {
+    localStorage.setItem('themePreference_vc_ga', theme_vc_ga);
   }
 
-  loadTheme() {
-    const savedTheme = localStorage.getItem('themePreference');
-    const systemTheme = this.getSystemTheme();
-    const themeToApply = savedTheme || systemTheme;
+  loadTheme_vc_ga() {
+    const savedTheme_vc_ga = localStorage.getItem('themePreference_vc_ga');
+    const systemTheme_vc_ga = this.getSystemTheme_vc_ga();
+    const themeToApply_vc_ga = savedTheme_vc_ga || systemTheme_vc_ga;
     
-    this.applyTheme(themeToApply);
-    return themeToApply;
+    this.applyTheme_vc_ga(themeToApply_vc_ga);
+    return themeToApply_vc_ga;
   }
 
-  handleSystemThemeChange(e) {
-    const newTheme = e.matches ? 'dark' : 'light';
+  handleSystemThemeChange_vc_ga(e_vc_ga) {
+    const newTheme_vc_ga = e_vc_ga.matches ? 'dark' : 'light';
     
-    if (!localStorage.getItem('themePreference')) {
-      this.applyTheme(newTheme);
+    if (!localStorage.getItem('themePreference_vc_ga')) {
+      this.applyTheme_vc_ga(newTheme_vc_ga);
     } else {
-      const currentSavedTheme = localStorage.getItem('themePreference');
-      if (currentSavedTheme === this.getSystemTheme()) {
-        this.saveThemePreference(newTheme);
+      const currentSavedTheme_vc_ga = localStorage.getItem('themePreference_vc_ga');
+      if (currentSavedTheme_vc_ga === this.getSystemTheme_vc_ga()) {
+        this.saveThemePreference_vc_ga(newTheme_vc_ga);
       }
     }
   }
 
-  toggleTheme() {
-    this.currentTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
-    this.applyTheme(this.currentTheme);
-    this.saveThemePreference(this.currentTheme);
+  toggleTheme_vc_ga() {
+    this.currentTheme_vc_ga = this.currentTheme_vc_ga === 'dark' ? 'light' : 'dark';
+    this.applyTheme_vc_ga(this.currentTheme_vc_ga);
+    this.saveThemePreference_vc_ga(this.currentTheme_vc_ga);
   }
 
-  init() {
-    this.mediaQuery.addEventListener('change', this.handleSystemThemeChange);
-    this.currentTheme = this.loadTheme();
-    this.btnColorModo.addEventListener('click', this.toggleTheme);
+  init_vc_ga() {
+    this.mediaQuery_vc_ga.addEventListener('change', this.handleSystemThemeChange_vc_ga);
+    this.currentTheme_vc_ga = this.loadTheme_vc_ga();
+    this.btnColorModo_vc_ga.addEventListener('click', this.toggleTheme_vc_ga);
   }
 }
 
 // Función simple para mantener la misma interfaz
 const setupThemeToggle_vc_ga = () => {
-  const themeToggle = new ThemeToggle();
-  themeToggle.init();
+  const themeToggle_vc_ga = new ThemeToggle_vc_ga();
+  themeToggle_vc_ga.init_vc_ga();
 };
 
 module.exports = { setupThemeToggle_vc_ga };
