@@ -463,62 +463,78 @@ class ReportesController_vc_ga {
     this._render_vc_ga();
   }
 
-  _onViewMore_vc_ga(btn_vc_ga) {
+ _onViewMore_vc_ga(btn_vc_ga) {
     const [tipo, id] = btn_vc_ga.dataset.id.split("__");
     const report = this.gestor_vc_ga.reportes_vc_ga
       .find(r => r.tipo === tipo && String(r.id) === id);
     if (!report) return;
 
-    let titulo = "Detalle Reportes";
+    let titulo;
+    let documentos = [];
+
     switch (tipo) {
-      case "reporte_banco": titulo = "Detalle Reporte Bancario"; break;
-      case "reporte_contable": titulo = "Detalle Reporte Contable"; break;
-      case "recibo_nomina": titulo = "Detalle Recibo de Nómina"; break;
+      case "reporte_banco":
+        titulo = `Detalle Reporte Bancario #${report.id}`;
+        documentos = this._obtenerRecibosAsociados_vc_ga(report.recibosAsociados);
+        documentos.unshift(report);
+        break;
+
+      case "reporte_contable":
+        titulo = `Detalle Reporte Contable #${report.id}`;
+        documentos = this._obtenerRecibosAsociados_vc_ga(report.recibosAsociados);
+        documentos.unshift(report);
+        break;
+
+      case "recibo_nomina":
+        // Usamos el mismo helper para formatear el detalle completo del recibo
+        titulo = `Detalle Recibo de Nómina #${report.id}`;
+        documentos = this._obtenerRecibosAsociados_vc_ga([report.id]);
+        break;
     }
 
-        // Preparar información extendida
-        const reportForModal = {...report};
-        if (tipo === 'recibo_nomina') {
-      reportForModal.info = `
-        ID Usuario: ${report.idUsuario || 'N/A'}
-        ID Pago: ${report.idPago || 'N/A'}
-        Fecha Pago: ${report.fechaPago || 'N/A'}
-        Monto Neto: ${report.montoNeto || '0.00'}
-        \n\n${report.info}`;
-      
-      // Agregar deducciones
-      if (report.deducciones.length > 0) {
-        reportForModal.info += `\n\nDeducciones:`;
-        report.deducciones.forEach(d => {
-          reportForModal.info += `\n- ${d.nombre}: ${d.monto} (${d.porcentaje}%)`;
-        });
-      }
-      
-      // Agregar bonos
-      if (report.bonos.length > 0) {
-        reportForModal.info += `\n\nBonos:`;
-        report.bonos.forEach(b => {
-          reportForModal.info += `\n- ${b.tipo}: ${b.monto}`;
-        });
-      }  
-        
-      if (report.reportesBancoAsociados.length > 0 || report.reportesContableAsociados.length > 0) {
-        reportForModal.info += `\n\nRelaciones:`;
-        if (report.reportesBancoAsociados.length > 0) {
-          reportForModal.info += `\nReportes Bancarios: ${report.reportesBancoAsociados.join(', ')}`;
-        }
-        if (report.reportesContableAsociados.length > 0) {
-          reportForModal.info += `\nReportes Contables: ${report.reportesContableAsociados.join(', ')}`;
-        }
-      }
-    } 
-    else if (tipo === 'reporte_banco' || tipo === 'reporte_contable') {
-      if (report.recibosAsociados.length > 0) {
-        reportForModal.info = `Recibos Asociados: ${report.recibosAsociados.join(', ')}\n\n${report.info}`;
-      }
-    }
+    modal_vc_ga.showReportes_vc_ga(titulo, documentos);
+  }
 
-    modal_vc_ga.showReportes_vc_ga(titulo, [reportForModal]);
+  // Método auxiliar para obtener y formatear recibos (ahora sirve también para el caso único)
+  _obtenerRecibosAsociados_vc_ga(idsRecibos) {
+    return idsRecibos.map(idRecibo => {
+      const recibo = this.gestor_vc_ga.reportes_vc_ga.find(
+        r => r.tipo === 'recibo_nomina' && r.id === idRecibo
+      );
+      if (!recibo) return null;
+
+      // Construcción del info detallado
+      let info = `ID Recibo: ${recibo.id}\n`;
+      info += `ID Usuario: ${recibo.idUsuario || 'N/A'}\n`;
+      info += `ID Pago: ${recibo.idPago || 'N/A'}\n`;
+      info += `Fecha Pago: ${recibo.fechaPago || 'N/A'}\n`;
+      info += `Monto Neto: ${recibo.montoNeto || '0.00'}\n\n`;
+      info += recibo.info || '';
+
+      if (recibo.deducciones.length) {
+        info += `\n\nDeducciones:`;
+        recibo.deducciones.forEach(d => {
+          info += `\n- ${d.nombre}: ${d.monto} (${d.porcentaje}%)`;
+        });
+      }
+      if (recibo.bonos.length) {
+        info += `\n\nBonos:`;
+        recibo.bonos.forEach(b => {
+          info += `\n- ${b.tipo}: ${b.monto}`;
+        });
+      }
+      if (recibo.reportesBancoAsociados.length || recibo.reportesContableAsociados.length) {
+        info += `\n\nRelaciones:`;
+        if (recibo.reportesBancoAsociados.length) {
+          info += `\nReportes Bancarios: ${recibo.reportesBancoAsociados.join(', ')}`;
+        }
+        if (recibo.reportesContableAsociados.length) {
+          info += `\nReportes Contables: ${recibo.reportesContableAsociados.join(', ')}`;
+        }
+      }
+
+      return { ...recibo, info };
+    }).filter(Boolean);
   }
 }
 
