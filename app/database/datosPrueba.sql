@@ -109,12 +109,14 @@ INSERT INTO td_usuario_deduccion_vc_ga (id_usuario_vc_ga, id_deduccion_vc_ga, mo
 (5, 3, 42.00, '2022-12-30');
 
 -- Recibos de nómina (ahora con datos directos sin referencia a pagos)
-INSERT INTO td_recibo_nomina_vc_ga (id_usuario_vc_ga, fecha_pago_vc_ga, monto_neto_vc_ga, fecha_generacion_vc_ga, contenido_vc_ga) VALUES
-(1, '2022-12-30', 5200.00, '2022-12-30 08:00:00', 'Recibo de pago para María González - Diciembre 2022'),
-(2, '2022-12-30', 4100.00, '2022-12-30 08:05:00', 'Recibo de pago para Carlos Pérez - Diciembre 2022'),
-(3, '2022-12-30', 3100.00, '2022-12-30 08:10:00', 'Recibo de pago para Ana Rodríguez - Diciembre 2022'),
-(4, '2022-12-30', 3600.00, '2022-12-30 08:15:00', 'Recibo de pago para Luis Martínez - Diciembre 2022'),
-(5, '2022-12-30', 4300.00, '2022-12-30 08:20:00', 'Recibo de pago para Pedro Sánchez - Diciembre 2022');
+INSERT INTO td_recibo_nomina_vc_ga 
+(id_usuario_vc_ga, id_pago_vc_ga, fecha_pago_vc_ga, monto_neto_vc_ga, fecha_generacion_vc_ga, contenido_vc_ga) 
+VALUES
+(1, 42412345, '2022-12-30', 5200.00, '2022-12-30 08:00:00', 'Recibo de pago para María González - Diciembre 2022'),
+(2, 42498765, '2022-12-30', 4100.00, '2022-12-30 08:05:00', 'Recibo de pago para Carlos Pérez - Diciembre 2022'),
+(3, 41655512, '2022-12-30', 3100.00, '2022-12-30 08:10:00', 'Recibo de pago para Ana Rodríguez - Diciembre 2022'),
+(4, 41478901, '2022-12-30', 3600.00, '2022-12-30 08:15:00', 'Recibo de pago para Luis Martínez - Diciembre 2022'),
+(5, 41234567, '2022-12-30', 4300.00, '2022-12-30 08:20:00', 'Recibo de pago para Pedro Sánchez - Diciembre 2022');
 
 -- Generar reportes bancarios actualizados
 INSERT INTO td_reporte_banco_vc_ga (fecha_reporte_vc_ga, info_banco_vc_ga)
