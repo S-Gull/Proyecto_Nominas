@@ -115,6 +115,15 @@ async guardarUsuario_vc_ga(datos_vc_ga) {
 
     const resultado = await this._ejecutarConsulta_vc_ga(query, params);
     
+    // Si es nuevo usuario, crear salario base de al menos 12$
+    if (esNuevo_vc_ga && resultado.insertId) {
+      const salarioBase = 12; // Salario mínimo
+      await this._ejecutarConsulta_vc_ga(
+        'INSERT INTO td_salario_historico_vc_ga (id_usuario_vc_ga, salario_vc_ga) VALUES (?, ?)',
+        [resultado.insertId, salarioBase]
+      );
+    }
+
     // Recargar lista de usuarios
     await this.cargarUsuarios_vc_ga();
 

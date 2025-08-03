@@ -44,6 +44,7 @@ class EmpleadoRepositorio_vc_ga {
             `SELECT id_salario_vc_ga, salario_vc_ga 
              FROM td_salario_historico_vc_ga 
              WHERE id_usuario_vc_ga = ? 
+             ORDER BY id_salario_vc_ga DESC
              LIMIT 1`,
             [id_vc_ga]
         );
@@ -395,12 +396,16 @@ class EmpleadoServicio_vc_ga {
 
     async actualizarSalario_vc_ga(idUsuario, nuevoSalario) {
         // Validaciones más robustas
+        console.log(idUsuario,"Idusuario");
+        console.log(nuevoSalario,"nuevoSalario");
         if (typeof nuevoSalario !== 'number' || isNaN(nuevoSalario) || nuevoSalario <= 0) {
             throw new Error("El salario debe ser un número positivo válido");
         }
 
         // Primero verificamos si el usuario ya tiene un salario registrado
-        const historialSalario = await this.obtenerHistorialSalario_vc_ga(idUsuario);
+         const id = sessionStorage.getItem("selectedUserId")
+        const historialSalario = await this.obtenerHistorialSalario_vc_ga(id);
+        console.log(historialSalario);
         
         if (historialSalario.length > 0) {
             // Si existe, actualizamos el registro existente
