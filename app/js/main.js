@@ -4,18 +4,6 @@ const path = require('path');
 
 let ventana_vc_ga;
 
-<<<<<<< HEAD
-function crearVentana() {
-    ventana = new BrowserWindow({
-    width: 1000,
-    height: 700,
-    webPreferences: {
-      nodeIntegration: false, // IMPORTANTE: deshabilitar
-      contextIsolation: true // HABILITAR seguridad
-      
-     // Archivo de precarga
-    
-=======
 const crearVentana_vc_ga = () => {
   ventana_vc_ga = new BrowserWindow({
     width: 1600,
@@ -23,7 +11,6 @@ const crearVentana_vc_ga = () => {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
->>>>>>> main
     }
   });
   ventana_vc_ga.loadFile(path.join(__dirname, '..','/','views','/' ,'index.html'));

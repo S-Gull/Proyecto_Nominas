@@ -5,9 +5,9 @@ const { modal_vc_ga } = require("./modal");
 const empleadoHTML_vc_ga = document.getElementById('employee-view');
 
 const salarioInput_vc_ga = document.getElementById('salaryBase');
-const agregarSalarioBtn_vc_ga = document.getElementById('addSalaryBtn');
+// const agregarSalarioBtn_vc_ga = document.getElementById('addSalaryBtn');
 const editarSalarioBtn_vc_ga = document.getElementById('editSalaryBtn');
-const borrarSalarioBtn_vc_ga = document.getElementById('deleteSalaryBtn');
+// const borrarSalarioBtn_vc_ga = document.getElementById('deleteSalaryBtn');
 
 const agregarDeduccionBtn_vc_ga = document.getElementById('addDeductionBtn');
 const editarDeduccionBtn_vc_ga = document.getElementById('editDeductionBtn');
@@ -39,31 +39,36 @@ class EmpleadoRepositorio_vc_ga {
 
     async obtenerHistorialSalario_vc_ga(id_vc_ga) {
         return await query_vc_ga(
-            'SELECT salario_vc_ga FROM td_salario_historico_vc_ga WHERE id_usuario_vc_ga = ?',
+            `SELECT id_salario_vc_ga, salario_vc_ga 
+             FROM td_salario_historico_vc_ga 
+             WHERE id_usuario_vc_ga = ? 
+             LIMIT 1`,
             [id_vc_ga]
         );
     }
 
-    async crearSalario_vc_ga(idUsuario, salario) { 
-    return await query_vc_ga(
-        'INSERT INTO td_salario_historico_vc_ga (id_usuario_vc_ga, salario_vc_ga) VALUES (?, ?)',
-        [idUsuario, salario]
-    );
-    }
+    // async crearSalario_vc_ga(idUsuario, salario) { 
+    // return await query_vc_ga(
+    //     'INSERT INTO td_salario_historico_vc_ga (id_usuario_vc_ga, salario_vc_ga) VALUES (?, ?)',
+    //     [idUsuario, salario]
+    // );
+    // }
 
     async actualizarSalario_vc_ga(idSalario, salario) {
-    return await query_vc_ga(
-        'UPDATE td_salario_historico_vc_ga SET salario_vc_ga = ? WHERE id_salario_vc_ga = ?',
-        [salario, idSalario]
-    );
+      return await query_vc_ga(
+            `UPDATE td_salario_historico_vc_ga 
+             SET salario_vc_ga = ? 
+             WHERE id_salario_vc_ga = ?`,
+            [salario, idSalario]
+        );
     }
 
-    async eliminarSalario_vc_ga(idSalario) {
-    return await query_vc_ga(
-        'DELETE FROM td_salario_historico_vc_ga WHERE id_salario_vc_ga = ?',
-        [idSalario]
-    );
-    }
+    // async eliminarSalario_vc_ga(idSalario) {
+    // return await query_vc_ga(
+    //     'DELETE FROM td_salario_historico_vc_ga WHERE id_salario_vc_ga = ?',
+    //     [idSalario]
+    // );
+    // }
 
 
     async obtenerHistorialDeducciones_vc_ga(id_vc_ga) {
@@ -185,23 +190,38 @@ class EmpleadoServicio_vc_ga {
         return await this.repositorio_vc_ga.obtenerHistorialSalario_vc_ga(id_vc_ga);
     }
 
-    async crearSalario_vc_ga(idUsuario, salario) { 
-        if (!salario || isNaN(salario)) {
-            throw new Error("El salario debe ser un número válido");
+    // async crearSalario_vc_ga(idUsuario, salario) { 
+    //     if (!salario || isNaN(salario)) {
+    //         throw new Error("El salario debe ser un número válido");
+    //     }
+    //     return await this.repositorio_vc_ga.crearSalario_vc_ga(idUsuario, parseFloat(salario));
+    // }
+
+    async actualizarSalario_vc_ga(idUsuario, nuevoSalario) {
+        // Validaciones más robustas
+        if (typeof nuevoSalario !== 'number' || isNaN(nuevoSalario) || nuevoSalario <= 0) {
+            throw new Error("El salario debe ser un número positivo válido");
         }
-        return await this.repositorio_vc_ga.crearSalario_vc_ga(idUsuario, parseFloat(salario));
+
+        // Primero verificamos si el usuario ya tiene un salario registrado
+        const historialSalario = await this.obtenerHistorialSalario_vc_ga(idUsuario);
+        
+        if (historialSalario.length > 0) {
+            // Si existe, actualizamos el registro existente
+            const idSalario = historialSalario[0].id_salario_vc_ga;
+            return await this.repositorio_vc_ga.actualizarSalario_vc_ga(idSalario, nuevoSalario);
+        } else {
+            // Si no existe, creamos un nuevo registro
+            // Nota: Necesitarías descomentar y completar el método crearSalario_vc_ga en el repositorio
+            throw new Error("No se encontró registro de salario para este empleado");
+            // return await this.repositorio_vc_ga.crearSalario_vc_ga(idUsuario, nuevoSalario);
+        }
     }
 
-    async actualizarSalario_vc_ga(idSalario, salario) {
-        if (!salario || isNaN(salario)) {
-            throw new Error("El salario debe ser un número válido");
-        }
-        return await this.repositorio_vc_ga.actualizarSalario_vc_ga(idSalario, parseFloat(salario));
-    }
 
-    async eliminarSalario_vc_ga(idSalario) {
-        return await this.repositorio_vc_ga.eliminarSalario_vc_ga(idSalario);
-    }
+    // async eliminarSalario_vc_ga(idSalario) {
+    //     return await this.repositorio_vc_ga.eliminarSalario_vc_ga(idSalario);
+    // }
 
     async obtenerHistorialDeducciones_vc_ga(id_vc_ga) {
         return await this.repositorio_vc_ga.obtenerHistorialDeducciones_vc_ga(id_vc_ga);
@@ -234,9 +254,9 @@ class EmpleadoControlador_vc_ga {
     }
 
         //CRUD SALARIO
-        async crearSalario_vc_ga(salario) { return await this.servicio_vc_ga.crearSalario_vc_ga(this.idEmpleado_vc_ga, salario); }
+        // async crearSalario_vc_ga(salario) { return await this.servicio_vc_ga.crearSalario_vc_ga(this.idEmpleado_vc_ga, salario); }
         async actualizarSalario_vc_ga(idSalario, salario) { return await this.servicio_vc_ga.actualizarSalario_vc_ga(idSalario, salario); }
-        async eliminarSalario_vc_ga(idSalario) { return await this.servicio_vc_ga.eliminarSalario_vc_ga(idSalario); }
+        // async eliminarSalario_vc_ga(idSalario) { return await this.servicio_vc_ga.eliminarSalario_vc_ga(idSalario); }
 
 
         //CRUD DEDUCCIONES
@@ -275,9 +295,9 @@ class EmpleadoControlador_vc_ga {
         }
         
         configurarBotonesSalario_vc_ga() {
-    agregarSalarioBtn_vc_ga?.addEventListener('click', () => this.manejarAgregarSalario_vc_ga());
+    // agregarSalarioBtn_vc_ga?.addEventListener('click', () => this.manejarAgregarSalario_vc_ga());
     editarSalarioBtn_vc_ga?.addEventListener('click', () => this.manejarEditarSalario_vc_ga());
-    borrarSalarioBtn_vc_ga?.addEventListener('click', () => this.manejarBorrarSalario_vc_ga());
+    // borrarSalarioBtn_vc_ga?.addEventListener('click', () => this.manejarBorrarSalario_vc_ga());
 }
 
 /**
@@ -296,7 +316,7 @@ async mostrarModalInputOscuro_vc_ga(titulo, mensaje, valorPredeterminado = '') {
         
         container.appendChild(input);
         
-        modal_vc_ga.show_vc_ga(titulo, mensaje, 'warning', true)
+        modal_vc_ga.show_vc_ga(titulo, mensaje, 'reportes', true)
             .then((confirmed) => {
                 if (confirmed) {
                     resolve(input.value);
@@ -330,7 +350,7 @@ async mostrarSelectOscuro_vc_ga(titulo, mensaje, opciones) {
         
         container.appendChild(select);
         
-        modal_vc_ga.show_vc_ga(titulo, mensaje, 'warning', true)
+        modal_vc_ga.show_vc_ga(titulo, mensaje, 'reportes', true)
             .then((confirmed) => {
                 if (confirmed) {
                     resolve({
@@ -350,24 +370,24 @@ async mostrarSelectOscuro_vc_ga(titulo, mensaje, opciones) {
 /**
  * Maneja la acción de agregar salario
  */
-async manejarAgregarSalario_vc_ga() {
-    try {
-        // const salarioInput_vc_ga = document.getElementById('salaryBase');
-        const salario = salarioInput_vc_ga.value;
+// async manejarAgregarSalario_vc_ga() {
+//     try {
+//         // const salarioInput_vc_ga = document.getElementById('salaryBase');
+//         const salario = salarioInput_vc_ga.value;
         
-        if (!salario || isNaN(salario)) {
-            throw new Error("Debe ingresar un valor numérico válido en el campo Sueldo Base");
-        }
+//         if (!salario || isNaN(salario)) {
+//             throw new Error("Debe ingresar un valor numérico válido en el campo Sueldo Base");
+//         }
         
-        await this.crearSalario_vc_ga(parseFloat(salario));
-        await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Salario agregado correctamente');
-        salarioInput_vc_ga.value = ''; // Limpiar el input
-        await this.recargarHistorialSalario_vc_ga();
-    } catch (error) {
-        await modal_vc_ga.showError_vc_ga('Error', error.message);
-        console.error(error);
-    }
-}
+//         await this.crearSalario_vc_ga(parseFloat(salario));
+//         await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Salario agregado correctamente');
+//         salarioInput_vc_ga.value = ''; // Limpiar el input
+//         await this.recargarHistorialSalario_vc_ga();
+//     } catch (error) {
+//         await modal_vc_ga.showError_vc_ga('Error', error.message);
+//         console.error(error);
+//     }
+// }
 
 
 /**
@@ -375,87 +395,88 @@ async manejarAgregarSalario_vc_ga() {
  */
 async manejarEditarSalario_vc_ga() {
     try {
+        // 1. Obtener el valor actual del input
+        const salarioActual = salarioInput_vc_ga.value;
+        
+        // 2. Validar que haya un valor en el input
+        if (!salarioActual || isNaN(salarioActual)) {
+            await modal_vc_ga.showError_vc_ga('Error', 'El salario actual no es válido o está vacío');
+            return;
+        }
+
+        // 3. Mostrar modal de confirmación simple
+        const confirmado = await modal_vc_ga.show_vc_ga(
+            'Confirmar Edición',
+            `¿Desea actualizar el salario base a ${salarioActual}?`,
+            'confirmacion', // Tipo de modal para confirmación
+            true // Mostrar botones OK/Cancelar
+        );
+
+        if (!confirmado) return;
+
+        // 4. Obtener el historial para encontrar el ID del salario actual
         const historial = await this.servicio_vc_ga.obtenerHistorialSalario_vc_ga(this.idEmpleado_vc_ga);
         
         if (!historial || historial.length === 0) {
-            await modal_vc_ga.showWarning_vc_ga('Advertencia', 'No hay salarios registrados para editar');
-            return;
+            throw new Error("No se encontró registro de salario para este empleado");
         }
-        
-        // Preparar opciones para el select
-        const opciones = historial.map(salario => ({
-            texto: `${salario.salario_vc_ga} (${new Date(salario.fecha_registro_vc_ga).toLocaleDateString()})`
-        }));
-        
-        const seleccion = await this.mostrarSelectOscuro_vc_ga(
-            'Editar Salario', 
-            'Seleccione el salario a editar:',
-            opciones
+
+        // 5. Actualizar el salario
+        await this.actualizarSalario_vc_ga(
+            historial[0].id_salario_vc_ga, 
+            parseFloat(salarioActual)
         );
-        
-        if (!seleccion.confirmado) return;
-        
-        const salarioSeleccionado = historial[seleccion.indice];
-        const nuevoSalario = await this.mostrarModalInputOscuro_vc_ga(
-            'Editar Salario', 
-            'Ingrese el nuevo valor:',
-            salarioSeleccionado.salario_vc_ga
-        );
-        
-        if (nuevoSalario === null) return;
-        if (!nuevoSalario || isNaN(nuevoSalario)) {
-            throw new Error("Debe ingresar un valor numérico válido");
-        }
-        
-        await this.actualizarSalario_vc_ga(salarioSeleccionado.id_salario_vc_ga, parseFloat(nuevoSalario));
-        await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Salario actualizado correctamente');
+
+        // 6. Recargar el historial
         await this.recargarHistorialSalario_vc_ga();
+
+        await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Salario base actualizado correctamente');
+        
     } catch (error) {
         await modal_vc_ga.showError_vc_ga('Error', `No se pudo editar el salario: ${error.message}`);
-        console.error(error);
+        console.error('Error al editar salario:', error);
     }
 }
-
 /**
  * Maneja la acción de borrar salario
  */
-async manejarBorrarSalario_vc_ga() {
-    try {
-        const historial = await this.servicio_vc_ga.obtenerHistorialSalario_vc_ga(this.idEmpleado_vc_ga);
+// async manejarBorrarSalario_vc_ga() {
+//     try {
+//         const historial = await this.servicio_vc_ga.obtenerHistorialSalario_vc_ga(this.idEmpleado_vc_ga);
         
-        if (!historial || historial.length === 0) {
-            await modal_vc_ga.showWarning_vc_ga('Advertencia', 'No hay salarios registrados para borrar');
-            return;
-        }
+//         if (!historial || historial.length === 0) {
+//             await modal_vc_ga.showWarning_vc_ga('Advertencia', 'No hay salarios registrados para borrar');
+//             return;
+//         }
         
-        const opciones = historial.map(salario => ({
-            texto: `${salario.salario_vc_ga} (${new Date(salario.fecha_registro_vc_ga).toLocaleDateString()})`
-        }));
+//         const opciones = historial.map(salario => ({
+//             texto: `${salario.salario_vc_ga} (${new Date(salario.fecha_registro_vc_ga).toLocaleDateString()})`
+//         }));
         
-        const seleccion = await this.mostrarSelectOscuro_vc_ga(
-            'Borrar Salario', 
-            'Seleccione el salario a borrar:',
-            opciones
-        );
+//         const seleccion = await this.mostrarSelectOscuro_vc_ga(
+//             'Borrar Salario', 
+//             'Seleccione el salario a borrar:',
+//             opciones
+//         );
         
-        if (!seleccion.confirmado) return;
+//         if (!seleccion.confirmado) return;
         
-        const salarioSeleccionado = historial[seleccion.indice];
-        const confirmacion = await modal_vc_ga.showConfirm_vc_ga(
-            'Confirmar Borrado', 
-            `¿Está seguro que desea borrar el salario ${salarioSeleccionado.salario_vc_ga}?`
-        );
+//         const salarioSeleccionado = historial[seleccion.indice];
+//         const confirmacion = await modal_vc_ga.showConfirm_vc_ga(
+//             'Confirmar Borrado', 
+//             `¿Está seguro que desea borrar el salario ${salarioSeleccionado.salario_vc_ga}?`
+//         );
         
-        if (!confirmacion) return;
+//         if (!confirmacion) return;
         
-        await this.eliminarSalario_vc_ga(salarioSeleccionado.id_salario_vc_ga);
-        await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Salario borrado correctamente');
-        await this.recargarHistorialSalario_vc_ga();
-    } catch (error) {
-        await modal_vc_ga.showError_vc_ga('Error', `No se pudo borrar el salario: ${error.message}`);
-        console.error(error);
-    }
-}
+//         await this.eliminarSalario_vc_ga(salarioSeleccionado.id_salario_vc_ga);
+//         await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Salario borrado correctamente');
+//         await this.recargarHistorialSalario_vc_ga();
+//     } catch (error) {
+//         await modal_vc_ga.showError_vc_ga('Error', `No se pudo borrar el salario: ${error.message}`);
+//         console.error(error);
+//     }
+// }
 
     async iniciar_vc_ga() {
         // Obtenemos usuario y rol
