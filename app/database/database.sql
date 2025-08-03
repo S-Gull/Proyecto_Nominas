@@ -68,17 +68,6 @@ CREATE TABLE IF NOT EXISTS td_bono_vc_ga (
     FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Tabla de horas extras
-CREATE TABLE IF NOT EXISTS td_horas_extras_vc_ga (
-    id_horas_extras_vc_ga int PRIMARY KEY AUTO_INCREMENT,
-    id_usuario_vc_ga int,
-    cantidad_horas_vc_ga decimal(5,2),
-    tipo_vc_ga varchar(255),
-    fecha_vc_ga date,
-    monto_vc_ga decimal(10,2),
-    FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
 -- Tabla de deducciones
 CREATE TABLE IF NOT EXISTS td_deduccion_vc_ga (
     id_deduccion_vc_ga int PRIMARY KEY AUTO_INCREMENT,
@@ -112,6 +101,24 @@ CREATE TABLE IF NOT EXISTS td_recibo_nomina_vc_ga (
     FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+-- Tabla de relación recibo-deducciones (M:N)
+CREATE TABLE IF NOT EXISTS td_recibo_deduccion_vc_ga (
+    id_recibo_vc_ga int NOT NULL,
+    id_usuario_deduccion_vc_ga int NOT NULL,
+    PRIMARY KEY (id_recibo_vc_ga, id_usuario_deduccion_vc_ga),
+    FOREIGN KEY (id_recibo_vc_ga) REFERENCES td_recibo_nomina_vc_ga(id_recibo_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_usuario_deduccion_vc_ga) REFERENCES td_usuario_deduccion_vc_ga(id_usuario_deduccion_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Tabla de relación recibo-bonos (M:N)
+CREATE TABLE IF NOT EXISTS td_recibo_bono_vc_ga (
+    id_recibo_vc_ga int NOT NULL,
+    id_bono_vc_ga int NOT NULL,
+    PRIMARY KEY (id_recibo_vc_ga, id_bono_vc_ga),
+    FOREIGN KEY (id_recibo_vc_ga) REFERENCES td_recibo_nomina_vc_ga(id_recibo_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_bono_vc_ga) REFERENCES td_bono_vc_ga(id_bono_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 -- Tabla de reportes bancarios
 CREATE TABLE IF NOT EXISTS td_reporte_banco_vc_ga (
     id_reporte_banco_vc_ga int PRIMARY KEY AUTO_INCREMENT,
@@ -131,8 +138,8 @@ CREATE TABLE IF NOT EXISTS td_reporte_banco_recibos_vc_ga (
     id_reporte_banco_vc_ga int,
     id_recibo_vc_ga int,
     PRIMARY KEY (id_reporte_banco_vc_ga, id_recibo_vc_ga),
-    FOREIGN KEY (id_reporte_banco_vc_ga) REFERENCES td_reporte_banco_vc_ga(id_reporte_banco_vc_ga) ON DELETE CASCADE,
-    FOREIGN KEY (id_recibo_vc_ga) REFERENCES td_recibo_nomina_vc_ga(id_recibo_vc_ga) ON DELETE CASCADE
+    FOREIGN KEY (id_reporte_banco_vc_ga) REFERENCES td_reporte_banco_vc_ga(id_reporte_banco_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_recibo_vc_ga) REFERENCES td_recibo_nomina_vc_ga(id_recibo_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Tabla de relación entre reportes contables y recibos de nómina
@@ -140,6 +147,6 @@ CREATE TABLE IF NOT EXISTS td_reporte_contable_recibos_vc_ga (
     id_reporte_contable_vc_ga int,
     id_recibo_vc_ga int,
     PRIMARY KEY (id_reporte_contable_vc_ga, id_recibo_vc_ga),
-    FOREIGN KEY (id_reporte_contable_vc_ga) REFERENCES td_reporte_contable_vc_ga(id_reporte_contable_vc_ga) ON DELETE CASCADE,
-    FOREIGN KEY (id_recibo_vc_ga) REFERENCES td_recibo_nomina_vc_ga(id_recibo_vc_ga) ON DELETE CASCADE
+    FOREIGN KEY (id_reporte_contable_vc_ga) REFERENCES td_reporte_contable_vc_ga(id_reporte_contable_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_recibo_vc_ga) REFERENCES td_recibo_nomina_vc_ga(id_recibo_vc_ga) ON DELETE CASCADE ON UPDATE CASCADE
 );

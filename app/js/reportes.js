@@ -35,26 +35,42 @@ class GestorReportes_vc_ga {
            GROUP BY rc.id_reporte_contable_vc_ga
            ORDER BY rc.fecha_reporte_vc_ga DESC`
         ),
-        this._ejecutarConsulta_vc_ga(
-          `SELECT 
-              rn.id_recibo_vc_ga AS id,
-              rn.id_usuario_vc_ga AS idUsuario,
-              rn.id_pago_vc_ga AS idPago,
-              rn.fecha_pago_vc_ga AS fechaPago,
-              rn.monto_neto_vc_ga AS montoNeto,
-              rn.fecha_generacion_vc_ga AS fecha,
-              rn.contenido_vc_ga AS info,
-              GROUP_CONCAT(rbr.id_reporte_banco_vc_ga) AS reportesBancoAsociados,
-              GROUP_CONCAT(rcr.id_reporte_contable_vc_ga) AS reportesContableAsociados
-           FROM td_recibo_nomina_vc_ga rn
-           LEFT JOIN td_reporte_banco_recibos_vc_ga rbr 
-             ON rn.id_recibo_vc_ga = rbr.id_recibo_vc_ga
-           LEFT JOIN td_reporte_contable_recibos_vc_ga rcr 
-             ON rn.id_recibo_vc_ga = rcr.id_recibo_vc_ga
-           GROUP BY rn.id_recibo_vc_ga
-           ORDER BY rn.fecha_generacion_vc_ga DESC`
-        )
-      ]);
+       this._ejecutarConsulta_vc_ga(
+    `SELECT 
+        rn.id_recibo_vc_ga AS id,
+        rn.id_usuario_vc_ga AS idUsuario,
+        rn.id_pago_vc_ga AS idPago,
+        rn.fecha_pago_vc_ga AS fechaPago,
+        rn.monto_neto_vc_ga AS montoNeto,
+        rn.fecha_generacion_vc_ga AS fecha,
+        rn.contenido_vc_ga AS info,
+        GROUP_CONCAT(DISTINCT rbr.id_reporte_banco_vc_ga) AS reportesBancoAsociados,
+        GROUP_CONCAT(DISTINCT rcr.id_reporte_contable_vc_ga) AS reportesContableAsociados,
+        -- Nuevos campos para deducciones
+        GROUP_CONCAT(DISTINCT CONCAT_WS('::', ud.id_usuario_deduccion_vc_ga, ud.monto_vc_ga, d.nombre_vc_ga, d.porcentaje_vc_ga) SEPARATOR '||') AS deducciones,
+        -- Nuevos campos para bonos
+        GROUP_CONCAT(DISTINCT CONCAT_WS('::', b.id_bono_vc_ga, b.monto_vc_ga, b.tipo_bono_vc_ga) SEPARATOR '||') AS bonos
+     FROM td_recibo_nomina_vc_ga rn
+     LEFT JOIN td_reporte_banco_recibos_vc_ga rbr 
+        ON rn.id_recibo_vc_ga = rbr.id_recibo_vc_ga
+     LEFT JOIN td_reporte_contable_recibos_vc_ga rcr 
+        ON rn.id_recibo_vc_ga = rcr.id_recibo_vc_ga
+     -- Nuevos JOINs para deducciones
+     LEFT JOIN td_recibo_deduccion_vc_ga rd 
+        ON rn.id_recibo_vc_ga = rd.id_recibo_vc_ga
+     LEFT JOIN td_usuario_deduccion_vc_ga ud 
+        ON rd.id_usuario_deduccion_vc_ga = ud.id_usuario_deduccion_vc_ga
+     LEFT JOIN td_deduccion_vc_ga d 
+        ON ud.id_deduccion_vc_ga = d.id_deduccion_vc_ga
+     -- Nuevos JOINs para bonos
+     LEFT JOIN td_recibo_bono_vc_ga rb 
+        ON rn.id_recibo_vc_ga = rb.id_recibo_vc_ga
+     LEFT JOIN td_bono_vc_ga b 
+        ON rb.id_bono_vc_ga = b.id_bono_vc_ga
+     GROUP BY rn.id_recibo_vc_ga
+     ORDER BY rn.fecha_generacion_vc_ga DESC`
+  )
+]);
 
       this.reportes_vc_ga = [
         ...bancos.map(r => ({ 
@@ -67,13 +83,38 @@ class GestorReportes_vc_ga {
           tipo: "reporte_contable",
           recibosAsociados: r.recibosAsociados ? r.recibosAsociados.split(',').map(Number) : [] 
         })),
-        ...recibos.map(r => ({ 
-          ...r, 
+        ...recibos.map(r => ({
+          ...r,
           tipo: "recibo_nomina",
           idUsuario: r.idUsuario ? String(r.idUsuario) : null,
           idPago: r.idPago ? String(r.idPago) : null,
-          reportesBancoAsociados: r.reportesBancoAsociados ? r.reportesBancoAsociados.split(',').map(Number) : [],
-          reportesContableAsociados: r.reportesContableAsociados ? r.reportesContableAsociados.split(',').map(Number) : []
+          reportesBancoAsociados: r.reportesBancoAsociados 
+            ? r.reportesBancoAsociados.split(',').map(Number) : [],
+          reportesContableAsociados: r.reportesContableAsociados 
+            ? r.reportesContableAsociados.split(',').map(Number) : [],
+          // Parsear deducciones
+          deducciones: r.deducciones 
+            ? r.deducciones.split('||').map(item => {
+                const [id, monto, nombre, porcentaje] = item.split('::');
+                return {
+                  id: Number(id),
+                  monto: Number(monto),
+                  nombre,
+                  porcentaje: Number(porcentaje)
+                };
+              }) 
+            : [],
+          // Parsear bonos
+          bonos: r.bonos 
+            ? r.bonos.split('||').map(item => {
+                const [id, monto, tipo] = item.split('::');
+                return {
+                  id: Number(id),
+                  monto: Number(monto),
+                  tipo
+                };
+              }) 
+            : []
         }))
       ];
       
@@ -322,18 +363,45 @@ class ReportesController_vc_ga {
         case "recibo_nomina": titulo = "Recibo de Nómina"; break;
       }
 
-      let detallesAdicionales = "";
-      if (r.tipo === 'recibo_nomina') {
-        detallesAdicionales = `
-          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            ID Usuario: ${r.idUsuario || 'N/A'}
-          </p>
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            ID Pago: ${r.idPago || 'N/A'}
-          </p>
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            Monto Neto: ${r.montoNeto || '0.00'}
-          </p>`;
+        let detallesAdicionales = "";
+        if (r.tipo === 'recibo_nomina') {
+    detallesAdicionales = `
+      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+        ID Usuario: ${r.idUsuario || 'N/A'}
+      </p>
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        ID Pago: ${r.idPago || 'N/A'}
+      </p>
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        Monto Neto: ${r.montoNeto || '0.00'}
+      </p>`;
+    
+    // Mostrar deducciones si existen
+    if (r.deducciones.length > 0) {
+      detallesAdicionales += `
+        <div class="mt-2">
+          <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Deducciones:</p>
+          ${r.deducciones.map(d => `
+            <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded mr-1 mb-1">
+              ${d.nombre}: ${d.monto} (${d.porcentaje}%)
+            </span>
+          `).join('')}
+        </div>`;
+    }
+    
+    // Mostrar bonos si existen
+    if (r.bonos.length > 0) {
+      detallesAdicionales += `
+        <div class="mt-1">
+          <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Bonos:</p>
+          ${r.bonos.map(b => `
+            <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mr-1 mb-1">
+              ${b.tipo}: ${b.monto}
+            </span>
+          `).join('')}
+        </div>`;
+    }
+
           
         if (r.reportesBancoAsociados.length > 0 || r.reportesContableAsociados.length > 0) {
           detallesAdicionales += `
@@ -408,15 +476,31 @@ class ReportesController_vc_ga {
       case "recibo_nomina": titulo = "Detalle Recibo de Nómina"; break;
     }
 
-    // Preparar información extendida
-    const reportForModal = {...report};
-    if (tipo === 'recibo_nomina') {
+        // Preparar información extendida
+        const reportForModal = {...report};
+        if (tipo === 'recibo_nomina') {
       reportForModal.info = `
         ID Usuario: ${report.idUsuario || 'N/A'}
         ID Pago: ${report.idPago || 'N/A'}
         Fecha Pago: ${report.fechaPago || 'N/A'}
         Monto Neto: ${report.montoNeto || '0.00'}
         \n\n${report.info}`;
+      
+      // Agregar deducciones
+      if (report.deducciones.length > 0) {
+        reportForModal.info += `\n\nDeducciones:`;
+        report.deducciones.forEach(d => {
+          reportForModal.info += `\n- ${d.nombre}: ${d.monto} (${d.porcentaje}%)`;
+        });
+      }
+      
+      // Agregar bonos
+      if (report.bonos.length > 0) {
+        reportForModal.info += `\n\nBonos:`;
+        report.bonos.forEach(b => {
+          reportForModal.info += `\n- ${b.tipo}: ${b.monto}`;
+        });
+      }  
         
       if (report.reportesBancoAsociados.length > 0 || report.reportesContableAsociados.length > 0) {
         reportForModal.info += `\n\nRelaciones:`;
