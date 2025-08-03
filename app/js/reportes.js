@@ -147,6 +147,126 @@ class GestorReportes_vc_ga {
       });
     });
   }
+
+  //CRUD Recibo de nomina
+    /**
+   * 1) Inserta un nuevo recibo de nómina en td_recibo_nomina_vc_ga
+   *    Obtiene los valores de inputs por su id:
+   *      - #inputReciboUsuario
+   *      - #inputReciboPago
+   *      - #inputReciboFechaPago
+   *      - #inputReciboMonto
+   *      - #inputReciboContenido
+   */
+  async crearReciboNomina_vc_ga() {
+    const idUsuario   = document.getElementById("inputReciboUsuario").value;
+    const idPago      = document.getElementById("inputReciboPago").value;
+    const fechaPago   = document.getElementById("inputReciboFechaPago").value;
+    const montoNeto   = document.getElementById("inputReciboMonto").value;
+    const contenido   = document.getElementById("inputReciboContenido").value;
+
+    const sql = `
+      INSERT INTO td_recibo_nomina_vc_ga
+        (id_usuario_vc_ga, id_pago_vc_ga, fecha_pago_vc_ga, monto_neto_vc_ga, contenido_vc_ga, fecha_generacion_vc_ga)
+      VALUES (?, ?, ?, ?, ?, NOW())
+    `;
+    const params = [idUsuario, idPago, fechaPago, montoNeto, contenido];
+
+    try {
+      const result = await this._ejecutarConsulta_vc_ga(sql, params);
+      // result.insertId contiene el nuevo id_recibo_vc_ga
+      return result.insertId;
+    } catch (err) {
+      console.error("Error creando recibo:", err);
+      throw err;
+    }
+  }
+
+  //CRUD Reporte Banco
+
+   /**
+   * 2) Inserta un nuevo reporte bancario y sus relaciones en td_reporte_banco_recibos_vc_ga
+   *    Obtiene:
+   *      - #inputBancoFecha
+   *      - #inputBancoInfo
+   *      - #inputBancoRecibos  (ids separados por comas)
+   */
+  async crearReporteBanco_vc_ga() {
+    const fecha     = document.getElementById("inputBancoFecha").value;
+    const info      = document.getElementById("inputBancoInfo").value;
+    const recibosIn = document.getElementById("inputBancoRecibos").value;
+    const recibos   = recibosIn.split(",").map(id => id.trim()).filter(x => x).map(Number);
+
+    // 1) Insertar en td_reporte_banco_vc_ga
+    const sqlReporte = `
+      INSERT INTO td_reporte_banco_vc_ga
+        (fecha_reporte_vc_ga, info_banco_vc_ga)
+      VALUES (?, ?)
+    `;
+    const paramsReporte = [fecha, info];
+
+    try {
+      const { insertId: idReporte } = await this._ejecutarConsulta_vc_ga(sqlReporte, paramsReporte);
+
+      // 2) Insertar relaciones en td_reporte_banco_recibos_vc_ga
+      const sqlRel = `
+        INSERT INTO td_reporte_banco_recibos_vc_ga
+          (id_reporte_banco_vc_ga, id_recibo_vc_ga)
+        VALUES (?, ?)
+      `;
+      for (const idRecibo of recibos) {
+        await this._ejecutarConsulta_vc_ga(sqlRel, [idReporte, idRecibo]);
+      }
+
+      return idReporte;
+    } catch (err) {
+      console.error("Error creando reporte bancario:", err);
+      throw err;
+    }
+  }
+
+  //CRUD Reporte Contable
+
+  /**
+   * 3) Inserta un nuevo reporte contable y sus relaciones en td_reporte_contable_recibos_vc_ga
+   *    Obtiene:
+   *      - #inputContableFecha
+   *      - #inputContableInfo
+   *      - #inputContableRecibos  (ids separados por comas)
+   */
+  async crearReporteContable_vc_ga() {
+    const fecha     = document.getElementById("inputContableFecha").value;
+    const info      = document.getElementById("inputContableInfo").value;
+    const recibosIn = document.getElementById("inputContableRecibos").value;
+    const recibos   = recibosIn.split(",").map(id => id.trim()).filter(x => x).map(Number);
+
+    // 1) Insertar en td_reporte_contable_vc_ga
+    const sqlReporte = `
+      INSERT INTO td_reporte_contable_vc_ga
+        (fecha_reporte_vc_ga, info_contable_vc_ga)
+      VALUES (?, ?)
+    `;
+    const paramsReporte = [fecha, info];
+
+    try {
+      const { insertId: idReporte } = await this._ejecutarConsulta_vc_ga(sqlReporte, paramsReporte);
+
+      // 2) Insertar relaciones en td_reporte_contable_recibos_vc_ga
+      const sqlRel = `
+        INSERT INTO td_reporte_contable_recibos_vc_ga
+          (id_reporte_contable_vc_ga, id_recibo_vc_ga)
+        VALUES (?, ?)
+      `;
+      for (const idRecibo of recibos) {
+        await this._ejecutarConsulta_vc_ga(sqlRel, [idReporte, idRecibo]);
+      }
+
+      return idReporte;
+    } catch (err) {
+      console.error("Error creando reporte contable:", err);
+      throw err;
+    }
+  }
 }
 
 class ReportesController_vc_ga {

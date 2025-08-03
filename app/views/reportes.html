@@ -44,74 +44,102 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Formulario de Recibos y Reportes -->
                 <div class="bg-white rounded-xl shadow-lg p-6 dark:bg-dark-800 animate__animated animate__fadeInLeft card">
-                    <h2 class="text-xl font-semibold mb-6 text-gray-800 dark:text-white font-verdana" id="formTitle">Agregar Documento</h2>
-                    <form id="documentForm" class="space-y-4">
-                        <input type="hidden" id="id_documento">
-                        <!-- Selector de Tipo de Documento -->
-                        <div>
-                            <label for="tipo_documento" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Documento</label>
-                            <select id="tipo_documento" required
-                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
-                                <option value="">Seleccione un tipo</option>
-                                <option value="recibo">Recibo de Nómina</option>
-                                <option value="reporte_banco">Reporte Bancario</option>
-                                <option value="reporte_contable">Reporte Contable</option>
-                            </select>
-                        </div>
-                        
-                        <!-- ID de Pago -->
-                        <div>
-                            <label for="id_pago_vc_ga" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ID de Pago</label>
-                            <input type="number" id="id_pago_vc_ga" placeholder="ID del pago asociado" required
-                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
-                        </div>
-                        
-                        <!-- Campos específicos para Recibo de Nómina -->
-                        <div id="recibo_fields" class="hidden space-y-4">
-                            <div>
-                                <label for="fecha_generacion_vc_ga" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fecha de Generación</label>
-                                <input type="datetime-local" id="fecha_generacion_vc_ga"
-                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
-                            </div>
-                            
-                            <div>
-                                <label for="contenido_vc_ga" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contenido del Recibo</label>
-                                <textarea id="contenido_vc_ga" rows="4" placeholder="Contenido del recibo"
-                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"></textarea>
-                            </div>
-                        </div>
-                        
-                        <!-- Campos específicos para Reporte Bancario -->
-                        <div id="reporte_banco_fields" class="hidden space-y-4">
-                            <div>
-                                <label for="info_banco_vc_ga" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Información Bancaria</label>
-                                <textarea id="info_banco_vc_ga" rows="4" placeholder="Información del banco"
-                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"></textarea>
-                            </div>
-                        </div>
-                        
-                        <!-- Campos específicos para Reporte Contable -->
-                        <div id="reporte_contable_fields" class="hidden space-y-4">
-                            <div>
-                                <label for="info_contable_vc_ga" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Información Contable</label>
-                                <textarea id="info_contable_vc_ga" rows="4" placeholder="Información contable"
-                                   class="w-full px-4 py-2 rou\nded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"></textarea>
-                            </div>
-                        </div>
-                        
-                        <div class="flex space-x-3">
-                            <button type="submit" 
-                                    class="flex-1 bg-accent1 hover:bg-accent2 text-white font-medium py-2 px-4 rounded-lg transition duration-300 dark:bg-accent1 dark:hover:bg-accent2">
-                                <i class="fas fa-save mr-2"></i> <span id="submitText">Guardar</span>
-                            </button>
-                            
-                            <button type="button" id="cancelEdit" 
-                                    class="hidden bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
-                                <i class="fas fa-times mr-2"></i> Cancelar
-                            </button>
-                        </div>
-                    </form>
+                <h2 class="text-xl font-semibold mb-6 text-gray-800 dark:text-white font-verdana" id="formTitle">Agregar Documento</h2>
+                <form id="documentForm" class="space-y-4">
+                    <input type="hidden" id="id_documento">
+
+                    <!-- Selector de Tipo de Documento -->
+                    <div>
+                    <label for="tipo_documento" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Documento</label>
+                    <select id="tipo_documento" required
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                        <option value="">Seleccione un tipo</option>
+                        <option value="recibo">Recibo de Nómina</option>
+                        <option value="reporte_banco">Reporte Bancario</option>
+                        <option value="reporte_contable">Reporte Contable</option>
+                    </select>
+                    </div>
+
+                    <!-- Campos específicos para Recibo de Nómina -->
+                    <div id="recibo_fields" class="hidden space-y-4">
+                    <div>
+                        <label for="inputReciboUsuario" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ID de Usuario</label>
+                        <input type="number" id="inputReciboUsuario" placeholder="ID del usuario"
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div>
+                        <label for="inputReciboPago" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ID de Pago</label>
+                        <input type="number" id="inputReciboPago" placeholder="ID del pago asociado"
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div>
+                        <label for="inputReciboFechaPago" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fecha de Pago</label>
+                        <input type="date" id="inputReciboFechaPago"
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div>
+                        <label for="inputReciboMonto" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monto Neto</label>
+                        <input type="number" step="0.01" id="inputReciboMonto" placeholder="Monto neto"
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div>
+                        <label for="inputReciboContenido" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contenido del Recibo</label>
+                        <textarea id="inputReciboContenido" rows="4" placeholder="Contenido del recibo"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white"></textarea>
+                    </div>
+                    </div>
+
+                    <!-- Campos específicos para Reporte Bancario -->
+                    <div id="reporte_banco_fields" class="hidden space-y-4">
+                    <div>
+                        <label for="inputBancoFecha" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fecha de Reporte</label>
+                        <input type="date" id="inputBancoFecha"
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div>
+                        <label for="inputBancoInfo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Información Bancaria</label>
+                        <textarea id="inputBancoInfo" rows="4" placeholder="Información del banco"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white"></textarea>
+                    </div>
+                    <div>
+                        <label for="inputBancoRecibos" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recibos Asociados</label>
+                        <input type="text" id="inputBancoRecibos" placeholder="IDs separados por comas"
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    </div>
+
+                    <!-- Campos específicos para Reporte Contable -->
+                    <div id="reporte_contable_fields" class="hidden space-y-4">
+                    <div>
+                        <label for="inputContableFecha" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fecha de Reporte</label>
+                        <input type="date" id="inputContableFecha"
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    <div>
+                        <label for="inputContableInfo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Información Contable</label>
+                        <textarea id="inputContableInfo" rows="4" placeholder="Información contable"
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white"></textarea>
+                    </div>
+                    <div>
+                        <label for="inputContableRecibos" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recibos Asociados</label>
+                        <input type="text" id="inputContableRecibos" placeholder="IDs separados por comas"
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-accent1 focus:border-transparent dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    </div>
+
+                    <div class="flex space-x-3">
+                    <button type="submit" 
+                            class="flex-1 bg-accent1 hover:bg-accent2 text-white font-medium py-2 px-4 rounded-lg transition duration-300 dark:bg-accent1 dark:hover:bg-accent2">
+                        <i class="fas fa-save mr-2"></i> <span id="submitText">Guardar</span>
+                    </button>
+                    <button type="button" id="cancelEdit" 
+                            class="hidden bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+                        <i class="fas fa-times mr-2"></i> Cancelar
+                    </button>
+                    </div>
+                </form>
                 </div>
+
 
                 <!-- Lista de Documentos -->
                 <div class="bg-white rounded-xl shadow-lg p-6 dark:bg-dark-800 animate__animated animate__fadeInRight card">
