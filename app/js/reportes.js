@@ -190,38 +190,57 @@ class GestorReportes_vc_ga {
   }
 
   //CRUD Recibo de nomina
-    /**
+  /**
    * 1) Inserta un nuevo recibo de nómina en td_recibo_nomina_vc_ga
-   *    Obtiene los valores de inputs por su id:
-   *      - #inputReciboUsuario
-   *      - #inputReciboPago
-   *      - #inputReciboFechaPago
-   *      - #inputReciboMonto
-   *      - #inputReciboContenido
+   * 2) Asocia automáticamente todas las deducciones del usuario en td_recibo_deduccion_vc_ga
+   * 3) Asocia automáticamente todos los bonos del usuario en td_recibo_bono_vc_ga
    */
   async crearReciboNomina_vc_ga() {
-    const idUsuario   = document.getElementById("inputReciboUsuario").value;
-    const idPago      = document.getElementById("inputReciboPago").value;
-    const fechaPago   = document.getElementById("inputReciboFechaPago").value;
-    const montoNeto   = document.getElementById("inputReciboMonto").value;
-    const contenido   = document.getElementById("inputReciboContenido").value;
+    // Leer valores de los inputs básicos
+    const idUsuario = document.getElementById("inputReciboUsuario").value;
+    const idPago = document.getElementById("inputReciboPago").value;
+    const fechaPago = document.getElementById("inputReciboFechaPago").value;
+    const montoNeto = document.getElementById("inputReciboMonto").value;
+    const contenido = document.getElementById("inputReciboContenido").value;
 
-    const sql = `
+    // Inserción principal en td_recibo_nomina_vc_ga
+    const sqlRecibo = `
       INSERT INTO td_recibo_nomina_vc_ga
         (id_usuario_vc_ga, id_pago_vc_ga, fecha_pago_vc_ga, monto_neto_vc_ga, contenido_vc_ga, fecha_generacion_vc_ga)
       VALUES (?, ?, ?, ?, ?, NOW())
     `;
-    const params = [idUsuario, idPago, fechaPago, montoNeto, contenido];
+    const paramsRecibo = [idUsuario, idPago, fechaPago, montoNeto, contenido];
 
     try {
-      const result = await this._ejecutarConsulta_vc_ga(sql, params);
-      // result.insertId contiene el nuevo id_recibo_vc_ga
-      return result.insertId;
+      const result = await this._ejecutarConsulta_vc_ga(sqlRecibo, paramsRecibo);
+      const idRecibo = result.insertId;
+
+      // Inserta automáticamente deducciones del usuario
+      const sqlAutoDedu = `
+        INSERT INTO td_recibo_deduccion_vc_ga (id_recibo_vc_ga, id_usuario_deduccion_vc_ga)
+        SELECT ?, ud.id_usuario_deduccion_vc_ga
+        FROM td_usuario_deduccion_vc_ga ud
+        WHERE ud.id_usuario_vc_ga = ?
+      `;
+      await this._ejecutarConsulta_vc_ga(sqlAutoDedu, [idRecibo, idUsuario]);
+
+      // Inserta automáticamente bonos del usuario
+      const sqlAutoBono = `
+        INSERT INTO td_recibo_bono_vc_ga (id_recibo_vc_ga, id_bono_vc_ga)
+        SELECT ?, b.id_bono_vc_ga
+        FROM td_bono_vc_ga b
+        WHERE b.id_usuario_vc_ga = ?
+      `;
+      await this._ejecutarConsulta_vc_ga(sqlAutoBono, [idRecibo, idUsuario]);
+
+      return idRecibo;
     } catch (err) {
-      console.error("Error creando recibo:", err);
+      console.error("Error creando recibo y asociando deducciones/bonos:", err);
       throw err;
     }
   }
+
+
 
   //CRUD Reporte Banco
 
