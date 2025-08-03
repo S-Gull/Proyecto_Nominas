@@ -240,6 +240,28 @@ class GestorReportes_vc_ga {
     }
   }
 
+  /**
+   * Elimina un recibo de nómina y sus asociaciones.
+   * @param {number} idRecibo
+   */
+  async eliminarReciboNomina_vc_ga(idRecibo) {
+    // Eliminar deducciones y bonos asociados
+    await this._ejecutarConsulta_vc_ga(
+      `DELETE FROM td_recibo_deduccion_vc_ga WHERE id_recibo_vc_ga = ?`,
+      [idRecibo]
+    );
+    await this._ejecutarConsulta_vc_ga(
+      `DELETE FROM td_recibo_bono_vc_ga WHERE id_recibo_vc_ga = ?`,
+      [idRecibo]
+    );
+
+    // Eliminar el recibo principal
+    await this._ejecutarConsulta_vc_ga(
+      `DELETE FROM td_recibo_nomina_vc_ga WHERE id_recibo_vc_ga = ?`,
+      [idRecibo]
+    );
+  }
+
 
 
   //CRUD Reporte Banco
@@ -382,46 +404,39 @@ class ReportesController_vc_ga {
         case "recibo_nomina": titulo = "Recibo de Nómina"; break;
       }
 
-        let detallesAdicionales = "";
-        if (r.tipo === 'recibo_nomina') {
-    detallesAdicionales = `
-      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-        ID Usuario: ${r.idUsuario || 'N/A'}
-      </p>
-      <p class="text-sm text-gray-600 dark:text-gray-400">
-        ID Pago: ${r.idPago || 'N/A'}
-      </p>
-      <p class="text-sm text-gray-600 dark:text-gray-400">
-        Monto Neto: ${r.montoNeto || '0.00'}
-      </p>`;
-    
-    // Mostrar deducciones si existen
-    if (r.deducciones.length > 0) {
-      detallesAdicionales += `
-        <div class="mt-2">
-          <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Deducciones:</p>
-          ${r.deducciones.map(d => `
-            <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded mr-1 mb-1">
-              ${d.nombre}: ${d.monto} (${d.porcentaje}%)
-            </span>
-          `).join('')}
-        </div>`;
-    }
-    
-    // Mostrar bonos si existen
-    if (r.bonos.length > 0) {
-      detallesAdicionales += `
-        <div class="mt-1">
-          <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Bonos:</p>
-          ${r.bonos.map(b => `
-            <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mr-1 mb-1">
-              ${b.tipo}: ${b.monto}
-            </span>
-          `).join('')}
-        </div>`;
-    }
+      let detallesAdicionales = "";
+      if (r.tipo === 'recibo_nomina') {
+        detallesAdicionales = `
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            ID Usuario: ${r.idUsuario || 'N/A'}
+          </p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            ID Pago: ${r.idPago || 'N/A'}
+          </p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Monto Neto: ${r.montoNeto || '0.00'}
+          </p>`;
 
-          
+        if (r.deducciones.length > 0) {
+          detallesAdicionales += `
+            <div class="mt-2">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Deducciones:</p>
+              ${r.deducciones.map(d => `
+                <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded mr-1 mb-1">
+                  ${d.nombre}: ${d.monto} (${d.porcentaje}%)
+                </span>`).join('')}
+            </div>`;
+        }
+        if (r.bonos.length > 0) {
+          detallesAdicionales += `
+            <div class="mt-1">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Bonos:</p>
+              ${r.bonos.map(b => `
+                <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mr-1 mb-1">
+                  ${b.tipo}: ${b.monto}
+                </span>`).join('')}
+            </div>`;
+        }
         if (r.reportesBancoAsociados.length > 0 || r.reportesContableAsociados.length > 0) {
           detallesAdicionales += `
             <div class="mt-2">
@@ -436,8 +451,7 @@ class ReportesController_vc_ga {
                 </span>` : ''}
             </div>`;
         }
-      } 
-      else if (r.tipo === 'reporte_banco' || r.tipo === 'reporte_contable') {
+      } else if (r.tipo === 'reporte_banco' || r.tipo === 'reporte_contable') {
         if (r.recibosAsociados.length > 0) {
           detallesAdicionales = `
             <div class="mt-1">
@@ -451,7 +465,7 @@ class ReportesController_vc_ga {
 
       card.innerHTML = `
         <div class="flex justify-between items-start">
-          <div>
+          <div class="flex-1">
             <h3 class="font-semibold text-gray-800 dark:text-white">${titulo}</h3>
             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
               Fecha: ${new Date(r.fecha).toLocaleDateString("es-ES")}
@@ -461,16 +475,37 @@ class ReportesController_vc_ga {
               ${r.info}
             </p>
           </div>
-          <button class="view-more-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600"
-                  data-id="${r.tipo}__${r.id}"
-                  aria-label="Ver detalles">
-            <i class="fas fa-arrow-right text-accent2"></i>
-          </button>
+          <div class="flex flex-col space-y-2 ml-4">
+            <button class="view-more-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600"
+                    data-id="${r.tipo}__${r.id}" aria-label="Ver detalles">
+              <i class="fas fa-arrow-right text-accent2"></i>
+            </button>
+            ${r.tipo === 'recibo_nomina' ? `
+            <button class="delete-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600"
+                    data-id="${r.id}" aria-label="Eliminar recibo">
+              <i class="fas fa-trash text-red-500"></i>
+            </button>
+            ` : ''}
+          </div>
         </div>`;
 
       this.container_vc_ga.appendChild(card);
     });
+
+    // Delegación de eventos extra
+    this.container_vc_ga.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', async e => {
+        const id = Number(e.currentTarget.dataset.id);
+        const confirm_vc_ga = await modal_vc_ga.showConfirm_vc_ga("Alerta", "¿Estás seguro de eliminar este recibo?")
+        if (confirm_vc_ga) {
+          await this.gestor_vc_ga.eliminarReciboNomina_vc_ga(id);
+          await this.gestor_vc_ga.cargarReportes_vc_ga();
+          this._render_vc_ga();
+        }
+      });
+    });
   }
+
 
   _onFiltrar_vc_ga() {
     const filtros = {
