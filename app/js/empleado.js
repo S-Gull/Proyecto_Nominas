@@ -15,9 +15,9 @@ const agregarDeduccionBtn_vc_ga = document.getElementById('addDeductionBtn');
 const editarDeduccionBtn_vc_ga = document.getElementById('editDeductionBtn');
 const borrarDeduccionBtn_vc_ga = document.getElementById('deleteDeductionBtn');
 
-const agregarHoraBtn_vc_ga = document.getElementById('addExtraBtn');
-const editarHoraBtn_vc_ga = document.getElementById('editExtraBtn');
-const borrarHoraBtn_vc_ga = document.getElementById('deleteExtraBtn');
+// const agregarHoraBtn_vc_ga = document.getElementById('addExtraBtn');
+// const editarHoraBtn_vc_ga = document.getElementById('editExtraBtn');
+// const borrarHoraBtn_vc_ga = document.getElementById('deleteExtraBtn');
 
 const agregarBonoBtn_vc_ga = document.getElementById('addBonusBtn');
 const editarBonoBtn_vc_ga = document.getElementById('editBonusBtn');
@@ -1049,7 +1049,7 @@ async recargarHistorialDeducciones_vc_ga() {
 
         await this.recargarHistorialSalario_vc_ga();
         await this.recargarHistorialDeducciones_vc_ga();
-        await this.recargarHistorialHorasExtras_vc_ga();
+        // await this.recargarHistorialHorasExtras_vc_ga();
         await this.recargarHistorialBonos_vc_ga();
         this.configurarPestañas_vc_ga();
 
@@ -1122,17 +1122,17 @@ async recargarHistorialDeducciones_vc_ga() {
         ).join('');
     }
 
-    async recargarHistorialHorasExtras_vc_ga() {
-        const filas_vc_ga = await this.servicio_vc_ga.obtenerHistorialHorasExtras_vc_ga(this.idEmpleado_vc_ga);
-        document.getElementById('extrasHistory').innerHTML = filas_vc_ga.map(r_vc_ga => `
-            <tr>
-                <td>${r_vc_ga.fecha}</td>
-                <td>${r_vc_ga.tipo}</td>
-                <td>${r_vc_ga.horas}</td>
-                <td>${r_vc_ga.monto}</td>
-            </tr>`
-        ).join('');
-    }
+    // async recargarHistorialHorasExtras_vc_ga() {
+    //     const filas_vc_ga = await this.servicio_vc_ga.obtenerHistorialHorasExtras_vc_ga(this.idEmpleado_vc_ga);
+    //     document.getElementById('extrasHistory').innerHTML = filas_vc_ga.map(r_vc_ga => `
+    //         <tr>
+    //             <td>${r_vc_ga.fecha}</td>
+    //             <td>${r_vc_ga.tipo}</td>
+    //             <td>${r_vc_ga.horas}</td>
+    //             <td>${r_vc_ga.monto}</td>
+    //         </tr>`
+    //     ).join('');
+    // }
 async actualizarTablaDeducciones_vc_ga() {
     const filas_vc_ga = await this.servicio_vc_ga.obtenerHistorialDeducciones_vc_ga(this.idEmpleado_vc_ga);
     document.getElementById('deductionHistory').innerHTML = filas_vc_ga.map(r_vc_ga => `
