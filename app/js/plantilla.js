@@ -101,7 +101,7 @@ async guardarUsuario_vc_ga(datos_vc_ga) {
     // Solo incluir clave si es nuevo usuario
     if (esNuevo_vc_ga) {
       datosParaGuardar.clave_vc_ga = datos_vc_ga.clave_vc_ga || 'Temp1234';
-      datosParaGuardar.clave_temporal_vc_ga = true;
+      datosParaGuardar.clave_temporal_vc_ga = false;
     }
 
     // Construir y ejecutar query
