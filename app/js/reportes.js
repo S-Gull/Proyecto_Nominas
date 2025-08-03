@@ -10,38 +10,33 @@ class GestorReportes_vc_ga {
 
   async cargarReportes_vc_ga() {
     try {
-      const [bancos, contables, recibos, pagos] = await Promise.all([
-        this._ejecutarConsulta_vc_ga(`
-          SELECT id_reporte_banco_vc_ga AS id, fecha_reporte_vc_ga AS fecha, info_banco_vc_ga AS info
-          FROM td_reporte_banco_vc_ga
-          ORDER BY fecha_reporte_vc_ga DESC
-        `),
-        this._ejecutarConsulta_vc_ga(`
-          SELECT id_reporte_contable_vc_ga AS id, fecha_reporte_vc_ga AS fecha, info_contable_vc_ga AS info
-          FROM td_reporte_contable_vc_ga
-          ORDER BY fecha_reporte_vc_ga DESC
-        `),
-        this._ejecutarConsulta_vc_ga(`
-          SELECT r.id_recibo_vc_ga AS id,
-                 r.fecha_generacion_vc_ga AS fecha,
-                 r.contenido_vc_ga AS info
-          FROM td_recibo_nomina_vc_ga r
-          ORDER BY r.fecha_generacion_vc_ga DESC
-        `),
-        this._ejecutarConsulta_vc_ga(`
-          SELECT p.id_pago_vc_ga AS id,
-                 p.fecha_pago_vc_ga AS fecha,
-                 CONCAT('Pago de nómina a usuario ID ', p.id_usuario_vc_ga, ' por Bs. ', p.monto_neto_vc_ga) AS info
-          FROM td_pago_nomina_vc_ga p
-          ORDER BY p.fecha_pago_vc_ga DESC
-        `)
+      const [bancos, contables, recibos] = await Promise.all([
+        this._ejecutarConsulta_vc_ga(
+          `SELECT id_reporte_banco_vc_ga AS id, fecha_reporte_vc_ga AS fecha, info_banco_vc_ga AS info
+           FROM td_reporte_banco_vc_ga
+           ORDER BY fecha_reporte_vc_ga DESC`
+        ),
+        this._ejecutarConsulta_vc_ga(
+          `SELECT id_reporte_contable_vc_ga AS id, fecha_reporte_vc_ga AS fecha, info_contable_vc_ga AS info
+           FROM td_reporte_contable_vc_ga
+           ORDER BY fecha_reporte_vc_ga DESC`
+        ),
+        this._ejecutarConsulta_vc_ga(
+          `SELECT id_recibo_vc_ga AS id,
+                  id_pago_vc_ga AS idPago,
+                  fecha_pago_vc_ga AS fechaPago,
+                  monto_neto_vc_ga AS montoNeto,
+                  fecha_generacion_vc_ga AS fecha,
+                  contenido_vc_ga AS info
+           FROM td_recibo_nomina_vc_ga
+           ORDER BY fecha_generacion_vc_ga DESC`
+        )
       ]);
 
       this.reportes_vc_ga = [
         ...bancos.map(r => ({ ...r, tipo: "reporte_banco" })),
         ...contables.map(r => ({ ...r, tipo: "reporte_contable" })),
-        ...recibos.map(r => ({ ...r, tipo: "recibo_nomina" })),
-        ...pagos.map(r => ({ ...r, tipo: "pago_nomina" }))
+        ...recibos.map(r => ({ ...r, tipo: "recibo_nomina" }))
       ];
       this.reportesFiltrados_vc_ga = [...this.reportes_vc_ga];
       return this.reportes_vc_ga;
@@ -52,20 +47,12 @@ class GestorReportes_vc_ga {
     }
   }
 
-  /**
-   * Filtra reportes por tipo, fecha ISO (YYYY-MM-DD) y opcionalmente por ID de pago.
-   * @param {Object} filters
-   * @param {string} filters.tipo        '' | 'recibo' | 'reporte_banco' | 'reporte_contable'
-   * @param {string} filters.fecha       Fecha en formato YYYY-MM-DD
-   * @param {string} filters.pagoId      ID numérico de pago a filtrar
-   */
-  filtrar_vc_ga({ tipo, fecha, pagoId }) {
+  filtrar_vc_ga({ tipo, fecha, reciboId }) {
     this.reportesFiltrados_vc_ga = this.reportes_vc_ga.filter(r => {
-      // Filtrar por ID de pago: solo aplica a pagos de nómina
-      if (pagoId && pagoId !== "") {
-        if (r.tipo !== 'pago_nomina' || String(r.id) !== pagoId) return false;
+      if (reciboId && reciboId !== "") {
+        if (r.tipo !== 'recibo_nomina' || String(r.id) !== reciboId) return false;
       }
-      // Filtrar por tipo
+
       if (tipo && tipo !== "") {
         switch (tipo) {
           case 'recibo':
@@ -75,10 +62,11 @@ class GestorReportes_vc_ga {
           case 'reporte_contable':
             if (r.tipo !== tipo) return false;
             break;
-          // Si se añaden más tipos de filtro, mapear aquí
+          default:
+            break;
         }
       }
-      // Filtrar por fecha exacta
+
       if (fecha && fecha !== "") {
         const fechaISO = new Date(r.fecha).toISOString().slice(0, 10);
         if (fechaISO !== fecha) return false;
@@ -107,7 +95,7 @@ class ReportesController_vc_ga {
     this.container_vc_ga = document.getElementById("documents");
     this.loading_vc_ga = document.getElementById("loadingMessage");
     this.filterType_vc_ga = document.getElementById("filterType");
-    this.filterPago_vc_ga = document.getElementById("filterPago");
+    this.filterRecibo_vc_ga = document.getElementById("filterRecibo");
     this.filterDate_vc_ga = document.getElementById("filterDate");
     this.applyBtn_vc_ga = document.getElementById("applyFilters");
 
@@ -153,7 +141,12 @@ class ReportesController_vc_ga {
         case "reporte_banco": titulo = "Reporte Bancario"; break;
         case "reporte_contable": titulo = "Reporte Contable"; break;
         case "recibo_nomina": titulo = "Recibo de Nómina"; break;
-        case "pago_nomina": titulo = "Pago de Nómina"; break;
+      }
+
+      let detallesAdicionales = "";
+      if (r.tipo === 'recibo_nomina') {
+        detallesAdicionales = `<p class="text-sm text-gray-600 dark:text-gray-400 mt-1">ID Pago: ${r.idPago}</p>
+                              <p class="text-sm text-gray-600 dark:text-gray-400">Monto Neto: ${r.montoNeto}</p>`;
       }
 
       card.innerHTML = `
@@ -161,6 +154,7 @@ class ReportesController_vc_ga {
           <div>
             <h3 class="font-semibold text-gray-800 dark:text-white">${titulo}</h3>
             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Fecha: ${new Date(r.fecha).toLocaleDateString("es-ES")}</p>
+            ${detallesAdicionales}
             <p class="mt-2 text-gray-700 dark:text-gray-300">${r.info}</p>
           </div>
           <button class="view-more-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600"
@@ -176,7 +170,7 @@ class ReportesController_vc_ga {
   _onFiltrar_vc_ga() {
     const filtros = {
       tipo: this.filterType_vc_ga.value,
-      pagoId: this.filterPago_vc_ga.value,
+      reciboId: this.filterRecibo_vc_ga.value,
       fecha: this.filterDate_vc_ga.value
     };
     this.gestor_vc_ga.filtrar_vc_ga(filtros);
@@ -194,10 +188,15 @@ class ReportesController_vc_ga {
       case "reporte_banco": titulo = "Detalle Reporte Bancario"; break;
       case "reporte_contable": titulo = "Detalle Reporte Contable"; break;
       case "recibo_nomina": titulo = "Detalle Recibo de Nómina"; break;
-      case "pago_nomina": titulo = "Detalle Pago de Nómina"; break;
     }
 
-    modal_vc_ga.showReportes_vc_ga(titulo, [report]);
+    // SOLUCIÓN CORREGIDA (COPIAR Y FORMATEAR)
+    const reportForModal = {...report};
+    if (tipo === 'recibo_nomina') {
+      reportForModal.info = `ID Pago: ${report.idPago}\nMonto Neto: ${report.montoNeto}\n\n${report.info}`;
+    }
+
+    modal_vc_ga.showReportes_vc_ga(titulo, [reportForModal]);
   }
 }
 
