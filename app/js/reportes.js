@@ -307,6 +307,24 @@ class GestorReportes_vc_ga {
     }
   }
 
+  /**
+   * Elimina un reporte bancario y sus asociaciones.
+   * @param {number} idReporte
+   */
+  async eliminarReporteBanco_vc_ga(idReporte) {
+    // Eliminar relaciones con recibos
+    await this._ejecutarConsulta_vc_ga(
+      `DELETE FROM td_reporte_banco_recibos_vc_ga WHERE id_reporte_banco_vc_ga = ?`,
+      [idReporte]
+    );
+    // Eliminar reporte bancario
+    await this._ejecutarConsulta_vc_ga(
+      `DELETE FROM td_reporte_banco_vc_ga WHERE id_reporte_banco_vc_ga = ?`,
+      [idReporte]
+    );
+  }
+
+
   //CRUD Reporte Contable
 
   /**
@@ -348,6 +366,23 @@ class GestorReportes_vc_ga {
       console.error("Error creando reporte contable:", err);
       throw err;
     }
+  }
+
+    /**
+   * Elimina un reporte contable y sus asociaciones.
+   * @param {number} idReporte
+   */
+  async eliminarReporteContable_vc_ga(idReporte) {
+    // Eliminar relaciones con recibos
+    await this._ejecutarConsulta_vc_ga(
+      `DELETE FROM td_reporte_contable_recibos_vc_ga WHERE id_reporte_contable_vc_ga = ?`,
+      [idReporte]
+    );
+    // Eliminar reporte contable
+    await this._ejecutarConsulta_vc_ga(
+      `DELETE FROM td_reporte_contable_vc_ga WHERE id_reporte_contable_vc_ga = ?`,
+      [idReporte]
+    );
   }
 }
 
@@ -480,32 +515,47 @@ class ReportesController_vc_ga {
                     data-id="${r.tipo}__${r.id}" aria-label="Ver detalles">
               <i class="fas fa-arrow-right text-accent2"></i>
             </button>
-            ${r.tipo === 'recibo_nomina' ? `
             <button class="delete-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600"
-                    data-id="${r.id}" aria-label="Eliminar recibo">
+                    data-id="${r.tipo}__${r.id}" aria-label="Eliminar documento">
               <i class="fas fa-trash text-red-500"></i>
             </button>
-            ` : ''}
           </div>
         </div>`;
 
       this.container_vc_ga.appendChild(card);
     });
 
-    // Delegación de eventos extra
+    // Delegación de eventos: Ver más
+    this.container_vc_ga.querySelectorAll('.view-more-btn').forEach(btn => {
+      btn.addEventListener('click', e => this._onViewMore_vc_ga(e.target.closest('button')));
+    });
+
+    // Delegación de eventos: Eliminar
     this.container_vc_ga.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', async e => {
-        const id = Number(e.currentTarget.dataset.id);
-        const confirm_vc_ga = await modal_vc_ga.showConfirm_vc_ga("Alerta", "¿Estás seguro de eliminar este recibo?")
-        if (confirm_vc_ga) {
-          await this.gestor_vc_ga.eliminarReciboNomina_vc_ga(id);
-          await this.gestor_vc_ga.cargarReportes_vc_ga();
-          this._render_vc_ga();
+        const [tipo, id] = e.currentTarget.dataset.id.split("__");
+        const confirm_vc_ga = await modal_vc_ga.showConfirm_vc_ga(
+          "Alerta", `¿Estás seguro de eliminar este ${tipo.replace('_', ' ')} #${id}?`
+        );
+        if (!confirm_vc_ga) return;
+
+        switch (tipo) {
+          case 'recibo_nomina':
+            await this.gestor_vc_ga.eliminarReciboNomina_vc_ga(Number(id));
+            break;
+          case 'reporte_banco':
+            await this.gestor_vc_ga.eliminarReporteBanco_vc_ga(Number(id));
+            break;
+          case 'reporte_contable':
+            await this.gestor_vc_ga.eliminarReporteContable_vc_ga(Number(id));
+            break;
         }
+        await this.gestor_vc_ga.cargarReportes_vc_ga();
+        this._render_vc_ga();
       });
     });
+  
   }
-
 
   _onFiltrar_vc_ga() {
     const filtros = {
