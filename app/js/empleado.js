@@ -160,32 +160,58 @@ class EmpleadoRepositorio_vc_ga {
         );
     }
 
+    // Métodos actualizados para usar las funciones de BD para bonos
     async crearBono_vc_ga(idUsuario, tipo, monto, fecha) {
-    return await query_vc_ga(
-        `INSERT INTO td_bono_vc_ga
-        (id_usuario_vc_ga, tipo_bono_vc_ga, monto_vc_ga, fecha_pago_vc_ga)
-        VALUES (?, ?, ?, ?)`,
-        [idUsuario, tipo, monto, fecha]
-    );
+        const resultado = await query_vc_ga(
+            'SELECT fn_insertar_bono_vc_ga(?, ?, ?, ?) as bono_id',
+            [idUsuario, tipo, monto, fecha]
+        );
+        
+        if (resultado[0].bono_id === -1) {
+            throw new Error('Usuario no existe');
+        }
+        
+        return resultado[0].bono_id;
     }
 
-    async actualizarBono_vc_ga(idReg, tipo, monto, fecha) {
-    return await query_vc_ga(
-        `UPDATE td_bono_vc_ga
-        SET tipo_bono_vc_ga = ?, monto_vc_ga = ?, fecha_pago_vc_ga = ?
-        WHERE id_bono_vc_ga = ?`,
-        [tipo, monto, fecha, idReg]
-    );
+    async actualizarBono_vc_ga(idBono, idUsuario, tipo, monto, fecha) {
+        const resultado = await query_vc_ga(
+            'SELECT fn_editar_bono_vc_ga(?, ?, ?, ?, ?) as success',
+            [idBono, idUsuario, tipo, monto, fecha]
+        );
+        
+        if (!resultado[0].success) {
+            throw new Error('No se pudo actualizar el bono. Verifique que el bono y usuario existan.');
+        }
+        
+        return resultado[0].success;
     }
 
-    async eliminarBono_vc_ga(idReg) {
-    return await query_vc_ga(
-        'DELETE FROM td_bono_vc_ga WHERE id_bono_vc_ga = ?',
-        [idReg]
-    );
+    async eliminarBono_vc_ga(idBono) {
+        const resultado = await query_vc_ga(
+            'SELECT fn_eliminar_bono_vc_ga(?) as success',
+            [idBono]
+        );
+        
+        if (!resultado[0].success) {
+            throw new Error('No se pudo eliminar el bono. Verifique que el bono exista.');
+        }
+        
+        return resultado[0].success;
+    }
+
+    // Método para obtener bonos con ID para operaciones CRUD
+    async obtenerHistorialBonosConId_vc_ga(id_vc_ga) {
+        return await query_vc_ga(
+            `SELECT id_bono_vc_ga, fecha_pago_vc_ga AS fecha, tipo_bono_vc_ga AS tipo, monto_vc_ga AS monto
+             FROM td_bono_vc_ga 
+             WHERE id_usuario_vc_ga = ? 
+             ORDER BY fecha_pago_vc_ga DESC`,
+            [id_vc_ga]
+        );
+    }
 
     
-    }
     async obtenerHistorialDeducciones_vc_ga(id_vc_ga) {
     return await query_vc_ga(
         `SELECT ud.id_usuario_deduccion_vc_ga, 
@@ -333,8 +359,17 @@ async obtenerEstadisticasDeducciones_vc_ga(idUsuario) {
          WHERE id_usuario_vc_ga = ?`,
         [idUsuario]
     );
+    
 }
-
+async buscarDeduccionPorNombre_vc_ga(nombre) {
+    return await query_vc_ga(
+        `SELECT id_deduccion_vc_ga, nombre_vc_ga, porcentaje_vc_ga, descripcion_vc_ga
+         FROM td_deduccion_vc_ga 
+         WHERE LOWER(nombre_vc_ga) = LOWER(?)
+           AND (vigente_hasta_vc_ga IS NULL OR vigente_hasta_vc_ga >= CURDATE())`,
+        [nombre]
+    );
+}
 }
 
 // 2. Capa de Servicio
@@ -429,7 +464,9 @@ async obtenerEstadisticasDeducciones_vc_ga(idUsuario) {
     return await this.repositorio_vc_ga.obtenerEstadisticasDeducciones_vc_ga(idUsuario);
 }
 
-
+async crearTipoDeduccion_vc_ga(nombre, porcentaje, descripcion, vigenteDe) {
+    return await this.repositorio_vc_ga.crearTipoDeduccion_vc_ga(nombre, porcentaje, descripcion, vigenteDe);
+}
 
 }
 
@@ -441,6 +478,7 @@ class EmpleadoControlador_vc_ga {
 
         this.configurarBotonesSalario_vc_ga();
         this.configurarBotonesDeducciones_vc_ga();
+        this.configurarBotonesBonos_vc_ga();
 
     }
 
@@ -496,6 +534,11 @@ class EmpleadoControlador_vc_ga {
             editarDeduccionBtn_vc_ga?.addEventListener('click', () => this.manejarEditarDeduccion_vc_ga());
             borrarDeduccionBtn_vc_ga?.addEventListener('click', () => this.manejarBorrarDeduccion_vc_ga());
         }
+        configurarBotonesBonos_vc_ga() {
+    agregarBonoBtn_vc_ga?.addEventListener('click', () => this.manejarAgregarBono_vc_ga());
+    editarBonoBtn_vc_ga?.addEventListener('click', () => this.manejarEditarBono_vc_ga());
+    borrarBonoBtn_vc_ga?.addEventListener('click', () => this.manejarBorrarBono_vc_ga());
+}
 /**
  * Muestra un modal con campo de entrada
  */
@@ -1014,6 +1057,231 @@ async recargarHistorialDeducciones_vc_ga() {
     } catch (error) {
         console.error('Error recargando historial:', error);
     }
+}
+
+
+async manejarAgregarBono_vc_ga() {
+    try {
+        // Obtener valores del formulario
+        // Obtener valores del formulario
+        const tipoBonoInput_vc_ga = document.getElementById('bonusType')
+        const montoBonoInput_vc_ga = document.getElementById('bonusAmount')
+        const tipo = tipoBonoInput_vc_ga?.value?.trim();
+        const monto = parseFloat(montoBonoInput_vc_ga?.value);
+        const fechaActual = new Date().toISOString().split('T')[0];
+
+        // Validaciones
+        if (!tipo) {
+            await modal_vc_ga.showWarning_vc_ga(
+                'Tipo requerido',
+                'Por favor ingrese el tipo de bono.'
+            );
+            return;
+        }
+
+        if (!monto || isNaN(monto) || monto <= 0) {
+            await modal_vc_ga.showWarning_vc_ga(
+                'Monto inválido',
+                'El monto debe ser un número positivo válido.'
+            );
+            return;
+        }
+
+        // Confirmar acción
+        const confirmado = await modal_vc_ga.showConfirm_vc_ga(
+            'Confirmar Agregar Bono',
+            `¿Desea agregar un bono de tipo "${tipo}" por $${monto}?`
+        );
+
+        if (!confirmado) return;
+
+        // Crear el bono
+        await this.crearBono_vc_ga(tipo, monto, fechaActual);
+
+        // Limpiar formulario
+        if (tipoBonoInput_vc_ga) tipoBonoInput_vc_ga.value = '';
+        if (montoBonoInput_vc_ga) montoBonoInput_vc_ga.value = '';
+
+        // Recargar historial
+        await this.recargarHistorialBonos_vc_ga();
+
+        await modal_vc_ga.showSuccess_vc_ga(
+            'Éxito',
+            'Bono agregado correctamente.'
+        );
+
+    } catch (error) {
+        await modal_vc_ga.showError_vc_ga(
+            'Error',
+            `No se pudo agregar el bono: ${error.message}`
+        );
+        console.error('Error al agregar bono:', error);
+    }
+}
+
+// Función para manejar editar bono
+async manejarEditarBono_vc_ga() {
+    try {
+        // Obtener historial con IDs
+        const historial = await this.servicio_vc_ga.repositorio_vc_ga.obtenerHistorialBonosConId_vc_ga(this.idEmpleado_vc_ga);
+        
+        if (!historial || historial.length === 0) {
+            await modal_vc_ga.showWarning_vc_ga('Advertencia', 'No hay bonos registrados para editar');
+            return;
+        }
+        
+        // Crear opciones para el select
+        const opciones = historial.map(bono => ({
+            texto: `${bono.tipo} - $${bono.monto} (${new Date(bono.fecha).toLocaleDateString()})`
+        }));
+        
+        // Mostrar select para elegir bono
+        const seleccion = await this.mostrarSelectOscuro_vc_ga(
+            'Editar Bono', 
+            'Seleccione el bono a editar:',
+            opciones
+        );
+        
+        if (!seleccion.confirmado) return;
+        
+        const bonoSeleccionado = historial[seleccion.indice];
+        
+        // Solicitar nuevo tipo
+        const nuevoTipo = await this.mostrarModalInputTexto_vc_ga(
+            'Editar Tipo de Bono', 
+            'Ingrese el nuevo tipo de bono:',
+            bonoSeleccionado.tipo
+        );
+        
+        if (!nuevoTipo?.trim()) {
+            await modal_vc_ga.showWarning_vc_ga('Advertencia', 'Debe ingresar un tipo válido');
+            return;
+        }
+        
+        // Solicitar nuevo monto
+        const nuevoMonto = await this.mostrarModalInputOscuro_vc_ga(
+            'Editar Monto', 
+            'Ingrese el nuevo monto para el bono:',
+            bonoSeleccionado.monto
+        );
+        
+        if (!nuevoMonto || parseFloat(nuevoMonto) <= 0) {
+            await modal_vc_ga.showWarning_vc_ga('Advertencia', 'Debe ingresar un monto válido mayor a 0');
+            return;
+        }
+        
+        // Confirmar cambios
+        const confirmacion = await modal_vc_ga.showConfirm_vc_ga(
+            'Confirmar Edición', 
+            `¿Está seguro que desea actualizar el bono?\n\nDe: ${bonoSeleccionado.tipo} - $${bonoSeleccionado.monto}\nA: ${nuevoTipo.trim()} - $${nuevoMonto}`
+        );
+        
+        if (!confirmacion) return;
+        
+        // Actualizar bono usando la función de BD
+        await this.servicio_vc_ga.repositorio_vc_ga.actualizarBono_vc_ga(
+            bonoSeleccionado.id_bono_vc_ga,
+            this.idEmpleado_vc_ga,
+            nuevoTipo.trim(),
+            parseFloat(nuevoMonto),
+            bonoSeleccionado.fecha
+        );
+        
+        await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Bono actualizado correctamente');
+        await this.recargarHistorialBonos_vc_ga();
+        
+    } catch (error) {
+        await modal_vc_ga.showError_vc_ga('Error', `No se pudo editar el bono: ${error.message}`);
+        console.error('Error al editar bono:', error);
+    }
+}
+
+// Función para manejar borrar bono
+async manejarBorrarBono_vc_ga() {
+    try {
+        // Obtener historial con IDs
+        const historial = await this.servicio_vc_ga.repositorio_vc_ga.obtenerHistorialBonosConId_vc_ga(this.idEmpleado_vc_ga);
+        
+        if (!historial || historial.length === 0) {
+            await modal_vc_ga.showWarning_vc_ga('Advertencia', 'No hay bonos registrados para borrar');
+            return;
+        }
+        
+        // Crear opciones para el select
+        const opciones = historial.map(bono => ({
+            texto: `${bono.tipo} - $${bono.monto} (${new Date(bono.fecha).toLocaleDateString()})`
+        }));
+        
+        // Mostrar select para elegir bono
+        const seleccion = await this.mostrarSelectOscuro_vc_ga(
+            'Borrar Bono', 
+            'Seleccione el bono a borrar:',
+            opciones
+        );
+        
+        if (!seleccion.confirmado) return;
+        
+        const bonoSeleccionado = historial[seleccion.indice];
+        
+        // Confirmar borrado
+        const confirmacion = await modal_vc_ga.showConfirm_vc_ga(
+            'Confirmar Borrado', 
+            `¿Está seguro que desea borrar el bono de ${bonoSeleccionado.tipo} por $${bonoSeleccionado.monto}?\n\nEsta acción no se puede deshacer.`
+        );
+        
+        if (!confirmacion) return;
+        
+        // Eliminar bono usando la función de BD
+        await this.servicio_vc_ga.repositorio_vc_ga.eliminarBono_vc_ga(bonoSeleccionado.id_bono_vc_ga);
+        
+        await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Bono borrado correctamente');
+        await this.recargarHistorialBonos_vc_ga();
+        
+    } catch (error) {
+        await modal_vc_ga.showError_vc_ga('Error', `No se pudo borrar el bono: ${error.message}`);
+        console.error('Error al borrar bono:', error);
+    }
+}
+
+
+// Función auxiliar para modal de input de texto
+async mostrarModalInputTexto_vc_ga(titulo, mensaje, valorPredeterminado = '') {
+    return new Promise((resolve) => {
+        const container = document.createElement('div');
+        container.className = 'mt-4';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'w-full p-2 border rounded bg-gray-800 text-white border-gray-600 focus:border-blue-500 focus:ring-blue-500';
+        input.value = valorPredeterminado;
+        input.placeholder = 'Ingrese el tipo de bono';
+        
+        container.appendChild(input);
+        
+        modal_vc_ga.show_vc_ga(titulo, mensaje, 'reportes', true)
+            .then((confirmed) => {
+                if (confirmed) {
+                    resolve(input.value);
+                } else {
+                    resolve(null);
+                }
+            });
+        
+        modal_vc_ga.modalMessage_vc_ga.appendChild(container);
+        input.focus();
+    });
+}
+
+// Actualizar el método recargarHistorialBonos_vc_ga para mostrar formato de moneda
+async recargarHistorialBonos_vc_ga() {
+    const filas_vc_ga = await this.servicio_vc_ga.obtenerHistorialBonos_vc_ga(this.idEmpleado_vc_ga);
+    document.getElementById('bonusHistory').innerHTML = filas_vc_ga.map(r_vc_ga => `
+        <tr class="border-b border-gray-200 dark:border-gray-700">
+            <td class="p-2">${new Date(r_vc_ga.fecha).toLocaleDateString()}</td>
+            <td class="p-2">${r_vc_ga.tipo}</td>
+            <td class="p-2">${parseFloat(r_vc_ga.monto).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+        </tr>`
+    ).join('');
 }
 
 
