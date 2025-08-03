@@ -318,4 +318,4 @@ class ReportesController_vc_ga {
   }
 }
 
-module.exports = { reportesHTML_vc_ga, ReportesController_vc_ga };
+module.exports = { reportesHTML_vc_ga, ReportesController_vc_ga, GestorReportes_vc_ga};

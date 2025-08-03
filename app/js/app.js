@@ -3,7 +3,7 @@ const { ipcRenderer } = require("electron");
 const { LoginControlador_vc_ga, AuthServicio_vc_ga, AuthRepositorio_vc_ga, GestorSesion_vc_ga, loginHTML_vc_ga, botonCerrarSesion_vc_ga, AuthFabrica_vc_ga } = require("../js/login");
 const { PlantillaController_vc_ga, GestorUsuarios_vc_ga } = require("../js/plantilla");
 const { setupThemeToggle_vc_ga } = require("../js/dark-mode");
-const { reportesHTML_vc_ga, ReportesController_vc_ga } = require("../js/reportes");
+const { reportesHTML_vc_ga, ReportesController_vc_ga, GestorReportes_vc_ga } = require("../js/reportes");
 const { modal_vc_ga } = require("../js/modal");
 const { empleadoHTML_vc_ga, EmpleadoFabrica_vc_ga } = require("../js/empleado");
 // const { selectedHTML_vc_ga, inicializarEmpleado, addSalary, editSalary, deleteSalary, addDeduction, editDeduction, deleteDeduction, addExtra, editExtra, deleteExtra, addBonus, editBonus, deleteBonus, addVacation, editVacation, deleteVacation } = require("../js/seleccionado");
@@ -293,6 +293,61 @@ document.getElementById('tipo_documento').addEventListener('change', function() 
             }
           }
         }
-        const controladorReportes_vc_ga = new ReportesController_vc_ga;
-        controladorReportes_vc_ga._init_vc_ga();
+        const gestor = new GestorReportes_vc_ga();
+
+  // Inicializar la UI de reportes (la lista, filtros, etc.)
+  const controller = new ReportesController_vc_ga();
+
+  // Referencias a elementos
+  const form = document.getElementById("documentForm");
+  const tipoSelect = document.getElementById("tipo_documento");
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+
+    const tipo = tipoSelect.value;
+    try {
+      let nuevoId;
+      switch (tipo) {
+        case "recibo":
+          nuevoId = await gestor.crearReciboNomina_vc_ga();
+          await modal_vc_ga.showSuccess_vc_ga(
+            "Recibo creado",
+            `El recibo de nómina (ID ${nuevoId}) se creó correctamente.`
+          );
+          break;
+
+        case "reporte_banco":
+          nuevoId = await gestor.crearReporteBanco_vc_ga();
+          await modal_vc_ga.showSuccess_vc_ga(
+            "Reporte bancario creado",
+            `El reporte bancario (ID ${nuevoId}) se creó correctamente.`
+          );
+          break;
+
+        case "reporte_contable":
+          nuevoId = await gestor.crearReporteContable_vc_ga();
+          await modal_vc_ga.showSuccess_vc_ga(
+            "Reporte contable creado",
+            `El reporte contable (ID ${nuevoId}) se creó correctamente.`
+          );
+          break;
+
+        default:
+          throw new Error("Seleccione un tipo de documento válido.");
+      }
+
+      // Una vez confirmado el modal, redirigir a la lista de reportes
+      location.href = "reportes.html";
+    } catch (err) {
+      console.error("Error al guardar documento:", err);
+      await modal_vc_ga.showError_vc_ga(
+        "Error al guardar",
+        err.message || "Ocurrió un error al intentar guardar el documento."
+      );
+      submitBtn.disabled = false;
+    }
+  });
   }
