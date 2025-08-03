@@ -408,7 +408,7 @@ async manejarEditarSalario_vc_ga() {
         const confirmado = await modal_vc_ga.show_vc_ga(
             'Confirmar Edición',
             `¿Desea actualizar el salario base a ${salarioActual}?`,
-            'confirmacion', // Tipo de modal para confirmación
+            'warning', // Tipo de modal para confirmación
             true // Mostrar botones OK/Cancelar
         );
 
