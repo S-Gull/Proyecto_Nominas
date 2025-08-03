@@ -1,7 +1,25 @@
 const { query_vc_ga } = require("../database/conexion");
 const { GestorSesion_vc_ga } = require("./login");
+const { modal_vc_ga } = require("./modal");
 
 const empleadoHTML_vc_ga = document.getElementById('employee-view');
+
+const salarioInput_vc_ga = document.getElementById('salaryBase');
+const agregarSalarioBtn_vc_ga = document.getElementById('addSalaryBtn');
+const editarSalarioBtn_vc_ga = document.getElementById('editSalaryBtn');
+const borrarSalarioBtn_vc_ga = document.getElementById('deleteSalaryBtn');
+
+const agregarDeduccionBtn_vc_ga = document.getElementById('addDeductionBtn');
+const editarDeduccionBtn_vc_ga = document.getElementById('editDeductionBtn');
+const borrarDeduccionBtn_vc_ga = document.getElementById('deleteDeductionBtn');
+
+const agregarHoraBtn_vc_ga = document.getElementById('addExtraBtn');
+const editarHoraBtn_vc_ga = document.getElementById('editExtraBtn');
+const borrarHoraBtn_vc_ga = document.getElementById('deleteExtraBtn');
+
+const agregarBonoBtn_vc_ga = document.getElementById('addBonusBtn');
+const editarBonoBtn_vc_ga = document.getElementById('editBonusBtn');
+const borrarBonoBtn_vc_ga = document.getElementById('deleteBonusBtn');
 
 // 1. Capa de Repositorio
 class EmpleadoRepositorio_vc_ga {
@@ -158,7 +176,6 @@ class EmpleadoServicio_vc_ga {
     constructor(repositorio_vc_ga) {
         this.repositorio_vc_ga = repositorio_vc_ga;
     }
-
     async obtenerDetallesEmpleado_vc_ga(idEmpleado_vc_ga) {
         const [personal_vc_ga] = await this.repositorio_vc_ga.obtenerDetallesEmpleado_vc_ga(idEmpleado_vc_ga);
         return { personal_vc_ga };
@@ -166,6 +183,24 @@ class EmpleadoServicio_vc_ga {
 
     async obtenerHistorialSalario_vc_ga(id_vc_ga) {
         return await this.repositorio_vc_ga.obtenerHistorialSalario_vc_ga(id_vc_ga);
+    }
+
+    async crearSalario_vc_ga(idUsuario, salario) { 
+        if (!salario || isNaN(salario)) {
+            throw new Error("El salario debe ser un número válido");
+        }
+        return await this.repositorio_vc_ga.crearSalario_vc_ga(idUsuario, parseFloat(salario));
+    }
+
+    async actualizarSalario_vc_ga(idSalario, salario) {
+        if (!salario || isNaN(salario)) {
+            throw new Error("El salario debe ser un número válido");
+        }
+        return await this.repositorio_vc_ga.actualizarSalario_vc_ga(idSalario, parseFloat(salario));
+    }
+
+    async eliminarSalario_vc_ga(idSalario) {
+        return await this.repositorio_vc_ga.eliminarSalario_vc_ga(idSalario);
     }
 
     async obtenerHistorialDeducciones_vc_ga(id_vc_ga) {
@@ -179,9 +214,6 @@ class EmpleadoServicio_vc_ga {
     async obtenerHistorialBonos_vc_ga(id_vc_ga) {
         return await this.repositorio_vc_ga.obtenerHistorialBonos_vc_ga(id_vc_ga);
     }
-    async crearSalario_vc_ga(idUsuario, salario) { return await this.repositorio_vc_ga.crearSalario_vc_ga(idUsuario, salario); }
-    async actualizarSalario_vc_ga(idSalario, salario) { return await this.repositorio_vc_ga.actualizarSalario_vc_ga(idSalario, salario); }
-    async eliminarSalario_vc_ga(idSalario) { return await this.repositorio_vc_ga.eliminarSalario_vc_ga(idSalario); }
     async crearDeduccionUsuario_vc_ga(...args) { return await this.repositorio_vc_ga.crearDeduccionUsuario_vc_ga(...args); }
     async actualizarDeduccionUsuario_vc_ga(...args) { return await this.repositorio_vc_ga.actualizarDeduccionUsuario_vc_ga(...args); }
     async eliminarDeduccionUsuario_vc_ga(idReg) { return await this.repositorio_vc_ga.eliminarDeduccionUsuario_vc_ga(idReg); }
@@ -241,6 +273,189 @@ class EmpleadoControlador_vc_ga {
         async eliminarBono_vc_ga(idReg) {
         return await this.servicio_vc_ga.eliminarBono_vc_ga(idReg);
         }
+        
+        configurarBotonesSalario_vc_ga() {
+    agregarSalarioBtn_vc_ga?.addEventListener('click', () => this.manejarAgregarSalario_vc_ga());
+    editarSalarioBtn_vc_ga?.addEventListener('click', () => this.manejarEditarSalario_vc_ga());
+    borrarSalarioBtn_vc_ga?.addEventListener('click', () => this.manejarBorrarSalario_vc_ga());
+}
+
+/**
+ * Muestra un modal con campo de entrada
+ */
+async mostrarModalInputOscuro_vc_ga(titulo, mensaje, valorPredeterminado = '') {
+    return new Promise((resolve) => {
+        const container = document.createElement('div');
+        container.className = 'mt-4';
+        
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.className = 'w-full p-2 border rounded bg-gray-800 text-white border-gray-600 focus:border-blue-500 focus:ring-blue-500';
+        input.value = valorPredeterminado;
+        input.placeholder = 'Ingrese el valor';
+        
+        container.appendChild(input);
+        
+        modal_vc_ga.show_vc_ga(titulo, mensaje, 'warning', true)
+            .then((confirmed) => {
+                if (confirmed) {
+                    resolve(input.value);
+                } else {
+                    resolve(null);
+                }
+            });
+        
+        modal_vc_ga.modalMessage_vc_ga.appendChild(container);
+        input.focus();
+    });
+}
+
+/**
+ * Muestra un select con opciones en modo oscuro (para editar/borrar)
+ */
+async mostrarSelectOscuro_vc_ga(titulo, mensaje, opciones) {
+    return new Promise((resolve) => {
+        const container = document.createElement('div');
+        container.className = 'mt-4';
+        
+        const select = document.createElement('select');
+        select.className = 'w-full p-2 border rounded bg-gray-800 text-white border-gray-600 focus:border-blue-500 focus:ring-blue-500';
+        
+        opciones.forEach((opcion, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = opcion.texto;
+            select.appendChild(option);
+        });
+        
+        container.appendChild(select);
+        
+        modal_vc_ga.show_vc_ga(titulo, mensaje, 'warning', true)
+            .then((confirmed) => {
+                if (confirmed) {
+                    resolve({
+                        indice: select.value,
+                        confirmado: true
+                    });
+                } else {
+                    resolve({ confirmado: false });
+                }
+            });
+        
+        modal_vc_ga.modalMessage_vc_ga.appendChild(container);
+        select.focus();
+    });
+}
+
+/**
+ * Maneja la acción de agregar salario
+ */
+async manejarAgregarSalario_vc_ga() {
+    try {
+        // const salarioInput_vc_ga = document.getElementById('salaryBase');
+        const salario = salarioInput_vc_ga.value;
+        
+        if (!salario || isNaN(salario)) {
+            throw new Error("Debe ingresar un valor numérico válido en el campo Sueldo Base");
+        }
+        
+        await this.crearSalario_vc_ga(parseFloat(salario));
+        await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Salario agregado correctamente');
+        salarioInput_vc_ga.value = ''; // Limpiar el input
+        await this.recargarHistorialSalario_vc_ga();
+    } catch (error) {
+        await modal_vc_ga.showError_vc_ga('Error', error.message);
+        console.error(error);
+    }
+}
+
+
+/**
+ * Maneja la acción de editar salario
+ */
+async manejarEditarSalario_vc_ga() {
+    try {
+        const historial = await this.servicio_vc_ga.obtenerHistorialSalario_vc_ga(this.idEmpleado_vc_ga);
+        
+        if (!historial || historial.length === 0) {
+            await modal_vc_ga.showWarning_vc_ga('Advertencia', 'No hay salarios registrados para editar');
+            return;
+        }
+        
+        // Preparar opciones para el select
+        const opciones = historial.map(salario => ({
+            texto: `${salario.salario_vc_ga} (${new Date(salario.fecha_registro_vc_ga).toLocaleDateString()})`
+        }));
+        
+        const seleccion = await this.mostrarSelectOscuro_vc_ga(
+            'Editar Salario', 
+            'Seleccione el salario a editar:',
+            opciones
+        );
+        
+        if (!seleccion.confirmado) return;
+        
+        const salarioSeleccionado = historial[seleccion.indice];
+        const nuevoSalario = await this.mostrarModalInputOscuro_vc_ga(
+            'Editar Salario', 
+            'Ingrese el nuevo valor:',
+            salarioSeleccionado.salario_vc_ga
+        );
+        
+        if (nuevoSalario === null) return;
+        if (!nuevoSalario || isNaN(nuevoSalario)) {
+            throw new Error("Debe ingresar un valor numérico válido");
+        }
+        
+        await this.actualizarSalario_vc_ga(salarioSeleccionado.id_salario_vc_ga, parseFloat(nuevoSalario));
+        await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Salario actualizado correctamente');
+        await this.recargarHistorialSalario_vc_ga();
+    } catch (error) {
+        await modal_vc_ga.showError_vc_ga('Error', `No se pudo editar el salario: ${error.message}`);
+        console.error(error);
+    }
+}
+
+/**
+ * Maneja la acción de borrar salario
+ */
+async manejarBorrarSalario_vc_ga() {
+    try {
+        const historial = await this.servicio_vc_ga.obtenerHistorialSalario_vc_ga(this.idEmpleado_vc_ga);
+        
+        if (!historial || historial.length === 0) {
+            await modal_vc_ga.showWarning_vc_ga('Advertencia', 'No hay salarios registrados para borrar');
+            return;
+        }
+        
+        const opciones = historial.map(salario => ({
+            texto: `${salario.salario_vc_ga} (${new Date(salario.fecha_registro_vc_ga).toLocaleDateString()})`
+        }));
+        
+        const seleccion = await this.mostrarSelectOscuro_vc_ga(
+            'Borrar Salario', 
+            'Seleccione el salario a borrar:',
+            opciones
+        );
+        
+        if (!seleccion.confirmado) return;
+        
+        const salarioSeleccionado = historial[seleccion.indice];
+        const confirmacion = await modal_vc_ga.showConfirm_vc_ga(
+            'Confirmar Borrado', 
+            `¿Está seguro que desea borrar el salario ${salarioSeleccionado.salario_vc_ga}?`
+        );
+        
+        if (!confirmacion) return;
+        
+        await this.eliminarSalario_vc_ga(salarioSeleccionado.id_salario_vc_ga);
+        await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Salario borrado correctamente');
+        await this.recargarHistorialSalario_vc_ga();
+    } catch (error) {
+        await modal_vc_ga.showError_vc_ga('Error', `No se pudo borrar el salario: ${error.message}`);
+        console.error(error);
+    }
+}
 
     async iniciar_vc_ga() {
         // Obtenemos usuario y rol
@@ -366,6 +581,7 @@ class EmpleadoControlador_vc_ga {
                 <td>${r_vc_ga.monto}</td>
             </tr>`
         ).join('');
+        this.configurarBotonesSalario_vc_ga();
     }
 }
 

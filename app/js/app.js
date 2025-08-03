@@ -6,7 +6,7 @@ const { setupThemeToggle_vc_ga } = require("../js/dark-mode");
 const { reportesHTML_vc_ga, ReportesController_vc_ga } = require("../js/reportes");
 const { modal_vc_ga } = require("../js/modal");
 const { empleadoHTML_vc_ga, EmpleadoFabrica_vc_ga } = require("../js/empleado");
-const { selectedHTML_vc_ga, inicializarEmpleado, addSalary, editSalary, deleteSalary, addDeduction, editDeduction, deleteDeduction, addExtra, editExtra, deleteExtra, addBonus, editBonus, deleteBonus, addVacation, editVacation, deleteVacation } = require("../js/seleccionado");
+// const { selectedHTML_vc_ga, inicializarEmpleado, addSalary, editSalary, deleteSalary, addDeduction, editDeduction, deleteDeduction, addExtra, editExtra, deleteExtra, addBonus, editBonus, deleteBonus, addVacation, editVacation, deleteVacation } = require("../js/seleccionado");
 
 if (!GestorSesion_vc_ga.verificarAcceso_vc_ga()) {
   // El método ya maneja la redirección automáticamente
