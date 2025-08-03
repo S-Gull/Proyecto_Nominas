@@ -1,50 +1,3 @@
-<<<<<<< HEAD
-console.log("carga el app");
-const { ipcRenderer } = require("electron")
-
-const formularioProducto = document.querySelector("#productForm");
-const nombreProducto = document.querySelector("#name");
-const precioProducto = document.querySelector("#price");
-const descripcionProducto = document.querySelector("#description");
-const listaProductos = document.querySelector("#products");
-let btnColorModo = document.getElementById("cambio-color")
-
-let productos = [];
-let editando = false;
-let idProductoEditar;
-
-const eliminarProducto = async (id) => {
-  const respuesta = confirm("¿Estás seguro de que quieres eliminarlo?");
-  if (respuesta) {
-    await ipcRenderer.invoke("eliminar-producto", id);
-    await obtenerProductos();
-  }
-  return;
-};
-
-const obtenerProductos = async () => {
-  productos = await ipcRenderer.invoke("obtener-productos");
-  renderizarProductos(productos);
-};
-
-const editarProducto = async (id) => {
-  const producto = await ipcRenderer.invoke("obtener-producto-por-id", id);
-  if (!producto) {
-    console.log(producto);
-    alert("Producto no encontrado");
-    return;
-  } else { 
-  nombreProducto.value = producto.nombre;
-  precioProducto.value = producto.precio;
-  descripcionProducto.value = producto.descripcion;
-
-  editando = true;
-  idProductoEditar = id;
-  
-  document.querySelector("#formTitle").textContent = "Editar Producto";
-  document.querySelector("#submitText").textContent = "Actualizar";
-  document.querySelector("#cancelEdit").classList.remove("hidden");
-=======
 console.log("carga el app_vc_ga");
 const { ipcRenderer } = require("electron");
 const { registerHTML_vc_ga, crudHTML_vc_ga, loginHTML_vc_ga, toggleEye_vc_ga } = require("../js/login");
@@ -102,7 +55,7 @@ if (loginHTML_vc_ga) {
           }
         };
 setupThemeToggle_vc_ga();
->>>>>>> main
+
 }
 
 if (registerHTML_vc_ga){

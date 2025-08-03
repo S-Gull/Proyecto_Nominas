@@ -1,235 +1,210 @@
-console.log("carga la conexion_vcga");
-const mysql_vc_ga = require('mysql');
 
-// Configuración de conexión inicial (sin base de datos especificada)
-const config_vc_ga = {
-  host: 'localhost',
-  user: 'root',
-  password: '3690'
+
+console.log("Cargando módulo de conexión VCGA");
+
+const mysql = require('mysql2');
+const fs = require('fs').promises;
+const path = require('path');
+
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') }); // Ajusta la ruta si tu .env está en otra ubicación
+const config = {
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  charset: 'utf8mb4'
 };
 
-// Crear una conexión global
-const connection_vc_ga = mysql_vc_ga.createConnection(config_vc_ga);
+// Función para verificar si la BD existe
+const verificarExistenciaBD_vc_ga = async (conexion_vc_ga) => {
+  return new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+    conexion_vc_ga.query(`SHOW DATABASES LIKE 'dbcrud_electron_vc_ga'`, (error_vc_ga, resultados_vc_ga) => {
+      if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+      resolver_vc_ga(resultados_vc_ga.length > 0);
+    });
+  });
+};
 
-const tablas_vc_ga = [
-  `CREATE TABLE IF NOT EXISTS productos_vc_ga(
-    id_vc_ga INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    nombre_vc_ga VARCHAR(100) NOT NULL,
-    descripcion_vc_ga VARCHAR(255),
-    precio_vc_ga DECIMAL(10,2) NOT NULL
-  )`,
+// Función para verificar si la BD tiene tablas
+const verificarTablasBD_vc_ga = async (conexion_vc_ga) => {
+  return new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+    conexion_vc_ga.query(`USE dbcrud_electron_vc_ga`, (error_vc_ga) => {
+      if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+      
+      conexion_vc_ga.query(`SHOW TABLES`, (error_vc_ga, resultados_vc_ga) => {
+        if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+        resolver_vc_ga(resultados_vc_ga.length > 0);
+      });
+    });
+  });
+};
 
-  `CREATE TABLE IF NOT EXISTS td_sucursal_vc_ga (
-    id_sucursal_vc_ga int PRIMARY KEY,
-    nombre_vc_ga varchar(255),
-    direccion_vc_ga varchar(255)
-  )`,
+// Función para eliminar y recrear la BD con collation para español
+const recrearBD_vc_ga = async (conexion_vc_ga) => {
+  try {
+    await new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+      conexion_vc_ga.query(`DROP DATABASE IF EXISTS dbcrud_electron_vc_ga`, (error_vc_ga) => {
+        if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+        console.log('Base de datos eliminada');
+        resolver_vc_ga();
+      });
+    });
 
-  `CREATE TABLE IF NOT EXISTS td_departamento_vc_ga (
-    id_departamento_vc_ga int PRIMARY KEY,
-    id_sucursal_vc_ga int,
-    nombre_vc_ga varchar(255),
-    FOREIGN KEY (id_sucursal_vc_ga) REFERENCES td_sucursal_vc_ga(id_sucursal_vc_ga)
-  )`,
+    await new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+      conexion_vc_ga.query(
+        `CREATE DATABASE dbcrud_electron_vc_ga 
+         CHARACTER SET utf8mb4 
+         COLLATE utf8mb4_spanish_ci`, 
+        (error_vc_ga) => {
+          if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+          console.log('Base de datos creada');
+          resolver_vc_ga();
+        }
+      );
+    });
 
-  `CREATE TABLE IF NOT EXISTS td_roles_vc_ga (
-    id_rol_vc_ga int PRIMARY KEY,
-    nombre_vc_ga varchar(255),
-    descripcion_vc_ga varchar(255)
-  )`,
+    await new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+      conexion_vc_ga.query(`USE dbcrud_electron_vc_ga`, (error_vc_ga) => {
+        if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+        resolver_vc_ga();
+      });
+    });
+  } catch (error_vc_ga) {
+    console.error('Error al recrear la base de datos:', error_vc_ga);
+    throw error_vc_ga;
+  }
+};
 
-  `CREATE TABLE IF NOT EXISTS td_cargos_vc_ga (
-    id_cargo_vc_ga int PRIMARY KEY,
-    nombre_vc_ga varchar(255),
-    descripcion_vc_ga varchar(255)
-  )`,
+// Función para ejecutar archivo SQL con soporte para español
+const ejecutarArchivoSQL_vc_ga = async (conexion_vc_ga, rutaArchivo_vc_ga) => {
+  try {
+    const contenidoSQL_vc_ga = await fs.readFile(rutaArchivo_vc_ga, 'utf8');
+    const consultas_vc_ga = contenidoSQL_vc_ga.split(';').filter(q => q.trim().length > 0);
+    
+    await new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+      conexion_vc_ga.query(`SET NAMES utf8mb4`, (error_vc_ga) => {
+        if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+        resolver_vc_ga();
+      });
+    });
 
-  `CREATE TABLE IF NOT EXISTS td_usuarios_vc_ga (
-    id_usuario_vc_ga int PRIMARY KEY,
-    id_departamento_vc_ga int,
-    id_rol_vc_ga int,
-    id_cargo_vc_ga int,
-    nombre_completo_vc_ga varchar(255),
-    cedula_vc_ga varchar(255),
-    rif_vc_ga varchar(255),
-    fecha_nacimiento_vc_ga date,
-    fecha_ingreso_vc_ga date,
-    status_vc_ga ENUM('Trabajando', 'De Vacaciones'),
-    correo_electronico_vc_ga varchar(255),
-    telefono_vc_ga varchar(255),
-    clave_vc_ga varchar(255),
-    FOREIGN KEY (id_departamento_vc_ga) REFERENCES td_departamento_vc_ga(id_departamento_vc_ga),
-    FOREIGN KEY (id_rol_vc_ga) REFERENCES td_roles_vc_ga(id_rol_vc_ga),
-    FOREIGN KEY (id_cargo_vc_ga) REFERENCES td_cargos_vc_ga(id_cargo_vc_ga)
-  )`,
+    for (const consulta_vc_ga of consultas_vc_ga) {
+      await new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+        conexion_vc_ga.query(consulta_vc_ga, (error_vc_ga, resultados_vc_ga) => {
+          if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+          console.log('Consulta ejecutada:', consulta_vc_ga.substring(0, 50) + '...');
+          resolver_vc_ga(resultados_vc_ga);
+        });
+      });
+    }
+  } catch (error_vc_ga) {
+    console.error('Error al ejecutar archivo SQL:', error_vc_ga);
+    throw error_vc_ga;
+  }
+};
 
-  `CREATE TABLE IF NOT EXISTS td_salario_historico_vc_ga (
-    id_salario_vc_ga int PRIMARY KEY,
-    id_usuario_vc_ga int,
-    sueldo_base_vc_ga decimal(10,2),
-    sueldo_variable_vc_ga decimal(10,2),
-    fecha_inicio_vc_ga date,
-    fecha_fin_vc_ga date,
-    FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga)
-  )`,
+// Función principal de inicialización
+const inicializarBD_vc_ga = async () => {
+  const conexion_vc_ga = mysql.createConnection(config);
+  
+  try {
+    await new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+      conexion_vc_ga.connect(error_vc_ga => {
+        if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+        resolver_vc_ga();
+      });
+    });
 
-  `CREATE TABLE IF NOT EXISTS td_bono_vc_ga (
-    id_bono_vc_ga int PRIMARY KEY,
-    id_usuario_vc_ga int,
-    tipo_bono_vc_ga varchar(255),
-    monto_vc_ga decimal(10,2),
-    fecha_pago_vc_ga date,
-    FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga)
-  )`,
+    const bdExiste_vc_ga = await verificarExistenciaBD_vc_ga(conexion_vc_ga);
+    
+    if (bdExiste_vc_ga) {
+      console.log('La base de datos ya existe');
+      
+      const tieneTablas_vc_ga = await verificarTablasBD_vc_ga(conexion_vc_ga).catch(() => false);
+      
+      if (!tieneTablas_vc_ga) {
+        console.log('La base de datos no tiene tablas, recreando...');
+        await recrearBD_vc_ga(conexion_vc_ga);
+        await ejecutarArchivoSQL_vc_ga(conexion_vc_ga, path.join(__dirname, 'database.sql'));
+      } else {
+        console.log('La base de datos tiene tablas, no se requiere recreación');
+      }
+    } else {
+      console.log('La base de datos no existe, creando...');
+      await recrearBD_vc_ga(conexion_vc_ga);
+      await ejecutarArchivoSQL_vc_ga(conexion_vc_ga, path.join(__dirname, 'database.sql'));
+    }
 
-  `CREATE TABLE IF NOT EXISTS td_horas_extras_vc_ga (
-    id_horas_extras_vc_ga int PRIMARY KEY,
-    id_usuario_vc_ga int,
-    cantidad_horas_vc_ga decimal(5,2),
-    tipo_vc_ga varchar(255),
-    fecha_vc_ga date,
-    monto_vc_ga decimal(10,2),
-    FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga)
-  )`,
+    console.log('Base de datos inicializada correctamente');
+  } catch (error_vc_ga) {
+    console.error('Error durante la inicialización:', error_vc_ga);
+    throw error_vc_ga;
+  } finally {
+    conexion_vc_ga.end();
+  }
+};
 
-  `CREATE TABLE IF NOT EXISTS td_vacaciones_vc_ga (
-    id_vacacion_vc_ga int PRIMARY KEY,
-    id_usuario_vc_ga int,
-    dias_derecho_vc_ga int,
-    dias_disfrutados_vc_ga int,
-    fecha_inicio_vc_ga date,
-    fecha_fin_vc_ga date,
-    FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga)
-  )`,
+// Funciones de consulta con soporte para caracteres españoles
+const consulta_vc_ga = (sql_vc_ga, parametros_vc_ga = [], callback_vc_ga) => {
+  const db_vc_ga = mysql.createConnection({ 
+    ...config, 
+    database: 'dbcrud_electron_vc_ga',
+    charset: 'utf8mb4'
+  });
 
-  `CREATE TABLE IF NOT EXISTS td_prestaciones_sociales_vc_ga (
-    id_prestacion_vc_ga int PRIMARY KEY,
-    id_usuario_vc_ga int,
-    monto_vc_ga decimal(10,2),
-    fecha_calculo_vc_ga date,
-    tipo_vc_ga varchar(255),
-    FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga)
-  )`,
+  db_vc_ga.connect((error_vc_ga) => {
+    if (error_vc_ga) return callback_vc_ga(error_vc_ga);
+    
+    db_vc_ga.query(`SET NAMES utf8mb4`, (error_vc_ga) => {
+      if (error_vc_ga) return callback_vc_ga(error_vc_ga);
+      
+      db_vc_ga.query(sql_vc_ga, parametros_vc_ga, (error_vc_ga, resultados_vc_ga) => {
+        db_vc_ga.end();
+        callback_vc_ga(error_vc_ga, resultados_vc_ga);
+      });
+    });
+  });
+};
 
-  `CREATE TABLE IF NOT EXISTS td_deduccion_vc_ga (
-    id_deduccion_vc_ga int PRIMARY KEY,
-    nombre_vc_ga varchar(255),
-    porcentaje_vc_ga decimal(5,2),
-    descripcion_vc_ga varchar(255),
-    vigente_desde_vc_ga date,
-    vigente_hasta_vc_ga date
-  )`,
-
-  `CREATE TABLE IF NOT EXISTS td_usuario_deduccion_vc_ga (
-    id_usuario_vc_ga int,
-    id_deduccion_vc_ga int,
-    monto_vc_ga decimal(10,2),
-    fecha_aplicacion_vc_ga date,
-    PRIMARY KEY (id_usuario_vc_ga, id_deduccion_vc_ga, fecha_aplicacion_vc_ga),
-    FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga),
-    FOREIGN KEY (id_deduccion_vc_ga) REFERENCES td_deduccion_vc_ga(id_deduccion_vc_ga)
-  )`,
-
-  `CREATE TABLE IF NOT EXISTS td_pago_nomina_vc_ga (
-    id_pago_vc_ga int PRIMARY KEY,
-    id_usuario_vc_ga int,
-    fecha_pago_vc_ga date,
-    monto_neto_vc_ga decimal(10,2),
-    periodo_vc_ga varchar(255),
-    FOREIGN KEY (id_usuario_vc_ga) REFERENCES td_usuarios_vc_ga(id_usuario_vc_ga)
-  )`,
-
-  `CREATE TABLE IF NOT EXISTS td_recibo_nomina_vc_ga (
-    id_recibo_vc_ga int PRIMARY KEY,
-    id_pago_vc_ga int,
-    fecha_generacion_vc_ga timestamp,
-    contenido_vc_ga text,
-    FOREIGN KEY (id_pago_vc_ga) REFERENCES td_pago_nomina_vc_ga(id_pago_vc_ga)
-  )`,
-
-  `CREATE TABLE IF NOT EXISTS td_reporte_banco_vc_ga (
-    id_reporte_banco_vc_ga int PRIMARY KEY,
-    id_pago_vc_ga int,
-    info_banco_vc_ga text,
-    FOREIGN KEY (id_pago_vc_ga) REFERENCES td_pago_nomina_vc_ga(id_pago_vc_ga)
-  )`,
-
-  `CREATE TABLE IF NOT EXISTS td_reporte_contable_vc_ga (
-    id_reporte_contable_vc_ga int PRIMARY KEY,
-    id_pago_vc_ga int,
-    info_contable_vc_ga text,
-    FOREIGN KEY (id_pago_vc_ga) REFERENCES td_pago_nomina_vc_ga(id_pago_vc_ga)
-  )`
-];
-
-
-// Función para crear tablas secuencialmente
-const crearTablas_vc_ga = () => {
-  return tablas_vc_ga.reduce((promise_vc_ga, query_vc_ga) => {
-    return promise_vc_ga.then(() => {
-      return new Promise((resolve_vc_ga, reject_vc_ga) => {
-        connection_vc_ga.query(query_vc_ga, (err_vc_ga) => {
-          if (err_vc_ga) return reject_vc_ga(err_vc_ga);
-          console.log('Tabla creada o ya existe.');
-          resolve_vc_ga();
+const query_vc_ga = (sql_vc_ga, parametros_vc_ga = []) => {
+  return new Promise((resolver_vc_ga, rechazar_vc_ga) => {
+    const db_vc_ga = mysql.createConnection({ 
+      ...config, 
+      database: 'dbcrud_electron_vc_ga',
+      charset: 'utf8mb4'
+    });
+    
+    db_vc_ga.connect(error_vc_ga => {
+      if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+      
+      db_vc_ga.query(`SET NAMES utf8mb4`, (error_vc_ga) => {
+        if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+        
+        db_vc_ga.query(sql_vc_ga, parametros_vc_ga, (error_vc_ga, resultados_vc_ga) => {
+          db_vc_ga.end();
+          if (error_vc_ga) return rechazar_vc_ga(error_vc_ga);
+          resolver_vc_ga(resultados_vc_ga);
         });
       });
     });
-  }, Promise.resolve());
+  });
 };
 
-connection_vc_ga.connect(async (err_vc_ga) => {
-  if (err_vc_ga) {
-    console.error('Error de conexión inicial:', err_vc_ga);
-    return;
-  }
-
-  try {
-    await new Promise((resolve_vc_ga, reject_vc_ga) => {
-      connection_vc_ga.query('CREATE DATABASE IF NOT EXISTS crud_electron', (err_vc_ga) => {
-        if (err_vc_ga) return reject_vc_ga(err_vc_ga);
-        resolve_vc_ga();
-      });
-    });
-
-    await new Promise((resolve_vc_ga, reject_vc_ga) => {
-      connection_vc_ga.query('USE crud_electron', (err_vc_ga) => {
-        if (err_vc_ga) return reject_vc_ga(err_vc_ga);
-        resolve_vc_ga();
-      });
-    });
-
-    await crearTablas_vc_ga();
-
-    console.log('Base de datos y tablas creadas correctamente.');
-  } catch (error_vc_ga) {
-    console.error('Error al crear tablas:', error_vc_ga);
-  }
+// Inicialización automática al cargar el módulo
+inicializarBD_vc_ga().catch(error_vc_ga => {
+  console.error('Error en inicialización automática:', error_vc_ga);
 });
 
-// Función para ejecutar consultas (con reconexión automática)
-const query_vc_ga = (sql_vc_ga, params_vc_ga = [], callback_vc_ga) => {
-  // Crear una nueva conexión para cada consulta
-  const db_vc_ga = mysql_vc_ga.createConnection({
-    ...config_vc_ga,
-    database: 'crud_electron'
-  });
-
-  db_vc_ga.connect((err_vc_ga) => {
-    if (err_vc_ga) {
-      console.error('Error de conexión:', err_vc_ga);
-      return callback_vc_ga(err_vc_ga);
-    }
-
-    db_vc_ga.query(sql_vc_ga, params_vc_ga, (err_vc_ga, results_vc_ga) => {
-      db_vc_ga.end();
-      if (err_vc_ga) {
-        console.error('Error en consulta:', err_vc_ga);
-        return callback_vc_ga(err_vc_ga);
-      }
-      callback_vc_ga(null, results_vc_ga);
+module.exports = { 
+  query_vc_ga, 
+  consulta_vc_ga,
+  ejecutarArchivoSQL: (ruta_vc_ga) => {
+    const conexion_vc_ga = mysql.createConnection({ 
+      ...config, 
+      database: 'dbcrud_electron_vc_ga',
+      charset: 'utf8mb4'
     });
-  });
+    return ejecutarArchivoSQL_vc_ga(conexion_vc_ga, ruta_vc_ga)
+      .finally(() => conexion_vc_ga.end());
+  },
+  inicializarBD: inicializarBD_vc_ga
 };
-
-module.exports = { query_vc_ga };
