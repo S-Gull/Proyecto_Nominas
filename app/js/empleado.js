@@ -9,6 +9,8 @@ const salarioInput_vc_ga = document.getElementById('salaryBase');
 const editarSalarioBtn_vc_ga = document.getElementById('editSalaryBtn');
 // const borrarSalarioBtn_vc_ga = document.getElementById('deleteSalaryBtn');
 
+const deduccionSelect_vc_ga = document.getElementById('deductionType');
+const deduccionInput_vc_ga = document.getElementById('deductionAmount')
 const agregarDeduccionBtn_vc_ga = document.getElementById('addDeductionBtn');
 const editarDeduccionBtn_vc_ga = document.getElementById('editDeductionBtn');
 const borrarDeduccionBtn_vc_ga = document.getElementById('deleteDeductionBtn');
@@ -80,6 +82,15 @@ class EmpleadoRepositorio_vc_ga {
             [id_vc_ga]
         );
     }
+
+    async crearTipoDeduccion_vc_ga(nombre, porcentaje, descripcion, vigenteDe, vigenteHasta = null) {
+    return await query_vc_ga(
+        `INSERT INTO td_deduccion_vc_ga 
+         (nombre_vc_ga, porcentaje_vc_ga, descripcion_vc_ga, vigente_desde_vc_ga, vigente_hasta_vc_ga)
+         VALUES (?, ?, ?, ?, ?)`,
+        [nombre, porcentaje, descripcion, vigenteDe, vigenteHasta]
+    );
+}
 
     async crearDeduccionUsuario_vc_ga(idUsuario, idDeduccion, monto, fecha) {
     return await query_vc_ga(
@@ -172,7 +183,157 @@ class EmpleadoRepositorio_vc_ga {
         'DELETE FROM td_bono_vc_ga WHERE id_bono_vc_ga = ?',
         [idReg]
     );
+
+    
     }
+    async obtenerHistorialDeducciones_vc_ga(id_vc_ga) {
+    return await query_vc_ga(
+        `SELECT ud.id_usuario_deduccion_vc_ga, 
+                fecha_aplicacion_vc_ga AS fecha, 
+                d.nombre_vc_ga AS tipo, 
+                monto_vc_ga AS monto,
+                d.id_deduccion_vc_ga
+         FROM td_usuario_deduccion_vc_ga ud
+         JOIN td_deduccion_vc_ga d USING(id_deduccion_vc_ga)
+         WHERE id_usuario_vc_ga = ? 
+         ORDER BY fecha_aplicacion_vc_ga DESC`,
+        [id_vc_ga]
+    );
+}
+
+// 2. Obtener todas las deducciones disponibles para el select
+async obtenerDeduccionesDisponibles_vc_ga() {
+    return await query_vc_ga(
+        `SELECT id_deduccion_vc_ga, 
+                nombre_vc_ga, 
+                porcentaje_vc_ga, 
+                descripcion_vc_ga
+         FROM td_deduccion_vc_ga 
+         WHERE (vigente_hasta_vc_ga IS NULL OR vigente_hasta_vc_ga >= CURDATE())
+           AND vigente_desde_vc_ga <= CURDATE()
+         ORDER BY nombre_vc_ga`,
+        []
+    );
+}
+
+// 3. Obtener detalles específicos de una deducción
+async obtenerDeduccionPorId_vc_ga(idDeduccion) {
+    return await query_vc_ga(
+        `SELECT id_deduccion_vc_ga, 
+                nombre_vc_ga, 
+                porcentaje_vc_ga, 
+                descripcion_vc_ga,
+                vigente_desde_vc_ga,
+                vigente_hasta_vc_ga
+         FROM td_deduccion_vc_ga 
+         WHERE id_deduccion_vc_ga = ?`,
+        [idDeduccion]
+    );
+}
+
+// 4. Verificar si ya existe una deducción del mismo tipo para un usuario
+async verificarDeduccionExistente_vc_ga(idUsuario, idDeduccion) {
+    return await query_vc_ga(
+        `SELECT COUNT(*) as cantidad
+         FROM td_usuario_deduccion_vc_ga 
+         WHERE id_usuario_vc_ga = ? AND id_deduccion_vc_ga = ?`,
+        [idUsuario, idDeduccion]
+    );
+}
+
+// 5. Obtener el total de deducciones de un usuario para un período específico
+async obtenerTotalDeduccionesPeriodo_vc_ga(idUsuario, fechaInicio, fechaFin) {
+    return await query_vc_ga(
+        `SELECT SUM(monto_vc_ga) as total_deducciones,
+                COUNT(*) as cantidad_deducciones
+         FROM td_usuario_deduccion_vc_ga 
+         WHERE id_usuario_vc_ga = ? 
+           AND fecha_aplicacion_vc_ga BETWEEN ? AND ?`,
+        [idUsuario, fechaInicio, fechaFin]
+    );
+}
+
+// 6. Obtener deducciones por tipo
+async obtenerDeduccionesPorTipo_vc_ga(idUsuario, idDeduccion) {
+    return await query_vc_ga(
+        `SELECT ud.id_usuario_deduccion_vc_ga,
+                ud.monto_vc_ga,
+                ud.fecha_aplicacion_vc_ga,
+                d.nombre_vc_ga AS tipo_deduccion
+         FROM td_usuario_deduccion_vc_ga ud
+         JOIN td_deduccion_vc_ga d USING(id_deduccion_vc_ga)
+         WHERE ud.id_usuario_vc_ga = ? AND ud.id_deduccion_vc_ga = ?
+         ORDER BY ud.fecha_aplicacion_vc_ga DESC`,
+        [idUsuario, idDeduccion]
+    );
+}
+
+// 7. Búsqueda de deducciones con filtros
+async buscarDeducciones_vc_ga(idUsuario, filtros = {}) {
+    let sql = `
+        SELECT ud.id_usuario_deduccion_vc_ga,
+               ud.monto_vc_ga,
+               ud.fecha_aplicacion_vc_ga,
+               d.nombre_vc_ga AS tipo,
+               d.descripcion_vc_ga
+        FROM td_usuario_deduccion_vc_ga ud
+        JOIN td_deduccion_vc_ga d USING(id_deduccion_vc_ga)
+        WHERE ud.id_usuario_vc_ga = ?
+    `;
+    
+    const params = [idUsuario];
+    
+    if (filtros.fechaInicio) {
+        sql += ` AND ud.fecha_aplicacion_vc_ga >= ?`;
+        params.push(filtros.fechaInicio);
+    }
+    
+    if (filtros.fechaFin) {
+        sql += ` AND ud.fecha_aplicacion_vc_ga <= ?`;
+        params.push(filtros.fechaFin);
+    }
+    
+    if (filtros.tipoDeduccion) {
+        sql += ` AND ud.id_deduccion_vc_ga = ?`;
+        params.push(filtros.tipoDeduccion);
+    }
+    
+    if (filtros.montoMinimo) {
+        sql += ` AND ud.monto_vc_ga >= ?`;
+        params.push(filtros.montoMinimo);
+    }
+    
+    if (filtros.montoMaximo) {
+        sql += ` AND ud.monto_vc_ga <= ?`;
+        params.push(filtros.montoMaximo);
+    }
+    
+    sql += ` ORDER BY ud.fecha_aplicacion_vc_ga DESC`;
+    
+    if (filtros.limite) {
+        sql += ` LIMIT ?`;
+        params.push(filtros.limite);
+    }
+    
+    return await query_vc_ga(sql, params);
+}
+
+// 8. Obtener estadísticas de deducciones
+async obtenerEstadisticasDeducciones_vc_ga(idUsuario) {
+    return await query_vc_ga(
+        `SELECT 
+            COUNT(*) as total_registros,
+            SUM(monto_vc_ga) as total_monto,
+            AVG(monto_vc_ga) as promedio_monto,
+            MIN(monto_vc_ga) as monto_minimo,
+            MAX(monto_vc_ga) as monto_maximo,
+            MIN(fecha_aplicacion_vc_ga) as primera_deduccion,
+            MAX(fecha_aplicacion_vc_ga) as ultima_deduccion
+         FROM td_usuario_deduccion_vc_ga 
+         WHERE id_usuario_vc_ga = ?`,
+        [idUsuario]
+    );
+}
 
 }
 
@@ -244,6 +405,32 @@ class EmpleadoServicio_vc_ga {
     async actualizarBono_vc_ga(...args) { return await this.repositorio_vc_ga.actualizarBono_vc_ga(...args); }
     async eliminarBono_vc_ga(idReg) { return await this.repositorio_vc_ga.eliminarBono_vc_ga(idReg); }
 
+    async crearDeduccionUsuario_vc_ga(idUsuario, idDeduccion, monto, fecha) {
+    return await this.repositorio_vc_ga.crearDeduccionUsuario_vc_ga(idUsuario, idDeduccion, monto, fecha);
+}
+
+async actualizarDeduccionUsuario_vc_ga(idReg, monto, fecha) {
+    return await this.repositorio_vc_ga.actualizarDeduccionUsuario_vc_ga(idReg, monto, fecha);
+}
+
+async eliminarDeduccionUsuario_vc_ga(idReg) {
+    return await this.repositorio_vc_ga.eliminarDeduccionUsuario_vc_ga(idReg);
+}
+
+async obtenerDeduccionesDisponibles_vc_ga() {
+    return await this.repositorio_vc_ga.obtenerDeduccionesDisponibles_vc_ga();
+}
+
+async verificarDeduccionExistente_vc_ga(idUsuario, idDeduccion) {
+    return await this.repositorio_vc_ga.verificarDeduccionExistente_vc_ga(idUsuario, idDeduccion);
+}
+
+async obtenerEstadisticasDeducciones_vc_ga(idUsuario) {
+    return await this.repositorio_vc_ga.obtenerEstadisticasDeducciones_vc_ga(idUsuario);
+}
+
+
+
 }
 
 // 3. Capa de Controlador
@@ -251,6 +438,10 @@ class EmpleadoControlador_vc_ga {
     constructor(servicio_vc_ga) {
         this.servicio_vc_ga = servicio_vc_ga;
         this.idEmpleado_vc_ga = null;
+
+        this.configurarBotonesSalario_vc_ga();
+        this.configurarBotonesDeducciones_vc_ga();
+
     }
 
         //CRUD SALARIO
@@ -299,7 +490,12 @@ class EmpleadoControlador_vc_ga {
     editarSalarioBtn_vc_ga?.addEventListener('click', () => this.manejarEditarSalario_vc_ga());
     // borrarSalarioBtn_vc_ga?.addEventListener('click', () => this.manejarBorrarSalario_vc_ga());
 }
+        configurarBotonesDeducciones_vc_ga() {
 
+            agregarDeduccionBtn_vc_ga?.addEventListener('click', () => this.manejarAgregarDeduccion_vc_ga());
+            editarDeduccionBtn_vc_ga?.addEventListener('click', () => this.manejarEditarDeduccion_vc_ga());
+            borrarDeduccionBtn_vc_ga?.addEventListener('click', () => this.manejarBorrarDeduccion_vc_ga());
+        }
 /**
  * Muestra un modal con campo de entrada
  */
@@ -478,6 +674,351 @@ async manejarEditarSalario_vc_ga() {
 //     }
 // }
 
+
+// Función completamente nueva para manejarAgregarDeduccion_vc_ga que maneja input de texto
+async manejarAgregarDeduccion_vc_ga() {
+    try {
+        // 1️⃣ Obtener datos del formulario
+        const nombreDeduccion = deduccionSelect_vc_ga.value.trim();
+        const monto = parseFloat(deduccionInput_vc_ga.value);
+        const ahora = new Date();
+        const fecha = ahora.toISOString().split('T')[0]; // YYYY-MM-DD
+
+        // Validaciones básicas
+        if (!nombreDeduccion) {
+            await modal_vc_ga.showWarning_vc_ga(
+                'Nombre requerido',
+                'Por favor escribe el nombre de la deducción.'
+            );
+            return;
+        }
+        if (!monto || isNaN(monto) || monto <= 0) {
+            await modal_vc_ga.showWarning_vc_ga(
+                'Monto inválido',
+                'El monto debe ser un número positivo.'
+            );
+            return;
+        }
+
+        // 2️⃣ Buscar ID de la deducción por nombre
+        const deduccionesDisponibles = await this.servicio_vc_ga.obtenerDeduccionesDisponibles_vc_ga();
+        let deduccionEncontrada = deduccionesDisponibles.find(
+            d => d.nombre_vc_ga.toLowerCase() === nombreDeduccion.toLowerCase()
+        );
+
+        // 3️⃣ Si no existe la deducción, preguntar si se quiere crear
+        if (!deduccionEncontrada) {
+            const confirmCrear = await modal_vc_ga.showConfirm_vc_ga(
+                'Deducción no encontrada',
+                `No se encontró la deducción "${nombreDeduccion}". ¿Deseas crearla ahora?`
+            );
+
+            if (!confirmCrear) {
+                return; // Usuario canceló
+            }
+
+            // Crear deducción básica sin porcentaje y sin fecha fin
+            await this.servicio_vc_ga.repositorio_vc_ga.crearTipoDeduccion_vc_ga(
+                nombreDeduccion,
+                0, // porcentaje
+                'Creada automáticamente desde el formulario',
+                fecha,
+                null
+            );
+
+            // Volver a buscar para obtener su ID
+            const nuevasDeducciones = await this.servicio_vc_ga.obtenerDeduccionesDisponibles_vc_ga();
+            deduccionEncontrada = nuevasDeducciones.find(
+                d => d.nombre_vc_ga.toLowerCase() === nombreDeduccion.toLowerCase()
+            );
+
+            if (!deduccionEncontrada) {
+                await modal_vc_ga.showError_vc_ga(
+                    'Error',
+                    'No se pudo crear la deducción.'
+                );
+                return;
+            }
+        }
+
+        const idDeduccion = deduccionEncontrada.id_deduccion_vc_ga;
+
+        // 4️⃣ Verificar si ya existe para este empleado
+        const existe = await this.servicio_vc_ga.verificarDeduccionExistente_vc_ga(
+            this.idEmpleado_vc_ga,
+            idDeduccion
+        );
+
+        if (existe[0]?.cantidad > 0) {
+            await modal_vc_ga.showWarning_vc_ga(
+                'Duplicado',
+                'Este empleado ya tiene una deducción de este tipo.'
+            );
+            return;
+        }
+
+        // 5️⃣ Insertar la deducción
+        await this.servicio_vc_ga.crearDeduccionUsuario_vc_ga(
+            this.idEmpleado_vc_ga,
+            idDeduccion,
+            monto,
+            fecha
+        );
+
+        // 6️⃣ Recargar tabla/lista de deducciones
+        const deducciones = await this.servicio_vc_ga.obtenerHistorialDeducciones_vc_ga(this.idEmpleado_vc_ga);
+        this.actualizarTablaDeducciones_vc_ga(deducciones);
+
+        await modal_vc_ga.showSuccess_vc_ga(
+            '¡Deducción agregada!',
+            'La deducción se registró correctamente.'
+        );
+    } catch (error) {
+        console.error('❌ Error al agregar deducción:', error);
+        await modal_vc_ga.showError_vc_ga(
+            'Error inesperado',
+            'Ocurrió un error al agregar la deducción.'
+        );
+    }
+}
+
+
+// Nueva función para buscar deducción por nombre
+async buscarDeduccionPorNombre_vc_ga(nombre) {
+    try {
+        const resultado = await this.servicio_vc_ga.repositorio_vc_ga.buscarDeduccionPorNombre_vc_ga(nombre);
+        return resultado.length > 0 ? resultado[0] : null;
+    } catch (error) {
+        console.error('Error buscando deducción por nombre:', error);
+        return null;
+    }
+}
+
+// Nueva función para crear tipo de deducción
+async crearTipoDeduccion_vc_ga(nombre, porcentaje, descripcion, vigenteDe) {
+    return await this.servicio_vc_ga.crearTipoDeduccion_vc_ga(nombre, porcentaje, descripcion, vigenteDe);
+}
+
+// Agregar al EmpleadoRepositorio_vc_ga:
+async buscarDeduccionPorNombre_vc_ga(nombre) {
+    return await query_vc_ga(
+        `SELECT id_deduccion_vc_ga, nombre_vc_ga, porcentaje_vc_ga, descripcion_vc_ga
+         FROM td_deduccion_vc_ga 
+         WHERE LOWER(nombre_vc_ga) = LOWER(?)
+           AND (vigente_hasta_vc_ga IS NULL OR vigente_hasta_vc_ga >= CURDATE())`,
+        [nombre]
+    );
+}
+
+// Agregar al EmpleadoServicio_vc_ga:
+async crearTipoDeduccion_vc_ga(nombre, porcentaje, descripcion, vigenteDe) {
+    return await this.repositorio_vc_ga.crearTipoDeduccion_vc_ga(nombre, porcentaje, descripcion, vigenteDe);
+}
+
+// Función opcional para autocompletar deducciones existentes
+// Función corregida para manejarAgregarDeduccion_vc_ga
+
+
+// Función corregida para buscar deducción por nombre
+async buscarDeduccionPorNombre_vc_ga(nombre) {
+    try {
+        console.log('Ejecutando búsqueda por nombre:', nombre);
+        const resultado = await this.servicio_vc_ga.repositorio_vc_ga.buscarDeduccionPorNombre_vc_ga(nombre);
+        console.log('Resultado de repositorio:', resultado);
+        
+        // Devolver el resultado tal como viene del repositorio
+        return resultado;
+    } catch (error) {
+        console.error('Error buscando deducción por nombre:', error);
+        return [];
+    }
+}
+
+// Asegurar que el método crearTipoDeduccion_vc_ga existe en el repositorio
+// Agregar al EmpleadoRepositorio_vc_ga si no está:
+async crearTipoDeduccion_vc_ga(nombre, porcentaje, descripcion, vigenteDe, vigenteHasta = null) {
+    console.log('Creando tipo de deducción en BD:', { nombre, porcentaje, descripcion, vigenteDe, vigenteHasta });
+    
+    const resultado = await query_vc_ga(
+        `INSERT INTO td_deduccion_vc_ga 
+         (nombre_vc_ga, porcentaje_vc_ga, descripcion_vc_ga, vigente_desde_vc_ga, vigente_hasta_vc_ga)
+         VALUES (?, ?, ?, ?, ?)`,
+        [nombre, porcentaje, descripcion, vigenteDe, vigenteHasta]
+    );
+    
+    console.log('Resultado de inserción de tipo de deducción:', resultado);
+    return resultado;
+}
+
+// Y agregar al EmpleadoServicio_vc_ga si no está:
+async crearTipoDeduccion_vc_ga(nombre, porcentaje, descripcion, vigenteDe) {
+    return await this.repositorio_vc_ga.crearTipoDeduccion_vc_ga(nombre, porcentaje, descripcion, vigenteDe);
+}
+
+// Función de debug mejorada
+async debugBuscarDeduccion_vc_ga(nombre) {
+    console.log('=== DEBUG BÚSQUEDA DEDUCCIÓN ===');
+    console.log('Nombre a buscar:', nombre);
+    
+    try {
+        // Buscar directamente en el repositorio
+        const resultado = await this.servicio_vc_ga.repositorio_vc_ga.buscarDeduccionPorNombre_vc_ga(nombre);
+        console.log('Resultado directo del repositorio:', resultado);
+        console.log('Es array?', Array.isArray(resultado));
+        console.log('Length:', resultado?.length);
+        
+        // También mostrar todas las deducciones disponibles
+        const todas = await this.servicio_vc_ga.obtenerDeduccionesDisponibles_vc_ga();
+        console.log('Todas las deducciones disponibles:', todas);
+        
+        return resultado;
+    } catch (error) {
+        console.error('Error en debug:', error);
+        return null;
+    }
+}
+
+// Función para mostrar sugerencias mientras escribe (opcional)
+// 
+
+
+async manejarEditarDeduccion_vc_ga() {
+    try {
+        const historial = await this.servicio_vc_ga.obtenerHistorialDeducciones_vc_ga(this.idEmpleado_vc_ga);
+        
+        if (!historial || historial.length === 0) {
+            await modal_vc_ga.showWarning_vc_ga('Advertencia', 'No hay deducciones registradas para editar');
+            return;
+        }
+        
+        const opciones = historial.map(deduccion => ({
+            texto: `${deduccion.tipo} - $${deduccion.monto} (${new Date(deduccion.fecha).toLocaleDateString()})`
+        }));
+        
+        const seleccion = await this.mostrarSelectOscuro_vc_ga(
+            'Editar Deducción', 
+            'Seleccione la deducción a editar:',
+            opciones
+        );
+        
+        if (!seleccion.confirmado) return;
+        
+        const deduccionSeleccionada = historial[seleccion.indice];
+        
+        // Solicitar nuevo monto
+        const nuevoMonto = await this.mostrarModalInputOscuro_vc_ga(
+            'Editar Monto', 
+            'Ingrese el nuevo monto para la deducción:',
+            deduccionSeleccionada.monto
+        );
+        
+        if (!nuevoMonto || parseFloat(nuevoMonto) <= 0) {
+            await modal_vc_ga.showWarning_vc_ga('Advertencia', 'Debe ingresar un monto válido mayor a 0');
+            return;
+        }
+        
+        const confirmacion = await modal_vc_ga.showConfirm_vc_ga(
+            'Confirmar Edición', 
+            `¿Está seguro que desea cambiar el monto de $${deduccionSeleccionada.monto} a $${nuevoMonto}?`
+        );
+        
+        if (!confirmacion) return;
+        
+        const fechaActual = new Date().toISOString().split('T')[0];
+        
+        await this.actualizarDeduccion_vc_ga(
+            deduccionSeleccionada.id_usuario_deduccion_vc_ga, 
+            parseFloat(nuevoMonto), 
+            fechaActual
+        );
+        
+        await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Deducción actualizada correctamente');
+        await this.recargarHistorialDeducciones_vc_ga();
+        
+    } catch (error) {
+        await modal_vc_ga.showError_vc_ga('Error', `No se pudo editar la deducción: ${error.message}`);
+        console.error(error);
+    }
+}
+
+async manejarBorrarDeduccion_vc_ga() {
+    try {
+        const historial = await this.servicio_vc_ga.obtenerHistorialDeducciones_vc_ga(this.idEmpleado_vc_ga);
+        
+        if (!historial || historial.length === 0) {
+            await modal_vc_ga.showWarning_vc_ga('Advertencia', 'No hay deducciones registradas para borrar');
+            return;
+        }
+        
+        const opciones = historial.map(deduccion => ({
+            texto: `${deduccion.tipo} - $${deduccion.monto} (${new Date(deduccion.fecha).toLocaleDateString()})`
+        }));
+        
+        const seleccion = await this.mostrarSelectOscuro_vc_ga(
+            'Borrar Deducción', 
+            'Seleccione la deducción a borrar:',
+            opciones
+        );
+        
+        if (!seleccion.confirmado) return;
+        
+        const deduccionSeleccionada = historial[seleccion.indice];
+        const confirmacion = await modal_vc_ga.showConfirm_vc_ga(
+            'Confirmar Borrado', 
+            `¿Está seguro que desea borrar la deducción de ${deduccionSeleccionada.tipo} por $${deduccionSeleccionada.monto}?`
+        );
+        
+        if (!confirmacion) return;
+        
+        await this.eliminarDeduccion_vc_ga(deduccionSeleccionada.id_usuario_deduccion_vc_ga);
+        await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Deducción borrada correctamente');
+        await this.recargarHistorialDeducciones_vc_ga();
+        
+    } catch (error) {
+        await modal_vc_ga.showError_vc_ga('Error', `No se pudo borrar la deducción: ${error.message}`);
+        console.error(error);
+    }
+}
+
+// Función auxiliar para cargar deducciones disponibles en el select
+async cargarDeduccionesDisponibles_vc_ga() {
+    try {
+        const deducciones = await this.servicio_vc_ga.obtenerDeduccionesDisponibles_vc_ga();
+        
+        // Limpiar select
+        deduccionSelect_vc_ga.innerHTML = '<option value="">Seleccione una deducción...</option>';
+        
+        // Agregar opciones
+        deducciones.forEach(deduccion => {
+            const option = document.createElement('option');
+            option.value = deduccion.id_deduccion_vc_ga;
+            option.textContent = `${deduccion.nombre_vc_ga}${deduccion.porcentaje_vc_ga ? ` (${deduccion.porcentaje_vc_ga}%)` : ''}`;
+            option.title = deduccion.descripcion_vc_ga || '';
+            deduccionSelect_vc_ga.appendChild(option);
+        });
+        
+    } catch (error) {
+        console.error('Error cargando deducciones:', error);
+        await modal_vc_ga.showError_vc_ga('Error', 'No se pudieron cargar las deducciones disponibles');
+    }
+}
+
+// Función para recargar el historial (debes implementar esta según tu interfaz)
+async recargarHistorialDeducciones_vc_ga() {
+    try {
+        const historial = await this.servicio_vc_ga.obtenerHistorialDeducciones_vc_ga(this.idEmpleado_vc_ga);
+        // Aquí actualizas tu tabla o lista de deducciones en la interfaz
+        // Por ejemplo:
+        // this.actualizarTablaDeducciones_vc_ga(historial);
+        console.log('Historial de deducciones recargado:', historial);
+    } catch (error) {
+        console.error('Error recargando historial:', error);
+    }
+}
+
+
+// Función auxiliar para mostrar select (si no la tienes ya implementada)
+
     async iniciar_vc_ga() {
         // Obtenemos usuario y rol
         const usuario_vc_ga = GestorSesion_vc_ga.obtenerUsuarioActual_vc_ga();
@@ -592,7 +1133,16 @@ async manejarEditarSalario_vc_ga() {
             </tr>`
         ).join('');
     }
-
+async actualizarTablaDeducciones_vc_ga() {
+    const filas_vc_ga = await this.servicio_vc_ga.obtenerHistorialDeducciones_vc_ga(this.idEmpleado_vc_ga);
+    document.getElementById('deductionHistory').innerHTML = filas_vc_ga.map(r_vc_ga => `
+        <tr>
+            <td>${r_vc_ga.fecha}</td>
+            <td>${r_vc_ga.tipo}</td>
+            <td>${r_vc_ga.monto}</td>
+        </tr>`
+    ).join('');
+}
     async recargarHistorialBonos_vc_ga() {
         const filas_vc_ga = await this.servicio_vc_ga.obtenerHistorialBonos_vc_ga(this.idEmpleado_vc_ga);
         document.getElementById('bonusHistory').innerHTML = filas_vc_ga.map(r_vc_ga => `
@@ -602,7 +1152,6 @@ async manejarEditarSalario_vc_ga() {
                 <td>${r_vc_ga.monto}</td>
             </tr>`
         ).join('');
-        this.configurarBotonesSalario_vc_ga();
     }
 }
 
