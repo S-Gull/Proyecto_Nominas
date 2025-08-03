@@ -86,7 +86,7 @@
         <nav class="flex -mb-px space-x-4" role="tablist">
           <button class="tab-btn px-4 py-2 text-sm font-medium text-secondary dark:text-light hover:text-accent1" data-tab="salary">Salario</button>
           <button class="tab-btn px-4 py-2 text-sm font-medium text-secondary dark:text-light hover:text-accent1" data-tab="deductions">Deducciones</button>
-          <button class="tab-btn px-4 py-2 text-sm font-medium text-secondary dark:text-light hover:text-accent1" data-tab="extras">Horas Extras</button>
+          <!-- <button class="tab-btn px-4 py-2 text-sm font-medium text-secondary dark:text-light hover:text-accent1" data-tab="extras">Horas Extras</button> -->
           <button class="tab-btn px-4 py-2 text-sm font-medium text-secondary dark:text-light hover:text-accent1" data-tab="bonuses">Bonos</button>
         </nav>
       </div>
@@ -99,9 +99,9 @@
             <input id="salaryBase" type="number" class="w-full p-2 border rounded bg-white text-black dark:bg-black dark:text-white" />
           </div>
           <div class="flex space-x-2 mb-4">
-            <button id="addSalaryBtn" class="px-4 py-2 bg-accent1 rounded">Agregar</button>
+            <!-- <button id="addSalaryBtn" class="px-4 py-2 bg-accent1 rounded">Agregar</button> -->
             <button id="editSalaryBtn" class="px-4 py-2 bg-accent2 rounded">Editar</button>
-            <button id="deleteSalaryBtn" class="px-4 py-2 bg-red-500 rounded">Eliminar</button>
+            <!-- <button id="deleteSalaryBtn" class="px-4 py-2 bg-red-500 rounded">Eliminar</button> -->
           </div>
           <table class="w-full text-sm">
             <thead>
@@ -115,7 +115,8 @@
         <div id="deductions" class="tab-content hidden">
           <div class="mb-4">
             <label class="block mb-1" for="deductionType">Tipo</label>
-            <select id="deductionType" class="w-full p-2 border rounded bg-white text-black dark:bg-black dark:text-white"></select>
+            <input id="deductionType" type="text" class="w-full p-2 border rounded bg-white text-black dark:bg-black dark:text-white" />
+            <!-- <select id="deductionType" class="w-full p-2 border rounded bg-white text-black dark:bg-black dark:text-white"></select> -->
           </div>
           <div class="mb-4">
             <label class="block mb-1" for="deductionAmount">Monto</label>
@@ -135,7 +136,7 @@
         </div>
 
         <!-- Horas Extras -->
-        <div id="extras" class="tab-content hidden">
+        <!-- <div id="extras" class="tab-content hidden">
           <div class="mb-4">
             <label class="block mb-1" for="extraType">Tipo</label>
             <input id="extraType" type="text" class="w-full p-2 border rounded bg-white text-black dark:bg-black dark:text-white" />
@@ -159,7 +160,7 @@
             </thead>
             <tbody id="extrasHistory"></tbody>
           </table>
-        </div>
+        </div> -->
 
         <!-- Bonos -->
         <div id="bonuses" class="tab-content hidden">

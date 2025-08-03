@@ -11,7 +11,8 @@ const config = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
-  charset: 'utf8mb4'
+  charset: 'utf8mb4',
+  multipleStatements:process.env.DB_MULTI_STATE
 };
 
 // Función para verificar si la BD existe
