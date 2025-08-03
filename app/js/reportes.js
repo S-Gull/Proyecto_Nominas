@@ -409,8 +409,9 @@ class ReportesController_vc_ga {
     try {
       await this.gestor_vc_ga.cargarReportes_vc_ga();
       this._render_vc_ga();
-    } catch {
-      // Error manejado en gestor
+    } catch (err) {
+      console.error("Error al iniciar los reportes:", err);
+      throw err;
     }
   }
 
