@@ -12,32 +12,71 @@ class GestorReportes_vc_ga {
     try {
       const [bancos, contables, recibos] = await Promise.all([
         this._ejecutarConsulta_vc_ga(
-          `SELECT id_reporte_banco_vc_ga AS id, fecha_reporte_vc_ga AS fecha, info_banco_vc_ga AS info
-           FROM td_reporte_banco_vc_ga
-           ORDER BY fecha_reporte_vc_ga DESC`
+          `SELECT 
+              rb.id_reporte_banco_vc_ga AS id, 
+              rb.fecha_reporte_vc_ga AS fecha, 
+              rb.info_banco_vc_ga AS info,
+              GROUP_CONCAT(rbr.id_recibo_vc_ga) AS recibosAsociados
+           FROM td_reporte_banco_vc_ga rb
+           LEFT JOIN td_reporte_banco_recibos_vc_ga rbr 
+             ON rb.id_reporte_banco_vc_ga = rbr.id_reporte_banco_vc_ga
+           GROUP BY rb.id_reporte_banco_vc_ga
+           ORDER BY rb.fecha_reporte_vc_ga DESC`
         ),
         this._ejecutarConsulta_vc_ga(
-          `SELECT id_reporte_contable_vc_ga AS id, fecha_reporte_vc_ga AS fecha, info_contable_vc_ga AS info
-           FROM td_reporte_contable_vc_ga
-           ORDER BY fecha_reporte_vc_ga DESC`
+          `SELECT 
+              rc.id_reporte_contable_vc_ga AS id, 
+              rc.fecha_reporte_vc_ga AS fecha, 
+              rc.info_contable_vc_ga AS info,
+              GROUP_CONCAT(rcr.id_recibo_vc_ga) AS recibosAsociados
+           FROM td_reporte_contable_vc_ga rc
+           LEFT JOIN td_reporte_contable_recibos_vc_ga rcr 
+             ON rc.id_reporte_contable_vc_ga = rcr.id_reporte_contable_vc_ga
+           GROUP BY rc.id_reporte_contable_vc_ga
+           ORDER BY rc.fecha_reporte_vc_ga DESC`
         ),
         this._ejecutarConsulta_vc_ga(
-          `SELECT id_recibo_vc_ga AS id,
-                  id_pago_vc_ga AS idPago,
-                  fecha_pago_vc_ga AS fechaPago,
-                  monto_neto_vc_ga AS montoNeto,
-                  fecha_generacion_vc_ga AS fecha,
-                  contenido_vc_ga AS info
-           FROM td_recibo_nomina_vc_ga
-           ORDER BY fecha_generacion_vc_ga DESC`
+          `SELECT 
+              rn.id_recibo_vc_ga AS id,
+              rn.id_usuario_vc_ga AS idUsuario,
+              rn.id_pago_vc_ga AS idPago,
+              rn.fecha_pago_vc_ga AS fechaPago,
+              rn.monto_neto_vc_ga AS montoNeto,
+              rn.fecha_generacion_vc_ga AS fecha,
+              rn.contenido_vc_ga AS info,
+              GROUP_CONCAT(rbr.id_reporte_banco_vc_ga) AS reportesBancoAsociados,
+              GROUP_CONCAT(rcr.id_reporte_contable_vc_ga) AS reportesContableAsociados
+           FROM td_recibo_nomina_vc_ga rn
+           LEFT JOIN td_reporte_banco_recibos_vc_ga rbr 
+             ON rn.id_recibo_vc_ga = rbr.id_recibo_vc_ga
+           LEFT JOIN td_reporte_contable_recibos_vc_ga rcr 
+             ON rn.id_recibo_vc_ga = rcr.id_recibo_vc_ga
+           GROUP BY rn.id_recibo_vc_ga
+           ORDER BY rn.fecha_generacion_vc_ga DESC`
         )
       ]);
 
       this.reportes_vc_ga = [
-        ...bancos.map(r => ({ ...r, tipo: "reporte_banco" })),
-        ...contables.map(r => ({ ...r, tipo: "reporte_contable" })),
-        ...recibos.map(r => ({ ...r, tipo: "recibo_nomina" }))
+        ...bancos.map(r => ({ 
+          ...r, 
+          tipo: "reporte_banco",
+          recibosAsociados: r.recibosAsociados ? r.recibosAsociados.split(',').map(Number) : [] 
+        })),
+        ...contables.map(r => ({ 
+          ...r, 
+          tipo: "reporte_contable",
+          recibosAsociados: r.recibosAsociados ? r.recibosAsociados.split(',').map(Number) : [] 
+        })),
+        ...recibos.map(r => ({ 
+          ...r, 
+          tipo: "recibo_nomina",
+          idUsuario: r.idUsuario ? String(r.idUsuario) : null,
+          idPago: r.idPago ? String(r.idPago) : null,
+          reportesBancoAsociados: r.reportesBancoAsociados ? r.reportesBancoAsociados.split(',').map(Number) : [],
+          reportesContableAsociados: r.reportesContableAsociados ? r.reportesContableAsociados.split(',').map(Number) : []
+        }))
       ];
+      
       this.reportesFiltrados_vc_ga = [...this.reportes_vc_ga];
       return this.reportes_vc_ga;
     } catch (err) {
@@ -49,28 +88,48 @@ class GestorReportes_vc_ga {
 
   filtrar_vc_ga({ tipo, fecha, reciboId }) {
     this.reportesFiltrados_vc_ga = this.reportes_vc_ga.filter(r => {
+      // Filtro por ID de recibo (busca en relaciones)
       if (reciboId && reciboId !== "") {
-        if (r.tipo !== 'recibo_nomina' || String(r.id) !== reciboId) return false;
+        const idBuscado = Number(reciboId);
+        if (isNaN(idBuscado)) return false;
+        
+        if (r.tipo === 'recibo_nomina') {
+          if (r.id !== idBuscado) return false;
+        } 
+        else if (r.tipo === 'reporte_banco') {
+          if (!r.recibosAsociados.includes(idBuscado)) return false;
+        }
+        else if (r.tipo === 'reporte_contable') {
+          if (!r.recibosAsociados.includes(idBuscado)) return false;
+        }
+        else {
+          return false;
+        }
       }
 
+      // Filtro por tipo de documento
       if (tipo && tipo !== "") {
         switch (tipo) {
           case 'recibo':
             if (r.tipo !== 'recibo_nomina') return false;
             break;
           case 'reporte_banco':
+            if (r.tipo !== 'reporte_banco') return false;
+            break;
           case 'reporte_contable':
-            if (r.tipo !== tipo) return false;
+            if (r.tipo !== 'reporte_contable') return false;
             break;
           default:
             break;
         }
       }
 
+      // Filtro por fecha
       if (fecha && fecha !== "") {
         const fechaISO = new Date(r.fecha).toISOString().slice(0, 10);
         if (fechaISO !== fecha) return false;
       }
+      
       return true;
     });
     return this.reportesFiltrados_vc_ga;
@@ -145,20 +204,59 @@ class ReportesController_vc_ga {
 
       let detallesAdicionales = "";
       if (r.tipo === 'recibo_nomina') {
-        detallesAdicionales = `<p class="text-sm text-gray-600 dark:text-gray-400 mt-1">ID Pago: ${r.idPago}</p>
-                              <p class="text-sm text-gray-600 dark:text-gray-400">Monto Neto: ${r.montoNeto}</p>`;
+        detallesAdicionales = `
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            ID Usuario: ${r.idUsuario || 'N/A'}
+          </p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            ID Pago: ${r.idPago || 'N/A'}
+          </p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Monto Neto: ${r.montoNeto || '0.00'}
+          </p>`;
+          
+        if (r.reportesBancoAsociados.length > 0 || r.reportesContableAsociados.length > 0) {
+          detallesAdicionales += `
+            <div class="mt-2">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Relacionado con:</p>
+              ${r.reportesBancoAsociados.length > 0 ? 
+                `<span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1">
+                  Bancario: ${r.reportesBancoAsociados.join(', ')}
+                </span>` : ''}
+              ${r.reportesContableAsociados.length > 0 ? 
+                `<span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
+                  Contable: ${r.reportesContableAsociados.join(', ')}
+                </span>` : ''}
+            </div>`;
+        }
+      } 
+      else if (r.tipo === 'reporte_banco' || r.tipo === 'reporte_contable') {
+        if (r.recibosAsociados.length > 0) {
+          detallesAdicionales = `
+            <div class="mt-1">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Recibos asociados:</p>
+              <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
+                ${r.recibosAsociados.join(', ')}
+              </span>
+            </div>`;
+        }
       }
 
       card.innerHTML = `
         <div class="flex justify-between items-start">
           <div>
             <h3 class="font-semibold text-gray-800 dark:text-white">${titulo}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Fecha: ${new Date(r.fecha).toLocaleDateString("es-ES")}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Fecha: ${new Date(r.fecha).toLocaleDateString("es-ES")}
+            </p>
             ${detallesAdicionales}
-            <p class="mt-2 text-gray-700 dark:text-gray-300">${r.info}</p>
+            <p class="mt-2 text-gray-700 dark:text-gray-300 line-clamp-2">
+              ${r.info}
+            </p>
           </div>
           <button class="view-more-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600"
-                  data-id="${r.tipo}__${r.id}">
+                  data-id="${r.tipo}__${r.id}"
+                  aria-label="Ver detalles">
             <i class="fas fa-arrow-right text-accent2"></i>
           </button>
         </div>`;
@@ -190,10 +288,30 @@ class ReportesController_vc_ga {
       case "recibo_nomina": titulo = "Detalle Recibo de Nómina"; break;
     }
 
-    // SOLUCIÓN CORREGIDA (COPIAR Y FORMATEAR)
+    // Preparar información extendida
     const reportForModal = {...report};
     if (tipo === 'recibo_nomina') {
-      reportForModal.info = `ID Pago: ${report.idPago}\nMonto Neto: ${report.montoNeto}\n\n${report.info}`;
+      reportForModal.info = `
+        ID Usuario: ${report.idUsuario || 'N/A'}
+        ID Pago: ${report.idPago || 'N/A'}
+        Fecha Pago: ${report.fechaPago || 'N/A'}
+        Monto Neto: ${report.montoNeto || '0.00'}
+        \n\n${report.info}`;
+        
+      if (report.reportesBancoAsociados.length > 0 || report.reportesContableAsociados.length > 0) {
+        reportForModal.info += `\n\nRelaciones:`;
+        if (report.reportesBancoAsociados.length > 0) {
+          reportForModal.info += `\nReportes Bancarios: ${report.reportesBancoAsociados.join(', ')}`;
+        }
+        if (report.reportesContableAsociados.length > 0) {
+          reportForModal.info += `\nReportes Contables: ${report.reportesContableAsociados.join(', ')}`;
+        }
+      }
+    } 
+    else if (tipo === 'reporte_banco' || tipo === 'reporte_contable') {
+      if (report.recibosAsociados.length > 0) {
+        reportForModal.info = `Recibos Asociados: ${report.recibosAsociados.join(', ')}\n\n${report.info}`;
+      }
     }
 
     modal_vc_ga.showReportes_vc_ga(titulo, [reportForModal]);

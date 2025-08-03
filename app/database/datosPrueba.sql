@@ -2,11 +2,15 @@ USE dbcrud_electron_vc_ga;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
+-- Eliminar relaciones primero si existen
+DROP TABLE IF EXISTS td_reporte_banco_recibos_vc_ga;
+DROP TABLE IF EXISTS td_reporte_contable_recibos_vc_ga;
+
 -- Eliminar reportes existentes
 DELETE FROM td_reporte_contable_vc_ga;
 DELETE FROM td_reporte_banco_vc_ga;
 
--- Eliminar recibos (ya no eliminamos pagos)
+-- Eliminar recibos
 DELETE FROM td_recibo_nomina_vc_ga;
 
 -- Eliminaciones manteniendo solo tablas existentes
@@ -26,6 +30,23 @@ DELETE FROM td_departamento_vc_ga;
 DELETE FROM td_sucursal_vc_ga;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- Crear tablas de relación si no existen
+CREATE TABLE IF NOT EXISTS td_reporte_banco_recibos_vc_ga (
+    id_reporte_banco_vc_ga int,
+    id_recibo_vc_ga int,
+    PRIMARY KEY (id_reporte_banco_vc_ga, id_recibo_vc_ga),
+    FOREIGN KEY (id_reporte_banco_vc_ga) REFERENCES td_reporte_banco_vc_ga(id_reporte_banco_vc_ga) ON DELETE CASCADE,
+    FOREIGN KEY (id_recibo_vc_ga) REFERENCES td_recibo_nomina_vc_ga(id_recibo_vc_ga) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS td_reporte_contable_recibos_vc_ga (
+    id_reporte_contable_vc_ga int,
+    id_recibo_vc_ga int,
+    PRIMARY KEY (id_reporte_contable_vc_ga, id_recibo_vc_ga),
+    FOREIGN KEY (id_reporte_contable_vc_ga) REFERENCES td_reporte_contable_vc_ga(id_reporte_contable_vc_ga) ON DELETE CASCADE,
+    FOREIGN KEY (id_recibo_vc_ga) REFERENCES td_recibo_nomina_vc_ga(id_recibo_vc_ga) ON DELETE CASCADE
+);
 
 -- Insertar datos de prueba con fechas alineadas
 INSERT INTO td_sucursal_vc_ga (nombre_vc_ga, direccion_vc_ga) VALUES
@@ -108,20 +129,20 @@ INSERT INTO td_usuario_deduccion_vc_ga (id_usuario_vc_ga, id_deduccion_vc_ga, mo
 (5, 2, 21.00, '2022-12-30'),
 (5, 3, 42.00, '2022-12-30');
 
--- Recibos de nómina (ahora con datos directos sin referencia a pagos)
+-- Recibos de nómina
 INSERT INTO td_recibo_nomina_vc_ga 
-(id_usuario_vc_ga, id_pago_vc_ga, fecha_pago_vc_ga, monto_neto_vc_ga, fecha_generacion_vc_ga, contenido_vc_ga) 
+(id_usuario_vc_ga, fecha_pago_vc_ga, monto_neto_vc_ga, fecha_generacion_vc_ga, contenido_vc_ga) 
 VALUES
-(1, 42412345, '2022-12-30', 5200.00, '2022-12-30 08:00:00', 'Recibo de pago para María González - Diciembre 2022'),
-(2, 42498765, '2022-12-30', 4100.00, '2022-12-30 08:05:00', 'Recibo de pago para Carlos Pérez - Diciembre 2022'),
-(3, 41655512, '2022-12-30', 3100.00, '2022-12-30 08:10:00', 'Recibo de pago para Ana Rodríguez - Diciembre 2022'),
-(4, 41478901, '2022-12-30', 3600.00, '2022-12-30 08:15:00', 'Recibo de pago para Luis Martínez - Diciembre 2022'),
-(5, 41234567, '2022-12-30', 4300.00, '2022-12-30 08:20:00', 'Recibo de pago para Pedro Sánchez - Diciembre 2022');
+(1, '2022-12-30', 5200.00, '2022-12-30 08:00:00', 'Recibo de pago para María González - Diciembre 2022'),
+(2, '2022-12-30', 4100.00, '2022-12-30 08:05:00', 'Recibo de pago para Carlos Pérez - Diciembre 2022'),
+(3, '2022-12-30', 3100.00, '2022-12-30 08:10:00', 'Recibo de pago para Ana Rodríguez - Diciembre 2022'),
+(4, '2022-12-30', 3600.00, '2022-12-30 08:15:00', 'Recibo de pago para Luis Martínez - Diciembre 2022'),
+(5, '2022-12-30', 4300.00, '2022-12-30 08:20:00', 'Recibo de pago para Pedro Sánchez - Diciembre 2022');
 
--- Generar reportes bancarios actualizados
+-- Generar reportes bancarios
 INSERT INTO td_reporte_banco_vc_ga (fecha_reporte_vc_ga, info_banco_vc_ga)
 SELECT 
-    r.fecha_pago_vc_ga,
+    '2022-12-30',
     JSON_OBJECT(
         'total_pagado', SUM(r.monto_neto_vc_ga),
         'cantidad_pagos', COUNT(*),
@@ -133,25 +154,24 @@ SELECT
                 'monto_neto', r.monto_neto_vc_ga
             )
         )
-    ) AS info_banco
+    )
 FROM td_recibo_nomina_vc_ga r
 JOIN td_usuarios_vc_ga u ON r.id_usuario_vc_ga = u.id_usuario_vc_ga
 WHERE r.fecha_pago_vc_ga = '2022-12-30'
 GROUP BY r.fecha_pago_vc_ga;
 
--- Generar reportes contables actualizados
+-- Generar reportes contables
 INSERT INTO td_reporte_contable_vc_ga (fecha_reporte_vc_ga, info_contable_vc_ga)
 SELECT 
-    r.fecha_pago_vc_ga,
+    '2022-12-30',
     JSON_OBJECT(
         'total_nomina', SUM(r.monto_neto_vc_ga),
-        'recibos_por_fecha', JSON_ARRAYAGG(r.id_recibo_vc_ga),
         'resumen_contable', JSON_OBJECT(
             'total_deducciones', COALESCE(SUM(ud.monto_vc_ga), 0),
             'total_bonos', COALESCE(SUM(b.monto_vc_ga), 0),
             'total_horas_extras', COALESCE(SUM(h.monto_vc_ga), 0)
         )
-    ) AS info_contable
+    )
 FROM td_recibo_nomina_vc_ga r
 LEFT JOIN (
     SELECT id_usuario_vc_ga, SUM(monto_vc_ga) AS monto_vc_ga
@@ -165,3 +185,19 @@ LEFT JOIN td_horas_extras_vc_ga h ON r.id_usuario_vc_ga = h.id_usuario_vc_ga
     AND r.fecha_pago_vc_ga = h.fecha_vc_ga
 WHERE r.fecha_pago_vc_ga = '2022-12-30'
 GROUP BY r.fecha_pago_vc_ga;
+
+-- Relacionar recibos con reporte bancario
+INSERT INTO td_reporte_banco_recibos_vc_ga (id_reporte_banco_vc_ga, id_recibo_vc_ga)
+SELECT 
+    (SELECT MAX(id_reporte_banco_vc_ga) FROM td_reporte_banco_vc_ga),
+    id_recibo_vc_ga
+FROM td_recibo_nomina_vc_ga
+WHERE fecha_pago_vc_ga = '2022-12-30';
+
+-- Relacionar recibos con reporte contable
+INSERT INTO td_reporte_contable_recibos_vc_ga (id_reporte_contable_vc_ga, id_recibo_vc_ga)
+SELECT 
+    (SELECT MAX(id_reporte_contable_vc_ga) FROM td_reporte_contable_vc_ga),
+    id_recibo_vc_ga
+FROM td_recibo_nomina_vc_ga
+WHERE fecha_pago_vc_ga = '2022-12-30';

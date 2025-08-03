@@ -125,3 +125,21 @@ CREATE TABLE IF NOT EXISTS td_reporte_contable_vc_ga (
     fecha_reporte_vc_ga date,
     info_contable_vc_ga text
 );
+
+-- Tabla de relación entre reportes bancarios y recibos de nómina
+CREATE TABLE IF NOT EXISTS td_reporte_banco_recibos_vc_ga (
+    id_reporte_banco_vc_ga int,
+    id_recibo_vc_ga int,
+    PRIMARY KEY (id_reporte_banco_vc_ga, id_recibo_vc_ga),
+    FOREIGN KEY (id_reporte_banco_vc_ga) REFERENCES td_reporte_banco_vc_ga(id_reporte_banco_vc_ga) ON DELETE CASCADE,
+    FOREIGN KEY (id_recibo_vc_ga) REFERENCES td_recibo_nomina_vc_ga(id_recibo_vc_ga) ON DELETE CASCADE
+);
+
+-- Tabla de relación entre reportes contables y recibos de nómina
+CREATE TABLE IF NOT EXISTS td_reporte_contable_recibos_vc_ga (
+    id_reporte_contable_vc_ga int,
+    id_recibo_vc_ga int,
+    PRIMARY KEY (id_reporte_contable_vc_ga, id_recibo_vc_ga),
+    FOREIGN KEY (id_reporte_contable_vc_ga) REFERENCES td_reporte_contable_vc_ga(id_reporte_contable_vc_ga) ON DELETE CASCADE,
+    FOREIGN KEY (id_recibo_vc_ga) REFERENCES td_recibo_nomina_vc_ga(id_recibo_vc_ga) ON DELETE CASCADE
+);
