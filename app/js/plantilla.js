@@ -98,10 +98,17 @@ async guardarUsuario_vc_ga(datos_vc_ga) {
       id_cargo_vc_ga: datos_vc_ga.id_cargo_vc_ga || null
     };
 
-    // Solo incluir clave si es nuevo usuario
+    // Si es nuevo, asignamos clave y marcamos como no temporal
     if (esNuevo_vc_ga) {
       datosParaGuardar.clave_vc_ga = datos_vc_ga.clave_vc_ga || 'Temp1234';
       datosParaGuardar.clave_temporal_vc_ga = false;
+    } else {
+      // Si es edición y se proporcionó nueva clave, la incluimos
+      if (datos_vc_ga.clave_vc_ga) {
+        datosParaGuardar.clave_vc_ga = datos_vc_ga.clave_vc_ga;
+        // opcional: marcar si sigue siendo temporal o no
+        datosParaGuardar.clave_temporal_vc_ga = false;
+      }
     }
 
     // Construir y ejecutar query
