@@ -1373,18 +1373,25 @@ class EmpleadoRecibosControlador_vc_ga {
             const reciboElement = document.createElement('div');
             reciboElement.className = 'bg-white dark:bg-gray-800 p-4 rounded-lg shadow';
             reciboElement.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h3 class="font-bold text-lg">Recibo #${recibo.id}</h3>
-                        <p>Fecha: ${new Date(recibo.fechaPago)}</p>
-                        <p>Monto Neto: $${recibo.montoNeto}</p>
-                    </div>
-                    <button class="view-more-btn bg-accent1 text-light px-3 py-1 rounded-md" 
-                            data-id="${recibo.id}">
-                        Ver Detalles
-                    </button>
+            <div class="flex justify-between items-center">
+                <div>
+                <h3 class="font-bold text-lg">Recibo #${recibo.id}</h3>
+                <p>Fecha: ${new Date(recibo.fechaPago).toLocaleDateString()}</p>
+                <p>Monto Neto: $${recibo.montoNeto}</p>
                 </div>
+                <div class="space-x-2">
+                <button class="view-more-btn bg-accent1 text-light px-3 py-1 rounded-md" 
+                        data-id="${recibo.id}">
+                    Ver Detalles
+                </button>
+                <button class="download-pdf-btn bg-blue-600 text-white px-3 py-1 rounded-md"
+                        data-id="${recibo.id}">
+                    Descargar PDF
+                </button>
+                </div>
+            </div>
             `;
+
             listaRecibos.appendChild(reciboElement);
         });
 
@@ -1399,7 +1406,48 @@ class EmpleadoRecibosControlador_vc_ga {
                 this.verDetalles_vc_ga(idRecibo);
             });
         });
+
+        listaRecibos.querySelectorAll('.download-pdf-btn').forEach(btn => {
+         btn.addEventListener('click', e => {
+            const idRecibo = e.currentTarget.dataset.id;
+            this.descargarReciboComoPDF_vc_ga(idRecibo);
+  });
+});
     }
+
+    async descargarReciboComoPDF_vc_ga(idRecibo) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        // Buscar en el array ya cargado
+        const recibo = this.recibos_vc_ga.find(r => r.id == idRecibo);
+        if (!recibo) return;
+        // Titular
+        doc.setFontSize(14);
+        doc.text(`Recibo de Nómina #${recibo.id}`, 10, 10);
+        // Construir texto
+        let texto = '';
+        texto += `ID Usuario: ${recibo.idUsuario}\n`;
+        texto += `Fecha Pago: ${recibo.fechaPago}\n`;
+        texto += `Monto Neto: $${recibo.montoNeto}\n\n`;
+        texto += `Contenido:\n${recibo.info}\n\n`;
+        if (recibo.deducciones.length) {
+            texto += "Deducciones:\n" + recibo.deducciones
+            .map(d => `- ${d.nombre}: $${d.monto.toFixed(2)} (${d.porcentaje}%)`)
+            .join("\n") + "\n\n";
+        }
+        if (recibo.bonos.length) {
+            texto += "Bonos:\n" + recibo.bonos
+            .map(b => `- ${b.tipo}: $${b.monto.toFixed(2)}`)
+            .join("\n") + "\n";
+        }
+        // Ajustar líneas largas
+        const lineas = doc.splitTextToSize(texto, 180);
+        doc.setFontSize(11);
+        doc.text(lineas, 10, 20);
+        // Guardar
+        doc.save(`recibo_${recibo.id}.pdf`);
+        }
+
 
     filtrarPorFecha_vc_ga() {
         const fecha = this.filterDate_vc_ga.value;
