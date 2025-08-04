@@ -404,6 +404,7 @@ class EmpleadoControlador_vc_ga {
     constructor(servicio_vc_ga) {
         this.servicio_vc_ga = servicio_vc_ga;
         this.idEmpleado_vc_ga = null;
+        this.recibosController_vc_ga = new EmpleadoRecibosControlador_vc_ga(servicio_vc_ga);
 
         this.configurarBotonesSalario_vc_ga();
         this.configurarBotonesDeducciones_vc_ga();
@@ -1156,6 +1157,8 @@ async recargarHistorialBonos_vc_ga() {
         // Cargar datos personales y UI
         const { personal_vc_ga } = await this.servicio_vc_ga.obtenerDetallesEmpleado_vc_ga(this.idEmpleado_vc_ga);
 
+        await this.recibosController_vc_ga.iniciar_vc_ga();
+
         document.getElementById('empName').textContent = personal_vc_ga.nombre_completo_vc_ga;
         document.getElementById('empCedula').textContent = personal_vc_ga.cedula_vc_ga;
         document.getElementById('empCargo').textContent = personal_vc_ga.nombre_cargo_vc_ga;
@@ -1262,7 +1265,181 @@ async actualizarTablaDeducciones_vc_ga() {
     }
 }
 
-// 4. Fábrica
+// 4. Clase para gestionar los recibos del empleado
+class EmpleadoRecibosControlador_vc_ga {
+    constructor(servicio_vc_ga) {
+        this.servicio_vc_ga = servicio_vc_ga;
+        this.idEmpleado_vc_ga = null;
+        this._initElements_vc_ga();
+    }
+
+    _initElements_vc_ga() {
+        this.filterDate_vc_ga = document.getElementById("reportPeriod");
+        this.applyBtn_vc_ga = document.getElementById("calcPayrollBtn");
+        this.previewContainer_vc_ga = document.getElementById("payrollPreview");
+        this.reportContent_vc_ga = document.getElementById("payrollReportContent");
+        this.generateBtn_vc_ga = document.getElementById("generateReceiptBtn");
+
+        this.applyBtn_vc_ga?.addEventListener("click", () => this.filtrarPorFecha_vc_ga());
+        this.generateBtn_vc_ga?.addEventListener("click", () => this.generarRecibo_vc_ga());
+    }
+
+    obtenerIdEmpleadoSesion_vc_ga() {
+        const usuario_vc_ga = GestorSesion_vc_ga.obtenerUsuarioActual_vc_ga();
+        if (!usuario_vc_ga) throw new Error("Usuario no encontrado en sesión");
+        return usuario_vc_ga.id;
+    }
+
+    async iniciar_vc_ga() {
+        try {
+            this.idEmpleado_vc_ga = this.obtenerIdEmpleadoSesion_vc_ga();
+            await this.cargarRecibos_vc_ga();
+        } catch (err) {
+            console.error("Error al iniciar recibos del empleado:", err);
+            modal_vc_ga.showError_vc_ga("Error", "No se pudieron cargar los recibos");
+        }
+    }
+
+    async cargarRecibos_vc_ga(fecha = null) {
+        try {
+            let sql = `
+                SELECT 
+                    rn.id_recibo_vc_ga AS id,
+                    rn.id_usuario_vc_ga AS idUsuario,
+                    rn.id_pago_vc_ga AS idPago,
+                    rn.fecha_pago_vc_ga AS fechaPago,
+                    rn.monto_neto_vc_ga AS montoNeto,
+                    rn.fecha_generacion_vc_ga AS fecha,
+                    rn.contenido_vc_ga AS info,
+                    GROUP_CONCAT(DISTINCT CONCAT_WS('::', ud.id_usuario_deduccion_vc_ga, ud.monto_vc_ga, d.nombre_vc_ga, d.porcentaje_vc_ga) SEPARATOR '||') AS deducciones,
+                    GROUP_CONCAT(DISTINCT CONCAT_WS('::', b.id_bono_vc_ga, b.monto_vc_ga, b.tipo_bono_vc_ga) SEPARATOR '||') AS bonos
+                FROM td_recibo_nomina_vc_ga rn
+                LEFT JOIN td_recibo_deduccion_vc_ga rd ON rn.id_recibo_vc_ga = rd.id_recibo_vc_ga
+                LEFT JOIN td_usuario_deduccion_vc_ga ud ON rd.id_usuario_deduccion_vc_ga = ud.id_usuario_deduccion_vc_ga
+                LEFT JOIN td_deduccion_vc_ga d ON ud.id_deduccion_vc_ga = d.id_deduccion_vc_ga
+                LEFT JOIN td_recibo_bono_vc_ga rb ON rn.id_recibo_vc_ga = rb.id_recibo_vc_ga
+                LEFT JOIN td_bono_vc_ga b ON rb.id_bono_vc_ga = b.id_bono_vc_ga
+                WHERE rn.id_usuario_vc_ga = ?
+            `;
+            
+            const params = [this.idEmpleado_vc_ga];
+            
+            if (fecha) {
+                sql += " AND DATE(rn.fecha_generacion_vc_ga) = ?";
+                params.push(fecha);
+            }
+            
+            sql += " GROUP BY rn.id_recibo_vc_ga ORDER BY rn.fecha_generacion_vc_ga DESC";
+            
+            const recibos = await query_vc_ga(sql, params);
+            console.log(recibos)
+            
+            this.recibos_vc_ga = recibos.map(r => ({
+                ...r,
+                tipo: "recibo_nomina",
+                deducciones: r.deducciones 
+                    ? r.deducciones.split('||').map(item => {
+                        const [id, monto, nombre, porcentaje] = item.split('::');
+                        return { id: Number(id), monto: Number(monto), nombre, porcentaje: Number(porcentaje) };
+                    }) 
+                    : [],
+                bonos: r.bonos 
+                    ? r.bonos.split('||').map(item => {
+                        const [id, monto, tipo] = item.split('::');
+                        return { id: Number(id), monto: Number(monto), tipo };
+                    }) 
+                    : []
+            }));
+            
+            this.renderRecibos_vc_ga();
+        } catch (err) {
+            console.error("Error cargando recibos:", err);
+            throw err;
+        }
+    }
+
+    renderRecibos_vc_ga() {
+        if (this.recibos_vc_ga.length === 0) {
+            this.reportContent_vc_ga.textContent = "No se encontraron recibos";
+            this.generateBtn_vc_ga.disabled = true;
+            return;
+        }
+
+        // Construir lista de recibos
+        const listaRecibos = document.createElement('div');
+        listaRecibos.className = 'space-y-4';
+        
+        this.recibos_vc_ga.forEach(recibo => {
+            const reciboElement = document.createElement('div');
+            reciboElement.className = 'bg-white dark:bg-gray-800 p-4 rounded-lg shadow';
+            reciboElement.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-lg">Recibo #${recibo.id}</h3>
+                        <p>Fecha: ${new Date(recibo.fechaPago)}</p>
+                        <p>Monto Neto: $${recibo.montoNeto}</p>
+                    </div>
+                    <button class="view-more-btn bg-accent1 text-light px-3 py-1 rounded-md" 
+                            data-id="${recibo.id}">
+                        Ver Detalles
+                    </button>
+                </div>
+            `;
+            listaRecibos.appendChild(reciboElement);
+        });
+
+        // Reemplazar contenido
+        this.reportContent_vc_ga.innerHTML = '';
+        this.reportContent_vc_ga.appendChild(listaRecibos);
+        
+        // Agregar eventos a los botones
+        listaRecibos.querySelectorAll('.view-more-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idRecibo = e.currentTarget.dataset.id;
+                this.verDetalles_vc_ga(idRecibo);
+            });
+        });
+    }
+
+    filtrarPorFecha_vc_ga() {
+        const fecha = this.filterDate_vc_ga.value;
+        this.cargarRecibos_vc_ga(fecha);
+    }
+
+    verDetalles_vc_ga(idRecibo) {
+        const recibo = this.recibos_vc_ga.find(r => r.id == idRecibo);
+        if (!recibo) return;
+
+        // Construir detalles del recibo
+        let detalles = `ID Recibo: ${recibo.id}\n`;
+        detalles += `ID Usuario: ${recibo.idUsuario}\n`;
+        detalles += `Fecha Pago: ${recibo.fechaPago}\n`;
+        detalles += `Monto Neto: $${recibo.montoNeto}\n\n`;
+        detalles += `Contenido:\n${recibo.info}\n\n`;
+
+        if (recibo.deducciones.length > 0) {
+            detalles += "Deducciones:\n";
+            recibo.deducciones.forEach(d => {
+                detalles += `- ${d.nombre}: $${d.monto.toFixed(2)} (${d.porcentaje}%)\n`;
+            });
+        }
+
+        if (recibo.bonos.length > 0) {
+            detalles += "\nBonos:\n";
+            recibo.bonos.forEach(b => {
+                detalles += `- ${b.tipo}: $${b.monto.toFixed(2)}\n`;
+            });
+        }
+
+        // Mostrar en modal
+        modal_vc_ga.showReportes_vc_ga(
+            `Detalles del Recibo #${recibo.id}`, 
+            `${detalles}`
+        );
+    }
+}
+
+// 5. Fábrica
 class EmpleadoFabrica_vc_ga {
     static crear_vc_ga() {
         const repositorio_vc_ga = new EmpleadoRepositorio_vc_ga();
