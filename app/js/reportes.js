@@ -415,6 +415,65 @@ class ReportesController_vc_ga {
     }
   }
 
+  async descargarComoPDF_vc_ga(tipo, id) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  const reporte = this.gestor_vc_ga.reportes_vc_ga.find(
+    r => r.tipo === tipo && r.id === id
+  );
+  if (!reporte) return;
+
+  let titulo = "";
+  let texto = "";
+
+  switch (tipo) {
+    case "recibo_nomina":
+      titulo = `Recibo de Nómina #${reporte.id}`;
+      texto += `ID Recibo: ${reporte.id}\nID Usuario: ${reporte.idUsuario || 'N/A'}\nID Pago: ${reporte.idPago || 'N/A'}\nFecha Pago: ${reporte.fechaPago || 'N/A'}\nMonto Neto: ${reporte.montoNeto || '0.00'}\n\n${reporte.info || ''}`;
+      if (reporte.deducciones?.length) {
+        texto += `\n\nDeducciones:\n` + reporte.deducciones.map(d => `- ${d.nombre}: ${d.monto} (${d.porcentaje}%)`).join("\n");
+      }
+      if (reporte.bonos?.length) {
+        texto += `\n\nBonos:\n` + reporte.bonos.map(b => `- ${b.tipo}: ${b.monto}`).join("\n");
+      }
+      if (reporte.reportesBancoAsociados.length || reporte.reportesContableAsociados.length) {
+        texto += `\n\nRelaciones:\n`;
+        if (reporte.reportesBancoAsociados.length) texto += `Reportes Bancarios: ${reporte.reportesBancoAsociados.join(', ')}\n`;
+        if (reporte.reportesContableAsociados.length) texto += `Reportes Contables: ${reporte.reportesContableAsociados.join(', ')}\n`;
+      }
+      break;
+
+    case "reporte_banco":
+      titulo = `Reporte Bancario #${reporte.id}`;
+      texto += `ID Reporte: ${reporte.id}\nFecha: ${reporte.fecha}\n\n${reporte.info || ''}`;
+      if (reporte.recibosAsociados?.length) {
+        texto += `\n\nRecibos Asociados: ${reporte.recibosAsociados.join(', ')}`;
+      }
+      break;
+
+    case "reporte_contable":
+      titulo = `Reporte Contable #${reporte.id}`;
+      texto += `ID Reporte: ${reporte.id}\nFecha: ${reporte.fecha}\n\n${reporte.info || ''}`;
+      if (reporte.recibosAsociados?.length) {
+        texto += `\n\nRecibos Asociados: ${reporte.recibosAsociados.join(', ')}`;
+      }
+      break;
+
+    default:
+      return;
+  }
+
+  doc.setFontSize(14);
+  doc.text(titulo, 10, 10);
+  doc.setFontSize(11);
+  doc.text(doc.splitTextToSize(texto, 180), 10, 20);
+
+  const fileName = `${tipo}_${id}.pdf`;
+  doc.save(fileName);
+}
+
+
   _render_vc_ga() {
     this.loading_vc_ga?.remove();
     this.container_vc_ga.innerHTML = "";
@@ -512,19 +571,31 @@ class ReportesController_vc_ga {
             </p>
           </div>
           <div class="flex flex-col space-y-2 ml-4">
-            <button class="view-more-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600"
-                    data-id="${r.tipo}__${r.id}" aria-label="Ver detalles">
-              <i class="fas fa-arrow-right text-accent2"></i>
-            </button>
-            <button class="delete-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600"
-                    data-id="${r.tipo}__${r.id}" aria-label="Eliminar documento">
-              <i class="fas fa-trash text-red-500"></i>
-            </button>
-          </div>
+          <button class="view-more-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600"
+                  data-id="${r.tipo}__${r.id}" aria-label="Ver detalles">
+            <i class="fas fa-arrow-right text-accent2"></i>
+          </button>
+          <button class="delete-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600"
+                  data-id="${r.tipo}__${r.id}" aria-label="Eliminar documento">
+            <i class="fas fa-trash text-red-500"></i>
+          </button>
+          <button class="download-pdf-btn p-2 rounded-full hover:bg-gray-200 dark:hover:bg-dark-600"
+                  data-id="${r.tipo}__${r.id}" aria-label="Descargar PDF">
+            <i class="fas fa-file-pdf text-blue-600"></i>
+          </button>
+        </div>
         </div>`;
 
       this.container_vc_ga.appendChild(card);
     });
+
+    this.container_vc_ga.querySelectorAll('.download-pdf-btn').forEach(btn => {
+  btn.addEventListener('click', async e => {
+    const [tipo, id] = e.currentTarget.dataset.id.split("__");
+    await this.descargarComoPDF_vc_ga(tipo, Number(id));
+  });
+});
+
 
     // Delegación de eventos: Ver más
     this.container_vc_ga.querySelectorAll('.view-more-btn').forEach(btn => {
