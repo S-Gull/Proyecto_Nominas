@@ -80,7 +80,9 @@ INSERT INTO td_deduccion_vc_ga (nombre_vc_ga, porcentaje_vc_ga, descripcion_vc_g
 ('Paro Forzoso', 0.50, 'Aporte paro forzoso', '2020-01-01', NULL),
 ('Ahorro Habitacional', 1.00, 'Aporte ahorro habitacional', '2020-01-01', NULL),
 ('Préstamo Personal', 5.00, 'Deducción por préstamo', '2022-01-01', '2023-12-31'),
-('Cuota Sindical', 1.50, 'Aporte sindical', '2021-01-01', NULL);
+('Cuota Sindical', 1.50, 'Aporte sindical', '2021-01-01', NULL),
+('Retención INCES', 0.50, 'Aporte al INCES del trabajador (0.5% sobre utilidades)', '2020-01-01', NULL),
+('Retención ISLR', 1.00, 'Retención de Impuesto Sobre la Renta según planilla AR-I o Decreto 1808', '2015-01-01', NULL);
 
 -- Deducciones aplicadas en la fecha de pago (2022-12-30)
 INSERT INTO td_usuario_deduccion_vc_ga (id_usuario_vc_ga, id_deduccion_vc_ga, monto_vc_ga, fecha_aplicacion_vc_ga) VALUES
@@ -102,13 +104,14 @@ INSERT INTO td_usuario_deduccion_vc_ga (id_usuario_vc_ga, id_deduccion_vc_ga, mo
 
 -- Recibos de nómina
 INSERT INTO td_recibo_nomina_vc_ga 
-(id_usuario_vc_ga, fecha_pago_vc_ga, fecha_generacion_vc_ga, contenido_vc_ga) 
+(id_usuario_vc_ga, id_pago_vc_ga, fecha_pago_vc_ga, fecha_generacion_vc_ga, contenido_vc_ga) 
 VALUES
-(1, '2022-12-30',  '2022-12-30 08:00:00', 'Recibo de pago para María González - Diciembre 2022'),
-(2, '2022-12-30',  '2022-12-30 08:05:00', 'Recibo de pago para Carlos Pérez - Diciembre 2022'),
-(3, '2022-12-30',  '2022-12-30 08:10:00', 'Recibo de pago para Ana Rodríguez - Diciembre 2022'),
-(4, '2022-12-30',  '2022-12-30 08:15:00', 'Recibo de pago para Luis Martínez - Diciembre 2022'),
-(5, '2022-12-30',  '2022-12-30 08:20:00', 'Recibo de pago para Pedro Sánchez - Diciembre 2022');
+(1, '0001', '2022-12-30', '2022-12-30 08:00:00', 'Recibo de pago para María González - Diciembre 2022'),
+(2, '0002', '2022-12-30', '2022-12-30 08:05:00', 'Recibo de pago para Carlos Pérez - Diciembre 2022'),
+(3, '0003', '2022-12-30', '2022-12-30 08:10:00', 'Recibo de pago para Ana Rodríguez - Diciembre 2022'),
+(4, '0004', '2022-12-30', '2022-12-30 08:15:00', 'Recibo de pago para Luis Martínez - Diciembre 2022'),
+(5, '0005', '2022-12-30', '2022-12-30 08:20:00', 'Recibo de pago para Pedro Sánchez - Diciembre 2022');
+
 
 -- Asociar deducciones a recibos
 INSERT INTO td_recibo_deduccion_vc_ga (id_recibo_vc_ga, id_usuario_deduccion_vc_ga)
