@@ -23,7 +23,7 @@
         <h2 class="text-2xl font-bold text-gray-800 dark:text-white font-verdana">Perfil<span class="text-accent1"> Empleado</span></h2>
         
         <!-- Menú de navegación -->
-        <nav class="flex flex-wrap gap-2 md:gap-4">
+        <nav id="menu-nav" class="flex flex-wrap gap-2 md:gap-4">
           <a href="./plantilla.html" class="px-3 py-2 bg-gray-100  rounded-lg hover:bg-accent1 hover:text-white transition-colors duration-300 text-sm md:text-base">
             <i class="fas fa-table mr-2"></i>Planilla
           </a>
@@ -99,9 +99,7 @@
             <input id="salaryBase" type="number" class="w-full p-2 border rounded bg-white text-black dark:bg-black dark:text-white" />
           </div>
           <div class="flex space-x-2 mb-4">
-            <!-- <button id="addSalaryBtn" class="px-4 py-2 bg-accent1 rounded">Agregar</button> -->
             <button id="editSalaryBtn" class="px-4 py-2 bg-accent2 rounded">Editar</button>
-            <!-- <button id="deleteSalaryBtn" class="px-4 py-2 bg-red-500 rounded">Eliminar</button> -->
           </div>
           <table class="w-full text-sm">
             <thead>
@@ -116,7 +114,6 @@
           <div class="mb-4">
             <label class="block mb-1" for="deductionType">Tipo</label>
             <input id="deductionType" type="text" class="w-full p-2 border rounded bg-white text-black dark:bg-black dark:text-white" />
-            <!-- <select id="deductionType" class="w-full p-2 border rounded bg-white text-black dark:bg-black dark:text-white"></select> -->
           </div>
           <div class="mb-4">
             <label class="block mb-1" for="deductionAmount">Monto</label>
@@ -134,33 +131,6 @@
             <tbody id="deductionHistory"></tbody>
           </table>
         </div>
-
-        <!-- Horas Extras -->
-        <!-- <div id="extras" class="tab-content hidden">
-          <div class="mb-4">
-            <label class="block mb-1" for="extraType">Tipo</label>
-            <input id="extraType" type="text" class="w-full p-2 border rounded bg-white text-black dark:bg-black dark:text-white" />
-          </div>
-          <div class="mb-4">
-            <label class="block mb-1" for="extraHours">Horas</label>
-            <input id="extraHours" type="number" class="w-full p-2 border rounded bg-white text-black dark:bg-black dark:text-white" />
-          </div>
-          <div class="mb-4">
-            <label class="block mb-1" for="extraAmount">Monto</label>
-            <input id="extraAmount" type="number" class="w-full p-2 border rounded bg-white text-black dark:bg-black dark:text-white" />
-          </div>
-          <div class="flex space-x-2 mb-4">
-            <button id="addExtraBtn" class="px-4 py-2 bg-accent1 rounded">Agregar</button>
-            <button id="editExtraBtn" class="px-4 py-2 bg-accent2 rounded">Editar</button>
-            <button id="deleteExtraBtn" class="px-4 py-2 bg-red-500 rounded">Eliminar</button>
-          </div>
-          <table class="w-full text-sm">
-            <thead>
-              <tr><th>Fecha</th><th>Tipo</th><th>Horas</th><th>Monto</th></tr>
-            </thead>
-            <tbody id="extrasHistory"></tbody>
-          </table>
-        </div> -->
 
         <!-- Bonos -->
         <div id="bonuses" class="tab-content hidden">
@@ -189,16 +159,15 @@
 
     <!-- Reporte de nómina -->
     <section id="payroll-report" class="mt-8 animate-pulse-slow">
-      <h2 class="text-2xl font-verdana mb-4 underline text-primary dark:text-light">Mi Nómina</h2>
+      <h2 class="text-2xl font-verdana mb-4 underline text-primary dark:text-light">Mis Recibos</h2>
       <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
-        <select id="reportPeriod" class="px-4 py-2 border border-secondary rounded-lg bg-white text-black dark:bg-black dark:text-white">
-          <option value="">-- Seleccione Periodo --</option>
-        </select>
-        <button id="calcPayrollBtn" class="bg-accent1 hover:bg-accent2 text-light px-4 py-2 rounded-lg">Calcular</button>
+        <input type="date" id="reportPeriod" 
+        class="px-4 py-2 rounded-lg border border-gray-300 dark:bg-dark-700 dark:border-gray-600 dark:text-white">
+        <button id="calcPayrollBtn" class="bg-accent1 hover:bg-accent2 text-light px-4 py-2 rounded-lg">Filtrar</button>
       </div>
       <div id="payrollPreview" class="mt-6 bg-light dark:bg-dark-800 p-4 rounded-2xl shadow-md">
         <pre id="payrollReportContent" class="whitespace-pre-wrap text-sm font-mono text-primary dark:text-light"></pre>
-        <button id="generateReceiptBtn" class="mt-4 bg-accent1 hover:bg-accent2 text-light px-4 py-2 rounded-lg">Generar Recibo</button>
+        <button id="generateReceiptBtn" class="mt-4 bg-accent1 hover:bg-accent2 text-light px-4 py-2 rounded-lg"> Recibo</button>
       </div>
     </section>
   </main>

@@ -3,22 +3,13 @@ const { GestorSesion_vc_ga } = require("./login");
 const { modal_vc_ga } = require("./modal");
 
 const empleadoHTML_vc_ga = document.getElementById('employee-view');
-
 const salarioInput_vc_ga = document.getElementById('salaryBase');
-// const agregarSalarioBtn_vc_ga = document.getElementById('addSalaryBtn');
 const editarSalarioBtn_vc_ga = document.getElementById('editSalaryBtn');
-// const borrarSalarioBtn_vc_ga = document.getElementById('deleteSalaryBtn');
-
 const deduccionSelect_vc_ga = document.getElementById('deductionType');
 const deduccionInput_vc_ga = document.getElementById('deductionAmount')
 const agregarDeduccionBtn_vc_ga = document.getElementById('addDeductionBtn');
 const editarDeduccionBtn_vc_ga = document.getElementById('editDeductionBtn');
 const borrarDeduccionBtn_vc_ga = document.getElementById('deleteDeductionBtn');
-
-// const agregarHoraBtn_vc_ga = document.getElementById('addExtraBtn');
-// const editarHoraBtn_vc_ga = document.getElementById('editExtraBtn');
-// const borrarHoraBtn_vc_ga = document.getElementById('deleteExtraBtn');
-
 const agregarBonoBtn_vc_ga = document.getElementById('addBonusBtn');
 const editarBonoBtn_vc_ga = document.getElementById('editBonusBtn');
 const borrarBonoBtn_vc_ga = document.getElementById('deleteBonusBtn');
@@ -50,12 +41,6 @@ class EmpleadoRepositorio_vc_ga {
         );
     }
 
-    // async crearSalario_vc_ga(idUsuario, salario) { 
-    // return await query_vc_ga(
-    //     'INSERT INTO td_salario_historico_vc_ga (id_usuario_vc_ga, salario_vc_ga) VALUES (?, ?)',
-    //     [idUsuario, salario]
-    // );
-    // }
 
     async actualizarSalario_vc_ga(idSalario, salario) {
       return await query_vc_ga(
@@ -65,14 +50,6 @@ class EmpleadoRepositorio_vc_ga {
             [salario, idSalario]
         );
     }
-
-    // async eliminarSalario_vc_ga(idSalario) {
-    // return await query_vc_ga(
-    //     'DELETE FROM td_salario_historico_vc_ga WHERE id_salario_vc_ga = ?',
-    //     [idSalario]
-    // );
-    // }
-
 
     async obtenerHistorialDeducciones_vc_ga(id_vc_ga) {
         return await query_vc_ga(
@@ -117,41 +94,6 @@ class EmpleadoRepositorio_vc_ga {
         [idReg]
     );
     }
-
-
-    async obtenerHistorialHorasExtras_vc_ga(id_vc_ga) {
-        return await query_vc_ga(
-            `SELECT fecha_vc_ga AS fecha, tipo_vc_ga AS tipo, cantidad_horas_vc_ga AS horas, monto_vc_ga AS monto
-             FROM td_horas_extras_vc_ga WHERE id_usuario_vc_ga = ? ORDER BY fecha_vc_ga DESC`,
-            [id_vc_ga]
-        );
-    }
-
-    async crearHorasExtras_vc_ga(idUsuario, tipo, horas, monto, fecha) {
-    return await query_vc_ga(
-        `INSERT INTO td_horas_extras_vc_ga
-        (id_usuario_vc_ga, tipo_vc_ga, cantidad_horas_vc_ga, monto_vc_ga, fecha_vc_ga)
-        VALUES (?, ?, ?, ?, ?)`,
-        [idUsuario, tipo, horas, monto, fecha]
-    );
-    }
-
-    async actualizarHorasExtras_vc_ga(idReg, tipo, horas, monto, fecha) {
-    return await query_vc_ga(
-        `UPDATE td_horas_extras_vc_ga
-        SET tipo_vc_ga = ?, cantidad_horas_vc_ga = ?, monto_vc_ga = ?, fecha_vc_ga = ?
-        WHERE id_horas_extras_vc_ga = ?`,
-        [tipo, horas, monto, fecha, idReg]
-    );
-    }
-
-    async eliminarHorasExtras_vc_ga(idReg) {
-    return await query_vc_ga(
-        'DELETE FROM td_horas_extras_vc_ga WHERE id_horas_extras_vc_ga = ?',
-        [idReg]
-    );
-    }
-
 
     async obtenerHistorialBonos_vc_ga(id_vc_ga) {
         return await query_vc_ga(
@@ -387,12 +329,6 @@ class EmpleadoServicio_vc_ga {
         return await this.repositorio_vc_ga.obtenerHistorialSalario_vc_ga(id_vc_ga);
     }
 
-    // async crearSalario_vc_ga(idUsuario, salario) { 
-    //     if (!salario || isNaN(salario)) {
-    //         throw new Error("El salario debe ser un número válido");
-    //     }
-    //     return await this.repositorio_vc_ga.crearSalario_vc_ga(idUsuario, parseFloat(salario));
-    // }
 
     async actualizarSalario_vc_ga(idUsuario, nuevoSalario) {
         // Validaciones más robustas
@@ -419,17 +355,8 @@ class EmpleadoServicio_vc_ga {
         }
     }
 
-
-    // async eliminarSalario_vc_ga(idSalario) {
-    //     return await this.repositorio_vc_ga.eliminarSalario_vc_ga(idSalario);
-    // }
-
     async obtenerHistorialDeducciones_vc_ga(id_vc_ga) {
         return await this.repositorio_vc_ga.obtenerHistorialDeducciones_vc_ga(id_vc_ga);
-    }
-
-    async obtenerHistorialHorasExtras_vc_ga(id_vc_ga) {
-        return await this.repositorio_vc_ga.obtenerHistorialHorasExtras_vc_ga(id_vc_ga);
     }
 
     async obtenerHistorialBonos_vc_ga(id_vc_ga) {
@@ -438,9 +365,6 @@ class EmpleadoServicio_vc_ga {
     async crearDeduccionUsuario_vc_ga(...args) { return await this.repositorio_vc_ga.crearDeduccionUsuario_vc_ga(...args); }
     async actualizarDeduccionUsuario_vc_ga(...args) { return await this.repositorio_vc_ga.actualizarDeduccionUsuario_vc_ga(...args); }
     async eliminarDeduccionUsuario_vc_ga(idReg) { return await this.repositorio_vc_ga.eliminarDeduccionUsuario_vc_ga(idReg); }
-    async crearHorasExtras_vc_ga(...args) { return await this.repositorio_vc_ga.crearHorasExtras_vc_ga(...args); }
-    async actualizarHorasExtras_vc_ga(...args) { return await this.repositorio_vc_ga.actualizarHorasExtras_vc_ga(...args); }
-    async eliminarHorasExtras_vc_ga(idReg) { return await this.repositorio_vc_ga.eliminarHorasExtras_vc_ga(idReg); }
     async crearBono_vc_ga(...args) { return await this.repositorio_vc_ga.crearBono_vc_ga(...args); }
     async actualizarBono_vc_ga(...args) { return await this.repositorio_vc_ga.actualizarBono_vc_ga(...args); }
     async eliminarBono_vc_ga(idReg) { return await this.repositorio_vc_ga.eliminarBono_vc_ga(idReg); }
@@ -488,10 +412,7 @@ class EmpleadoControlador_vc_ga {
     }
 
         //CRUD SALARIO
-        // async crearSalario_vc_ga(salario) { return await this.servicio_vc_ga.crearSalario_vc_ga(this.idEmpleado_vc_ga, salario); }
         async actualizarSalario_vc_ga(idSalario, salario) { return await this.servicio_vc_ga.actualizarSalario_vc_ga(idSalario, salario); }
-        // async eliminarSalario_vc_ga(idSalario) { return await this.servicio_vc_ga.eliminarSalario_vc_ga(idSalario); }
-
 
         //CRUD DEDUCCIONES
         async crearDeduccion_vc_ga(idDeduccion, monto, fecha) {
@@ -503,19 +424,6 @@ class EmpleadoControlador_vc_ga {
         async eliminarDeduccion_vc_ga(idReg) {
         return await this.servicio_vc_ga.eliminarDeduccionUsuario_vc_ga(idReg);
         }
-
-
-        //CRUD HORAS EXTRAS
-        async crearExtras_vc_ga(tipo, horas, monto, fecha) {
-        return await this.servicio_vc_ga.crearHorasExtras_vc_ga(this.idEmpleado_vc_ga, tipo, horas, monto, fecha);
-        }
-        async actualizarExtras_vc_ga(idReg, tipo, horas, monto, fecha) {
-        return await this.servicio_vc_ga.actualizarHorasExtras_vc_ga(idReg, tipo, horas, monto, fecha);
-        }
-        async eliminarExtras_vc_ga(idReg) {
-        return await this.servicio_vc_ga.eliminarHorasExtras_vc_ga(idReg);
-        }
-
 
         // CRUD BONOS
         async crearBono_vc_ga(tipo, monto, fecha) {
@@ -529,9 +437,7 @@ class EmpleadoControlador_vc_ga {
         }
         
         configurarBotonesSalario_vc_ga() {
-    // agregarSalarioBtn_vc_ga?.addEventListener('click', () => this.manejarAgregarSalario_vc_ga());
     editarSalarioBtn_vc_ga?.addEventListener('click', () => this.manejarEditarSalario_vc_ga());
-    // borrarSalarioBtn_vc_ga?.addEventListener('click', () => this.manejarBorrarSalario_vc_ga());
 }
         configurarBotonesDeducciones_vc_ga() {
 
@@ -612,29 +518,6 @@ async mostrarSelectOscuro_vc_ga(titulo, mensaje, opciones) {
 }
 
 /**
- * Maneja la acción de agregar salario
- */
-// async manejarAgregarSalario_vc_ga() {
-//     try {
-//         // const salarioInput_vc_ga = document.getElementById('salaryBase');
-//         const salario = salarioInput_vc_ga.value;
-        
-//         if (!salario || isNaN(salario)) {
-//             throw new Error("Debe ingresar un valor numérico válido en el campo Sueldo Base");
-//         }
-        
-//         await this.crearSalario_vc_ga(parseFloat(salario));
-//         await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Salario agregado correctamente');
-//         salarioInput_vc_ga.value = ''; // Limpiar el input
-//         await this.recargarHistorialSalario_vc_ga();
-//     } catch (error) {
-//         await modal_vc_ga.showError_vc_ga('Error', error.message);
-//         console.error(error);
-//     }
-// }
-
-
-/**
  * Maneja la acción de editar salario
  */
 async manejarEditarSalario_vc_ga() {
@@ -681,47 +564,6 @@ async manejarEditarSalario_vc_ga() {
         console.error('Error al editar salario:', error);
     }
 }
-/**
- * Maneja la acción de borrar salario
- */
-// async manejarBorrarSalario_vc_ga() {
-//     try {
-//         const historial = await this.servicio_vc_ga.obtenerHistorialSalario_vc_ga(this.idEmpleado_vc_ga);
-        
-//         if (!historial || historial.length === 0) {
-//             await modal_vc_ga.showWarning_vc_ga('Advertencia', 'No hay salarios registrados para borrar');
-//             return;
-//         }
-        
-//         const opciones = historial.map(salario => ({
-//             texto: `${salario.salario_vc_ga} (${new Date(salario.fecha_registro_vc_ga).toLocaleDateString()})`
-//         }));
-        
-//         const seleccion = await this.mostrarSelectOscuro_vc_ga(
-//             'Borrar Salario', 
-//             'Seleccione el salario a borrar:',
-//             opciones
-//         );
-        
-//         if (!seleccion.confirmado) return;
-        
-//         const salarioSeleccionado = historial[seleccion.indice];
-//         const confirmacion = await modal_vc_ga.showConfirm_vc_ga(
-//             'Confirmar Borrado', 
-//             `¿Está seguro que desea borrar el salario ${salarioSeleccionado.salario_vc_ga}?`
-//         );
-        
-//         if (!confirmacion) return;
-        
-//         await this.eliminarSalario_vc_ga(salarioSeleccionado.id_salario_vc_ga);
-//         await modal_vc_ga.showSuccess_vc_ga('Éxito', 'Salario borrado correctamente');
-//         await this.recargarHistorialSalario_vc_ga();
-//     } catch (error) {
-//         await modal_vc_ga.showError_vc_ga('Error', `No se pudo borrar el salario: ${error.message}`);
-//         console.error(error);
-//     }
-// }
-
 
 // Función completamente nueva para manejarAgregarDeduccion_vc_ga que maneja input de texto
 async manejarAgregarDeduccion_vc_ga() {
@@ -1322,7 +1164,6 @@ async recargarHistorialBonos_vc_ga() {
 
         await this.recargarHistorialSalario_vc_ga();
         await this.recargarHistorialDeducciones_vc_ga();
-        // await this.recargarHistorialHorasExtras_vc_ga();
         await this.recargarHistorialBonos_vc_ga();
         this.configurarPestañas_vc_ga();
 
@@ -1344,13 +1185,17 @@ async recargarHistorialBonos_vc_ga() {
       // Nuevo método para manejar visibilidad o mensaje según rol
     configurarVisibilidadGestion_vc_ga() {
         const usuario_vc_ga = GestorSesion_vc_ga.obtenerUsuarioActual_vc_ga();
-        const seccionGestion = document.querySelector('section[name="Gestion admin"]');
-        if (!usuario_vc_ga || !seccionGestion) return;
+        const seccionGestion_vc_ga = document.querySelector('section[name="Gestion admin"]');
+        const nominaUsuario_vc_ga = document.getElementById("payroll-report");
+        const MenuNavegacion_vc_ga = document.getElementById("menu-nav")
+        if (!usuario_vc_ga || !seccionGestion_vc_ga) return;
 
         if (usuario_vc_ga.rol === 1) {
             console.log("Bienvenido Administrador");
+            nominaUsuario_vc_ga.classList.add("hidden")
         } else if (usuario_vc_ga.rol === 2) {
-            seccionGestion.classList.add("hidden");
+            seccionGestion_vc_ga.classList.add("hidden");
+            MenuNavegacion_vc_ga.classList.add("hidden");
         }
     }
 
@@ -1395,17 +1240,6 @@ async recargarHistorialBonos_vc_ga() {
         ).join('');
     }
 
-    // async recargarHistorialHorasExtras_vc_ga() {
-    //     const filas_vc_ga = await this.servicio_vc_ga.obtenerHistorialHorasExtras_vc_ga(this.idEmpleado_vc_ga);
-    //     document.getElementById('extrasHistory').innerHTML = filas_vc_ga.map(r_vc_ga => `
-    //         <tr>
-    //             <td>${r_vc_ga.fecha}</td>
-    //             <td>${r_vc_ga.tipo}</td>
-    //             <td>${r_vc_ga.horas}</td>
-    //             <td>${r_vc_ga.monto}</td>
-    //         </tr>`
-    //     ).join('');
-    // }
 async actualizarTablaDeducciones_vc_ga() {
     const filas_vc_ga = await this.servicio_vc_ga.obtenerHistorialDeducciones_vc_ga(this.idEmpleado_vc_ga);
     document.getElementById('deductionHistory').innerHTML = filas_vc_ga.map(r_vc_ga => `
