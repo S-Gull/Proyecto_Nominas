@@ -102,13 +102,13 @@ INSERT INTO td_usuario_deduccion_vc_ga (id_usuario_vc_ga, id_deduccion_vc_ga, mo
 
 -- Recibos de nómina
 INSERT INTO td_recibo_nomina_vc_ga 
-(id_usuario_vc_ga, fecha_pago_vc_ga, monto_neto_vc_ga, fecha_generacion_vc_ga, contenido_vc_ga) 
+(id_usuario_vc_ga, fecha_pago_vc_ga, fecha_generacion_vc_ga, contenido_vc_ga) 
 VALUES
-(1, '2022-12-30', 5200.00, '2022-12-30 08:00:00', 'Recibo de pago para María González - Diciembre 2022'),
-(2, '2022-12-30', 4100.00, '2022-12-30 08:05:00', 'Recibo de pago para Carlos Pérez - Diciembre 2022'),
-(3, '2022-12-30', 3100.00, '2022-12-30 08:10:00', 'Recibo de pago para Ana Rodríguez - Diciembre 2022'),
-(4, '2022-12-30', 3600.00, '2022-12-30 08:15:00', 'Recibo de pago para Luis Martínez - Diciembre 2022'),
-(5, '2022-12-30', 4300.00, '2022-12-30 08:20:00', 'Recibo de pago para Pedro Sánchez - Diciembre 2022');
+(1, '2022-12-30',  '2022-12-30 08:00:00', 'Recibo de pago para María González - Diciembre 2022'),
+(2, '2022-12-30',  '2022-12-30 08:05:00', 'Recibo de pago para Carlos Pérez - Diciembre 2022'),
+(3, '2022-12-30',  '2022-12-30 08:10:00', 'Recibo de pago para Ana Rodríguez - Diciembre 2022'),
+(4, '2022-12-30',  '2022-12-30 08:15:00', 'Recibo de pago para Luis Martínez - Diciembre 2022'),
+(5, '2022-12-30',  '2022-12-30 08:20:00', 'Recibo de pago para Pedro Sánchez - Diciembre 2022');
 
 -- Asociar deducciones a recibos
 INSERT INTO td_recibo_deduccion_vc_ga (id_recibo_vc_ga, id_usuario_deduccion_vc_ga)

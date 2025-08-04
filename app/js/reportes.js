@@ -196,49 +196,49 @@ class GestorReportes_vc_ga {
    * 3) Asocia automáticamente todos los bonos del usuario en td_recibo_bono_vc_ga
    */
   async crearReciboNomina_vc_ga() {
-    // Leer valores de los inputs básicos
+  try {
+    // 1) Leer valores de los inputs (sin monto_neto)
     const idUsuario = document.getElementById("inputReciboUsuario").value;
-    const idPago = document.getElementById("inputReciboPago").value;
+    const idPago    = document.getElementById("inputReciboPago").value;
     const fechaPago = document.getElementById("inputReciboFechaPago").value;
-    const montoNeto = document.getElementById("inputReciboMonto").value;
     const contenido = document.getElementById("inputReciboContenido").value;
 
-    // Inserción principal en td_recibo_nomina_vc_ga
+    // 2) Insertar recibo SIN monto_neto; el trigger BEFORE INSERT lo calculará
     const sqlRecibo = `
       INSERT INTO td_recibo_nomina_vc_ga
-        (id_usuario_vc_ga, id_pago_vc_ga, fecha_pago_vc_ga, monto_neto_vc_ga, contenido_vc_ga, fecha_generacion_vc_ga)
-      VALUES (?, ?, ?, ?, ?, NOW())
+        (id_usuario_vc_ga, id_pago_vc_ga, fecha_pago_vc_ga, contenido_vc_ga, fecha_generacion_vc_ga)
+      VALUES (?, ?, ?, ?, NOW())
     `;
-    const paramsRecibo = [idUsuario, idPago, fechaPago, montoNeto, contenido];
+    const paramsRecibo = [idUsuario, idPago, fechaPago, contenido];
+    const { insertId: idRecibo } = await this._ejecutarConsulta_vc_ga(sqlRecibo, paramsRecibo);
 
-    try {
-      const result = await this._ejecutarConsulta_vc_ga(sqlRecibo, paramsRecibo);
-      const idRecibo = result.insertId;
-
-      // Inserta automáticamente deducciones del usuario
-      const sqlAutoDedu = `
-        INSERT INTO td_recibo_deduccion_vc_ga (id_recibo_vc_ga, id_usuario_deduccion_vc_ga)
-        SELECT ?, ud.id_usuario_deduccion_vc_ga
+    // 3) Asociar automáticamente deducciones del usuario
+    const sqlAutoDedu = `
+      INSERT INTO td_recibo_deduccion_vc_ga
+        (id_recibo_vc_ga, id_usuario_deduccion_vc_ga)
+      SELECT ?, ud.id_usuario_deduccion_vc_ga
         FROM td_usuario_deduccion_vc_ga ud
-        WHERE ud.id_usuario_vc_ga = ?
-      `;
-      await this._ejecutarConsulta_vc_ga(sqlAutoDedu, [idRecibo, idUsuario]);
+       WHERE ud.id_usuario_vc_ga = ?
+    `;
+    await this._ejecutarConsulta_vc_ga(sqlAutoDedu, [idRecibo, idUsuario]);
 
-      // Inserta automáticamente bonos del usuario
-      const sqlAutoBono = `
-        INSERT INTO td_recibo_bono_vc_ga (id_recibo_vc_ga, id_bono_vc_ga)
-        SELECT ?, b.id_bono_vc_ga
+    // 4) Asociar automáticamente bonos del usuario
+    const sqlAutoBono = `
+      INSERT INTO td_recibo_bono_vc_ga
+        (id_recibo_vc_ga, id_bono_vc_ga)
+      SELECT ?, b.id_bono_vc_ga
         FROM td_bono_vc_ga b
-        WHERE b.id_usuario_vc_ga = ?
-      `;
-      await this._ejecutarConsulta_vc_ga(sqlAutoBono, [idRecibo, idUsuario]);
+       WHERE b.id_usuario_vc_ga = ?
+    `;
+    await this._ejecutarConsulta_vc_ga(sqlAutoBono, [idRecibo, idUsuario]);
 
-      return idRecibo;
-    } catch (err) {
-      console.error("Error creando recibo y asociando deducciones/bonos:", err);
-      throw err;
-    }
+    return idRecibo;
+  } catch (err) {
+    console.error("Error creando recibo y asociando deducciones/bonos:", err);
+    throw err;
   }
+}
+
 
   /**
    * Elimina un recibo de nómina y sus asociaciones.

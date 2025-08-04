@@ -195,188 +195,63 @@ END;
 
 DELIMITER ;
 
-
-
 DELIMITER //
-
-CREATE TRIGGER tr_calcular_salario_neto_vc_ga
-AFTER INSERT ON td_usuario_deduccion_vc_ga
+CREATE TRIGGER trg_calc_monto_neto_recibo
+BEFORE INSERT ON td_recibo_nomina_vc_ga
 FOR EACH ROW
 BEGIN
-    DECLARE salario_base DECIMAL(10,2);
-    DECLARE total_bonos DECIMAL(10,2);
-    DECLARE total_deducciones DECIMAL(10,2);
-    DECLARE salario_neto DECIMAL(10,2);
-    DECLARE recibo_id INT;
-    DECLARE recibo_existente INT;
-    
-    -- Obtener el salario base más reciente del empleado
-    SELECT IFNULL(salario_vc_ga, 0) INTO salario_base
+    DECLARE salario_base DECIMAL(10,2) DEFAULT 0;
+    DECLARE total_deducciones DECIMAL(10,2) DEFAULT 0;
+    DECLARE total_bonos DECIMAL(10,2) DEFAULT 0;
+
+    SELECT IFNULL(salario_vc_ga,0)
+    INTO salario_base
     FROM td_salario_historico_vc_ga
     WHERE id_usuario_vc_ga = NEW.id_usuario_vc_ga
     ORDER BY id_salario_vc_ga DESC
     LIMIT 1;
-    
-    -- Calcular la suma total de bonos del empleado
-    SELECT IFNULL(SUM(monto_vc_ga), 0) INTO total_bonos
-    FROM td_bono_vc_ga
-    WHERE id_usuario_vc_ga = NEW.id_usuario_vc_ga;
-    
-    -- Calcular la suma total de deducciones del empleado
-    SELECT IFNULL(SUM(monto_vc_ga), 0) INTO total_deducciones
+
+    SELECT IFNULL(SUM(monto_vc_ga),0)
+    INTO total_deducciones
     FROM td_usuario_deduccion_vc_ga
     WHERE id_usuario_vc_ga = NEW.id_usuario_vc_ga;
-    
-    -- Calcular el salario neto
-    SET salario_neto = salario_base + total_bonos - total_deducciones;
-    
-    -- Verificar si ya existe un recibo para este empleado en el mes actual
-    SELECT COUNT(*), IFNULL(MAX(id_recibo_vc_ga), 0) INTO recibo_existente, recibo_id
-    FROM td_recibo_nomina_vc_ga
-    WHERE id_usuario_vc_ga = NEW.id_usuario_vc_ga
-    AND MONTH(fecha_pago_vc_ga) = MONTH(CURRENT_DATE())
-    AND YEAR(fecha_pago_vc_ga) = YEAR(CURRENT_DATE());
-    
-    -- Si ya existe un recibo, actualizarlo
-    IF recibo_existente > 0 THEN
-        UPDATE td_recibo_nomina_vc_ga
-        SET 
-            monto_neto_vc_ga = salario_neto,
-            fecha_generacion_vc_ga = NOW()
-        WHERE id_recibo_vc_ga = recibo_id;
-    ELSE
-        -- Si no existe, crear uno nuevo
-        INSERT INTO td_recibo_nomina_vc_ga (
-            id_usuario_vc_ga,
-            fecha_pago_vc_ga,
-            monto_neto_vc_ga,
-            fecha_generacion_vc_ga,
-            contenido_vc_ga
-        ) VALUES (
-            NEW.id_usuario_vc_ga,
-            LAST_DAY(CURRENT_DATE()),
-            salario_neto,
-            NOW(),
-            CONCAT('Recibo de pago generado automáticamente - ', 
-                  MONTHNAME(CURRENT_DATE()), ' ', 
-                  YEAR(CURRENT_DATE()))
-        );
-    END IF;
-END//
 
-DELIMITER ;
+    SELECT IFNULL(SUM(monto_vc_ga),0)
+    INTO total_bonos
+    FROM td_bono_vc_ga
+    WHERE id_usuario_vc_ga = NEW.id_usuario_vc_ga;
 
-DELIMITER //
+    SET NEW.monto_neto_vc_ga = salario_base + total_bonos - total_deducciones;
+END;
+//
 
-CREATE PROCEDURE sp_actualizar_recibo_nomina(IN p_id_usuario INT)
+CREATE TRIGGER trg_calc_monto_neto_recibo_upd
+BEFORE UPDATE ON td_recibo_nomina_vc_ga
+FOR EACH ROW
 BEGIN
-    DECLARE salario_base DECIMAL(10,2);
-    DECLARE total_bonos DECIMAL(10,2);
-    DECLARE total_deducciones DECIMAL(10,2);
-    DECLARE salario_neto DECIMAL(10,2);
-    DECLARE recibo_id INT;
-    DECLARE recibo_existente INT;
-    
-    -- Obtener el salario base más reciente del empleado
-    SELECT IFNULL(salario_vc_ga, 0) INTO salario_base
+    -- mismo cuerpo que el INSERT
+    DECLARE salario_base DECIMAL(10,2) DEFAULT 0;
+    DECLARE total_deducciones DECIMAL(10,2) DEFAULT 0;
+    DECLARE total_bonos DECIMAL(10,2) DEFAULT 0;
+
+    SELECT IFNULL(salario_vc_ga,0)
+    INTO salario_base
     FROM td_salario_historico_vc_ga
-    WHERE id_usuario_vc_ga = p_id_usuario
+    WHERE id_usuario_vc_ga = NEW.id_usuario_vc_ga
     ORDER BY id_salario_vc_ga DESC
     LIMIT 1;
-    
-    -- Calcular la suma total de bonos del empleado
-    SELECT IFNULL(SUM(monto_vc_ga), 0) INTO total_bonos
-    FROM td_bono_vc_ga
-    WHERE id_usuario_vc_ga = p_id_usuario;
-    
-    -- Calcular la suma total de deducciones del empleado
-    SELECT IFNULL(SUM(monto_vc_ga), 0) INTO total_deducciones
+
+    SELECT IFNULL(SUM(monto_vc_ga),0)
+    INTO total_deducciones
     FROM td_usuario_deduccion_vc_ga
-    WHERE id_usuario_vc_ga = p_id_usuario;
-    
-    -- Calcular el salario neto
-    SET salario_neto = salario_base + total_bonos - total_deducciones;
-    
-    -- Verificar si ya existe un recibo para este empleado en el mes actual
-    SELECT COUNT(*), IFNULL(MAX(id_recibo_vc_ga), 0) INTO recibo_existente, recibo_id
-    FROM td_recibo_nomina_vc_ga
-    WHERE id_usuario_vc_ga = p_id_usuario
-    AND MONTH(fecha_pago_vc_ga) = MONTH(CURRENT_DATE())
-    AND YEAR(fecha_pago_vc_ga) = YEAR(CURRENT_DATE());
-    
-    -- Si ya existe un recibo, actualizarlo
-    IF recibo_existente > 0 THEN
-        UPDATE td_recibo_nomina_vc_ga
-        SET 
-            monto_neto_vc_ga = salario_neto,
-            fecha_generacion_vc_ga = NOW()
-        WHERE id_recibo_vc_ga = recibo_id;
-    ELSE
-        -- Si no existe, crear uno nuevo
-        INSERT INTO td_recibo_nomina_vc_ga (
-            id_usuario_vc_ga,
-            fecha_pago_vc_ga,
-            monto_neto_vc_ga,
-            fecha_generacion_vc_ga,
-            contenido_vc_ga
-        ) VALUES (
-            p_id_usuario,
-            LAST_DAY(CURRENT_DATE()),
-            salario_neto,
-            NOW(),
-            CONCAT('Recibo de pago generado automáticamente - ', 
-                  MONTHNAME(CURRENT_DATE()), ' ', 
-                  YEAR(CURRENT_DATE()))
-        );
-    END IF;
-END//
+    WHERE id_usuario_vc_ga = NEW.id_usuario_vc_ga;
 
-DELIMITER ;
+    SELECT IFNULL(SUM(monto_vc_ga),0)
+    INTO total_bonos
+    FROM td_bono_vc_ga
+    WHERE id_usuario_vc_ga = NEW.id_usuario_vc_ga;
 
-DELIMITER //
-
--- Trigger para actualización de salarios
-CREATE TRIGGER tr_actualizar_recibo_salario_vc_ga
-AFTER INSERT ON td_salario_historico_vc_ga
-FOR EACH ROW
-BEGIN
-    CALL sp_actualizar_recibo_nomina(NEW.id_usuario_vc_ga);
-END//
-
--- Trigger para actualización de bonos
-CREATE TRIGGER tr_actualizar_recibo_bonos_vc_ga
-AFTER INSERT ON td_bono_vc_ga
-FOR EACH ROW
-BEGIN
-    CALL sp_actualizar_recibo_nomina(NEW.id_usuario_vc_ga);
-END//
-
--- Trigger para actualización de deducciones
-CREATE TRIGGER tr_actualizar_recibo_deducciones_vc_ga
-AFTER INSERT ON td_usuario_deduccion_vc_ga
-FOR EACH ROW
-BEGIN
-    CALL sp_actualizar_recibo_nomina(NEW.id_usuario_vc_ga);
-END//
-
-DELIMITER ;
-
-DELIMITER //
-
--- Trigger para actualización de salarios (UPDATE)
-CREATE TRIGGER tr_actualizar_recibo_salario_update_vc_ga
-AFTER UPDATE ON td_salario_historico_vc_ga
-FOR EACH ROW
-BEGIN
-    CALL sp_actualizar_recibo_nomina(NEW.id_usuario_vc_ga);
-END//
-
--- Trigger para eliminación de bonos (DELETE)
-CREATE TRIGGER tr_actualizar_recibo_bonos_delete_vc_ga
-AFTER DELETE ON td_bono_vc_ga
-FOR EACH ROW
-BEGIN
-    CALL sp_actualizar_recibo_nomina(OLD.id_usuario_vc_ga);
-END//
-
+    SET NEW.monto_neto_vc_ga = salario_base + total_bonos - total_deducciones;
+END;
+//
 DELIMITER ;
